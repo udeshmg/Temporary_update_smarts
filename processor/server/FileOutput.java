@@ -143,9 +143,9 @@ public class FileOutput {
 				final StringBuilder sb = new StringBuilder();
 				for (final SerializableRouteDump route : routes) {
 					sb.append("<vehicle ");
-					sb.append("id=\"" + "Import_"+ route.vehicleId + "\" type=\"" + route.type + "\" start_time=\""
+					sb.append("id=\"" + route.vehicleId + "\" type=\"" + route.type + "\" start_time=\""
 							+ route.startTime + "\" driverProfile=\"" + route.driverProfile + "\">"
-							+ System.getProperty("line.separator"));//A prefix "Import" is added to vehicle id
+							+ System.getProperty("line.separator"));
 					for (final SerializableRouteDumpPoint point : route.routeDumpPoints) {
 						sb.append("<node ");
 						if (point.stopDuration == 0) {
