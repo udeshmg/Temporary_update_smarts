@@ -14,8 +14,8 @@ public class IDM {
 
 	VehicleUtil vehicleUtil;
 
-	public IDM(final VehicleUtil vU) {
-		vehicleUtil = vU;
+	public IDM() {
+		vehicleUtil = new VehicleUtil();
 	}
 
 	/**

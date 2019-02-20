@@ -29,9 +29,8 @@ public class Simulation {
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_foregroundVehiclesReachedDestination = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
-	VehicleUtil vehicleUtil = new VehicleUtil();
-	LaneChange laneChange = new LaneChange(vehicleUtil);
-	CarFollow carFollow = new CarFollow(vehicleUtil);
+	LaneChange laneChange = new LaneChange();
+	CarFollow carFollow = new CarFollow();
 
 	public Simulation(final TrafficNetwork trafficNetwork, final ArrayList<Fellow> connectedFellows) {
 		this.trafficNetwork = trafficNetwork;

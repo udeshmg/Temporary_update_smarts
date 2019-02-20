@@ -33,12 +33,11 @@ public class MOBIL {
 	Random random = new Random();
 	VehicleUtil vehicleUtil;
 	Vehicle impedingObject = new Vehicle();
-
 	IDM idm;
 
-	public MOBIL(final VehicleUtil vehicleUtil) {
-		this.vehicleUtil = vehicleUtil;
-		idm = new IDM(vehicleUtil);
+	public MOBIL() {
+		vehicleUtil = new VehicleUtil();
+		idm = new IDM();
 	}
 
 	/**

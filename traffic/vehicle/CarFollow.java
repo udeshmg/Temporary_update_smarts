@@ -9,8 +9,8 @@ package traffic.vehicle;
 public class CarFollow {
 	IDM idm;
 
-	public CarFollow(final VehicleUtil vU) {
-		idm = new IDM(vU);
+	public CarFollow() {
+		idm = new IDM();
 	}
 
 	public double computeAccelerationBasedOnImpedingObjects(final Vehicle vehicle) {

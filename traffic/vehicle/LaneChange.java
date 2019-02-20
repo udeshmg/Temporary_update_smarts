@@ -9,8 +9,8 @@ public class LaneChange {
 
 	MOBIL mobil;
 
-	public LaneChange(final VehicleUtil vU) {
-		mobil = new MOBIL(vU);
+	public LaneChange() {
+		mobil = new MOBIL();
 	}
 
 	/**
