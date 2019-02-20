@@ -114,7 +114,6 @@ public class Worker implements MessageHandler, Runnable {
 	Simulation simulation;
 	boolean isDuringServerlessSim;//Once server-less simulation begins, this will true until the simulation ends
 	boolean isPausingServerlessSim;
-	boolean isSimulatingOneStep;
 	ArrayList<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
 	ArrayList<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
 	Thread singleWorkerServerlessThread = new Thread();//Used when this worker is the only worker in server-less mode
@@ -379,7 +378,6 @@ public class Worker implements MessageHandler, Runnable {
 			processReceivedSimulationConfiguration(messageToProcess);
 			trafficNetwork.buildEnvironment(workarea.workCells, workarea.workerName, step);
 			resetTraffic();
-			isSimulatingOneStep = false;
 
 			//Pause a bit so other workers can reset before starting simulation
 			try {

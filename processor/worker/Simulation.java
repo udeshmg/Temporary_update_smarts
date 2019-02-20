@@ -343,7 +343,6 @@ public class Simulation {
 
 	synchronized void simulateOneStep(final Worker worker, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
-		worker.isSimulatingOneStep = true;
 		pause();
 		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(worker.timeNow, worker.pspBorderEdges,
 				worker);
@@ -370,7 +369,5 @@ public class Simulation {
 
 		// Clear one-step data
 		clearOneStepData();
-
-		worker.isSimulatingOneStep = false;
 	}
 }
