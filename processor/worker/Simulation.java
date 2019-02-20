@@ -27,7 +27,6 @@ public class Simulation {
 	TrafficNetwork trafficNetwork;
 	ArrayList<Fellow> connectedFellows;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
-	ArrayList<Vehicle> oneStepData_foregroundVehiclesReachedDestination = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	LaneChange laneChange = new LaneChange();
 	CarFollow carFollow = new CarFollow();
@@ -67,7 +66,6 @@ public class Simulation {
 
 	void clearOneStepData() {
 		oneStepData_vehiclesReachedFellowWorker.clear();
-		oneStepData_foregroundVehiclesReachedDestination.clear();
 		oneStepData_allVehiclesReachedDestination.clear();
 	}
 
@@ -244,7 +242,6 @@ public class Simulation {
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
 						if (vehicle.isForeground) {
 							vehicle.timeTravel = timeNow - vehicle.timeRouteStart;
-							oneStepData_foregroundVehiclesReachedDestination.add(vehicle);
 						}
 						break;
 					}
