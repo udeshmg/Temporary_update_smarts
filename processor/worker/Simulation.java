@@ -340,16 +340,10 @@ public class Simulation {
 	synchronized void simulateOneStep(final Worker worker, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
-		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(worker.timeNow, worker.pspBorderEdges,
-				worker);
-		moveVehicleToNextLink(worker.timeNow, vehiclesAroundBorder);
-		if (!Settings.isServerBased) {
-			worker.transferVehicleDataToFellow();
-		}
-		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(worker.timeNow, worker.pspNonBorderEdges,
-				worker);
-		moveVehicleToNextLink(worker.timeNow, vehiclesNotAroundBorder);
-		trafficNetwork.removeActiveVehicles(oneStepData_allVehiclesReachedDestination);
+		moveVehiclesAroundBorder(worker);
+		transferDataTofellow(worker);
+		moveVehiclesNotAroundBorder(worker);
+		removeTripFinishedVehicles();
 		makeLaneChange(worker.timeNow);
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			trafficNetwork.lightCoordinator.updateLights();
@@ -365,5 +359,27 @@ public class Simulation {
 
 		// Clear one-step data
 		clearOneStepData();
+	}
+
+	void moveVehiclesAroundBorder(final Worker worker){
+		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(worker.timeNow, worker.pspBorderEdges,
+				worker);
+		moveVehicleToNextLink(worker.timeNow, vehiclesAroundBorder);
+	}
+
+	void transferDataTofellow(final Worker worker){
+		if (!Settings.isServerBased) {
+			worker.transferVehicleDataToFellow();
+		}
+	}
+
+	void moveVehiclesNotAroundBorder(final Worker worker){
+		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(worker.timeNow, worker.pspNonBorderEdges,
+				worker);
+		moveVehicleToNextLink(worker.timeNow, vehiclesNotAroundBorder);
+	}
+
+	void removeTripFinishedVehicles(){
+		trafficNetwork.removeActiveVehicles(oneStepData_allVehiclesReachedDestination);
 	}
 }
