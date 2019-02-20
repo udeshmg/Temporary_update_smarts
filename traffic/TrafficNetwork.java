@@ -103,7 +103,6 @@ public class TrafficNetwork extends RoadNetwork {
 	public LightCoordinator lightCoordinator = new LightCoordinator();
 	ArrayList<GridCell> workareaCells;
 	String internalVehiclePrefix = "";
-	VehicleUtil vehicleUtil = new VehicleUtil();
 	public VehiclePositionComparator vehiclePositionComparator = new VehiclePositionComparator();
 	double timeLastPublicVehicleCreated = 0;
 	ArrayList<String> internalTramRefInSdWindow = new ArrayList<>();

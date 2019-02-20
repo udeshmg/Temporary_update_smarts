@@ -249,9 +249,6 @@ public class VehicleUtil {
 		}
 	}
 
-	public VehicleUtil() {
-	}
-
 	/**
 	 * Find impeding object based on a certain factor. Impeding object's head
 	 * position is ahead of the given vehicle's head position. Impeding object
