@@ -47,7 +47,7 @@ public class Message_WW_Traffic {
 			for (final Lane lane : edge.lanes) {
 				final SerializableFrontVehicleOnBorder oneV = new SerializableFrontVehicleOnBorder();
 				oneV.laneIndex = lane.index;
-				final Vehicle lastV = VehicleUtil.getLastVehicle(lane);
+				final Vehicle lastV = lane.getLastVehicleInLane();
 				if (lastV == null) {
 					oneV.endPosition = edge.length + 1;
 					oneV.speed = 10000;

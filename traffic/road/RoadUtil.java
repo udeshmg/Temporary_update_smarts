@@ -373,10 +373,8 @@ public class RoadUtil {
 	public static boolean isEdgeContainsPriorityVehicle(final Edge edge) {
 		if (isEdgeOnPathOfPriorityVehicle(edge)) {
 			for (final Lane l : edge.lanes) {
-				for (Vehicle v : l.vehicles) {
-					if (v.type == VehicleType.PRIORITY) {
-						return true;
-					}
+				if(l.hasPriorityVehicles()){
+					return true;
 				}
 			}
 		}

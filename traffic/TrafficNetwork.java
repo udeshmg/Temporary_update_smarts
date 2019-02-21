@@ -466,8 +466,8 @@ public class TrafficNetwork extends RoadNetwork {
 		if (vehicle.indexLegOnRoute + 1 < vehicle.routeLegs.size()) {
 			RouteLeg legToCheck = vehicle.routeLegs.get(vehicle.indexLegOnRoute + 1);
 			Lane laneToCheck = legToCheck.edge.lanes.get(0);
-			if (laneToCheck.vehicles.size() > 0) {
-				Vehicle vehicleToCheck = laneToCheck.vehicles.get(laneToCheck.vehicles.size() - 1);
+			if (laneToCheck.getVehicleCount() > 0) {
+				Vehicle vehicleToCheck = laneToCheck.getLastVehicleInLane();
 				double endPosOfLastVehicleOnNextLeg = vehicleToCheck.headPosition + currentEdge.length
 						- vehicleToCheck.length;
 				if (endPosOfLastVehicleOnNextLeg < headPosSpaceFront) {
@@ -481,8 +481,8 @@ public class TrafficNetwork extends RoadNetwork {
 		if (vehicle.indexLegOnRoute > 0) {
 			RouteLeg legToCheck = vehicle.routeLegs.get(vehicle.indexLegOnRoute - 1);
 			Lane laneToCheck = legToCheck.edge.lanes.get(0);
-			if (laneToCheck.vehicles.size() > 0) {
-				Vehicle vehicleToCheck = laneToCheck.vehicles.get(0);
+			if (laneToCheck.getVehicleCount() > 0) {
+				Vehicle vehicleToCheck = laneToCheck.getFrontVehicleInLane();
 				double headPosOfFirstVehicleOnPreviousLeg = -(laneToCheck.edge.length - vehicleToCheck.headPosition);
 				if (headPosSpaceBack - vehicle.length < headPosOfFirstVehicleOnPreviousLeg) {
 					headPosSpaceBack = headPosOfFirstVehicleOnPreviousLeg + vehicle.length;
@@ -494,10 +494,10 @@ public class TrafficNetwork extends RoadNetwork {
 			return -1;
 
 		final ArrayList<double[]> gaps = new ArrayList<>();
-		if (currentEdge.lanes.get(0).vehicles.size() > 0) {
+		if (currentEdge.lanes.get(0).getVehicleCount() > 0) {
 
 			double gapFront = headPosSpaceFront;
-			for (Vehicle vehicleToCheck : currentEdge.lanes.get(0).vehicles) {
+			for (Vehicle vehicleToCheck : currentEdge.lanes.get(0).getVehicles()) {
 				if (gapFront - vehicle.length > vehicleToCheck.headPosition) {
 					gaps.add(new double[] { gapFront, vehicleToCheck.headPosition + vehicle.length });
 				}
@@ -680,7 +680,7 @@ public class TrafficNetwork extends RoadNetwork {
 			vehicle.earliestTimeToLeaveParking = timeNow + vehicle.routeLegs.get(vehicle.indexLegOnRoute).stopover;
 		}
 		if (vehicle.lane != null) {
-			vehicle.lane.vehicles.remove(vehicle);
+			vehicle.lane.removeVehicle(vehicle);
 			vehicle.lane = null;
 		}
 	}
@@ -702,7 +702,7 @@ public class TrafficNetwork extends RoadNetwork {
 			 * Remove vehicles from old lanes
 			 */
 			if (v.lane != null) {
-				v.lane.vehicles.remove(v);
+				v.lane.removeVehicle(v);
 			}
 			/*
 			 * Remove vehicle from the traffic network on this worker
@@ -750,7 +750,7 @@ public class TrafficNetwork extends RoadNetwork {
 		externalVehicleRepeatPerStep.clear();
 		// Reset temp values for lanes
 		for (final Lane lane : lanes) {
-			lane.vehicles.clear();
+			lane.clearVehicles();
 			lane.isBlocked = false;
 			lane.speedOfLatestVehicleLeftThisWorker = 100;
 			lane.endPositionOfLatestVehicleLeftThisWorker = 1000000000;

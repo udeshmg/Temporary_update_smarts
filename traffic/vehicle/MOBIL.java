@@ -63,7 +63,7 @@ public class MOBIL {
 		double overallGainForChangeTowardsRoadside = 0, overallGainForChangeAwayFromRoadside = 0;
 
 		if (isSafeToChange(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.vehicles.get(0)) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
 					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				overallGainForChangeTowardsRoadside = 0;
@@ -78,7 +78,7 @@ public class MOBIL {
 					LaneChangeDirection.TOWARDS_ROADSIDE);
 		}
 		if (isSafeToChange(vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.vehicles.get(0)) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
 					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				overallGainForChangeAwayFromRoadside = 0;
@@ -289,14 +289,14 @@ public class MOBIL {
 		}
 
 		// Cannot change if front vehicle in target lane is too close
-		frontVehicleInTargetLane = VehicleUtil.getFrontVehicleInTargetLane(vehicle, targetLane, 0);
+		frontVehicleInTargetLane = targetLane.getClosestFrontVehicleInLane(vehicle, 0);
 		if ((frontVehicleInTargetLane != null) && ((frontVehicleInTargetLane.headPosition
 				- frontVehicleInTargetLane.length - vehicle.headPosition) < vehicle.driverProfile.IDM_s0)) {
 			return false;
 		}
 
 		// Cannot change if back vehicle in target lane is too close
-		backVehicleInTargetLane = VehicleUtil.getBackVehicleInTargetLane(vehicle, targetLane);
+		backVehicleInTargetLane = targetLane.getClosestBackVehicleInLane(vehicle);
 		if ((backVehicleInTargetLane != null) && ((vehicle.headPosition - vehicle.length
 				- backVehicleInTargetLane.headPosition) < vehicle.driverProfile.IDM_s0)) {
 			return false;

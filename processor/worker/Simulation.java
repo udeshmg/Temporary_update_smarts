@@ -96,7 +96,7 @@ public class Simulation {
 				} else if (laneChangeDecision == LaneChangeDirection.TOWARDS_ROADSIDE) {
 					nextLane = currentLane.edge.lanes.get(currentLane.laneNumber - 1);
 				}
-				currentLane.vehicles.remove(vehicle);
+				currentLane.removeVehicle(vehicle);
 				nextLane.addVehicleToLane(vehicle);
 				vehicle.lane = nextLane;
 
@@ -114,7 +114,7 @@ public class Simulation {
 			double accumulatedVehicleSpeed = 0;
 			int numVehiclesOnEdge = 0;
 			for (final Lane lane : edge.lanes) {
-				for (final Vehicle vehicle : lane.vehicles) {
+				for (final Vehicle vehicle : lane.getVehicles()) {
 
 					if (!vehicle.active) {
 						continue;
@@ -272,7 +272,7 @@ public class Simulation {
 				}
 
 				// Remove vehicle from old lane
-				oldLane.vehicles.remove(vehicle);
+				oldLane.removeVehicle(vehicle);
 				// Add vehicle to new lane
 				if (vehicle.lane != null) {
 					vehicle.lane.addVehicleToLane(vehicle);

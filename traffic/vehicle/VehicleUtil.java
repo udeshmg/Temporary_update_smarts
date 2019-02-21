@@ -82,39 +82,7 @@ public class VehicleUtil {
 		return (length / vehicle.timeTravel) * 3.6;
 	}
 
-	/**
-	 * Get the closest vehicle whose head position is behind the head position
-	 * of a given vehicle. The two vehicles may not be in the same lane.
-	 *
-	 */
-	public static Vehicle getBackVehicleInTargetLane(final Vehicle vehicle, final Lane targetLane) {
-		Vehicle backVehicle = null;
-		for (int i = 0; i < targetLane.vehicles.size(); i++) {
-			if (targetLane.vehicles.get(i).headPosition < vehicle.headPosition) {
-				backVehicle = targetLane.vehicles.get(i);
-				break;
-			}
-		}
-		return backVehicle;
-	}
 
-	/**
-	 * Get the closest vehicle whose head position is ahead of the head position
-	 * of a given vehicle. The two vehicles may not be in the same lane.
-	 *
-	 */
-	public static Vehicle getFrontVehicleInTargetLane(final Vehicle vehicle, final Lane targetLane,
-			final double gapToTargetLane) {
-		Vehicle frontVehicle = null;
-
-		for (int i = targetLane.vehicles.size() - 1; i >= 0; i--) {
-			if ((targetLane.vehicles.get(i).headPosition + gapToTargetLane) > vehicle.headPosition) {
-				frontVehicle = targetLane.vehicles.get(i);
-				break;
-			}
-		}
-		return frontVehicle;
-	}
 
 	public static boolean isAllLanesOnLeftBlocked(Edge edge, int laneNumber) {
 		if (Settings.isDriveOnLeft) {
@@ -200,20 +168,6 @@ public class VehicleUtil {
 			}
 		}
 		vehicle.isRoadBlockedAhead = false;
-	}
-
-	/**
-	 * Get the last vehicle in a given lane. The vehicle is the closest vehicle
-	 * to the start node of this lane's edge. In other words, this vehicle will
-	 * be the last vehicle to leave the lane.
-	 *
-	 */
-	public static Vehicle getLastVehicle(final Lane lane) {
-		if (lane.vehicles.size() > 0) {
-			return lane.vehicles.get(lane.vehicles.size() - 1);
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -344,8 +298,8 @@ public class VehicleUtil {
 			// intersection
 			for (final Edge e : RoadUtil.getConflictingEdges(targetEdge, nextEdge)) {
 				for (final Lane lane : e.lanes) {
-					if (lane.vehicles.size() > 0) {
-						final Vehicle firstV = lane.vehicles.get(0);
+					if (lane.getVehicleCount() > 0) {
+						final Vehicle firstV = lane.getFrontVehicleInLane();
 						if (firstV.speed > 0) {
 							final double arrivalTime = (e.length - firstV.headPosition) / firstV.speed;
 							if (arrivalTime < earliestTime) {
@@ -406,7 +360,7 @@ public class VehicleUtil {
 
 		// Returns the closest impeding object, whose head position is in front of the given vehicle.
 		final Lane laneBeingChecked = edgeBeingChecked.lanes.get(laneNumberBeingChecked);
-		final Vehicle frontVehicle = getFrontVehicleInTargetLane(vehicle, laneBeingChecked, examinedDist);
+		final Vehicle frontVehicle = laneBeingChecked.getClosestFrontVehicleInLane(vehicle, examinedDist);
 		if (frontVehicle != null) {
 			slowdownObj.speed = frontVehicle.speed;
 			slowdownObj.headPosition = examinedDist + frontVehicle.headPosition;

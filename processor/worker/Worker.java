@@ -561,12 +561,12 @@ public class Worker implements MessageHandler, Runnable {
 		receivedTrafficCache.clear();
 		for (final Edge edge : pspBorderEdges) {
 			for (final Lane lane : edge.lanes) {
-				lane.vehicles.clear();
+				lane.clearVehicles();
 			}
 		}
 		for (final Edge edge : pspNonBorderEdges) {
 			for (final Lane lane : edge.lanes) {
-				lane.vehicles.clear();
+				lane.clearVehicles();
 			}
 		}
 
