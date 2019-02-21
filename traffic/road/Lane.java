@@ -1,6 +1,8 @@
 package traffic.road;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import traffic.vehicle.Vehicle;
 
@@ -48,8 +50,28 @@ public class Lane {
 	 *
 	 */
 	public double latStart, lonStart, latEnd, lonEnd, latLength, lonLength;
+	public VehiclePositionComparator vehiclePositionComparator = new VehiclePositionComparator();
 
 	public Lane(final Edge edge) {
 		this.edge = edge;
+	}
+
+	public void addVehicleToLane(Vehicle v){
+		vehicles.add(v);
+		Collections.sort(vehicles, vehiclePositionComparator);
+	}
+
+	/**
+	 * Comparator of vehicles based on their positions in a lane. The vehicle
+	 * closest to the end of the lane, will be the first element in the sorted
+	 * list.
+	 *
+	 */
+	public class VehiclePositionComparator implements Comparator<Vehicle> {
+
+		@Override
+		public int compare(final Vehicle v1, final Vehicle v2) {
+			return v1.headPosition > v2.headPosition ? -1 : v1.headPosition == v2.headPosition ? 0 : 1;
+		}
 	}
 }

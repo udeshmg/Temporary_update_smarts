@@ -67,19 +67,7 @@ public class TrafficNetwork extends RoadNetwork {
 		}
 	}
 
-	/**
-	 * Comparator of vehicles based on their positions in a lane. The vehicle
-	 * closest to the end of the lane, will be the first element in the sorted
-	 * list.
-	 *
-	 */
-	public class VehiclePositionComparator implements Comparator<Vehicle> {
 
-		@Override
-		public int compare(final Vehicle v1, final Vehicle v2) {
-			return v1.headPosition > v2.headPosition ? -1 : v1.headPosition == v2.headPosition ? 0 : 1;
-		}
-	}
 
 	public ArrayList<Vehicle> vehicles = new ArrayList<>();
 
@@ -103,7 +91,6 @@ public class TrafficNetwork extends RoadNetwork {
 	public LightCoordinator lightCoordinator = new LightCoordinator();
 	ArrayList<GridCell> workareaCells;
 	String internalVehiclePrefix = "";
-	public VehiclePositionComparator vehiclePositionComparator = new VehiclePositionComparator();
 	double timeLastPublicVehicleCreated = 0;
 	ArrayList<String> internalTramRefInSdWindow = new ArrayList<>();
 
@@ -194,7 +181,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void addOneTransferredVehicle(final Vehicle vehicle, final double timeNow) {
 		vehicle.active = true;
 		vehicles.add(vehicle);
-		vehicle.lane.vehicles.add(vehicle);
+		vehicle.lane.addVehicleToLane(vehicle);
 		if (!vehicle.isExternal) {
 			if (vehicle.type == VehicleType.TRAM) {
 				numInternalTram++;
@@ -794,10 +781,9 @@ public class TrafficNetwork extends RoadNetwork {
 		if (pos >= 0) {
 			edge.parkedVehicles.remove(vehicle);
 			vehicle.lane = lane;
-			vehicle.lane.vehicles.add(vehicle);
 			vehicle.headPosition = pos;
 			vehicle.speed = 0;
-			Collections.sort(vehicle.lane.vehicles, vehiclePositionComparator);// Sort			
+			vehicle.lane.addVehicleToLane(vehicle);
 			return true;
 		} else {
 			return false;

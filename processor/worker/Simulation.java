@@ -97,9 +97,8 @@ public class Simulation {
 					nextLane = currentLane.edge.lanes.get(currentLane.laneNumber - 1);
 				}
 				currentLane.vehicles.remove(vehicle);
-				nextLane.vehicles.add(vehicle);
+				nextLane.addVehicleToLane(vehicle);
 				vehicle.lane = nextLane;
-				Collections.sort(vehicle.lane.vehicles, trafficNetwork.vehiclePositionComparator);// Sort					
 
 				// Set priority lanes
 				if (vehicle.type == VehicleType.PRIORITY) {
@@ -276,8 +275,7 @@ public class Simulation {
 				oldLane.vehicles.remove(vehicle);
 				// Add vehicle to new lane
 				if (vehicle.lane != null) {
-					vehicle.lane.vehicles.add(vehicle);
-					Collections.sort(vehicle.lane.vehicles, trafficNetwork.vehiclePositionComparator);// Sort
+					vehicle.lane.addVehicleToLane(vehicle);
 				}
 
 				// Set priority lanes
