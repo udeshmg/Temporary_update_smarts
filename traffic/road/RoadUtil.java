@@ -259,7 +259,7 @@ public class RoadUtil {
 
 		// GPS of start point of lane
 		double extendedEdgeStartToEdgeRatio = 1;
-		if (RoadUtil.isOnTwoWayRoad(edge)) {
+		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber))
 					* Settings.laneWidthInMeters) / edge.length;
 		} else {
@@ -279,7 +279,7 @@ public class RoadUtil {
 
 		// GPS of end point of lane
 		double extendedEdgeEndToEdgeRatio = 1;
-		if (RoadUtil.isOnTwoWayRoad(edge)) {
+		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeEndToEdgeRatio = 1
 					+ (((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber)) * Settings.laneWidthInMeters)
 							/ edge.length);
@@ -353,35 +353,6 @@ public class RoadUtil {
 		return null;
 	}
 
-	public static boolean isEdgeOnPathOfPriorityVehicle(final Edge edge) {
-		for (final Lane l : edge.getLanes()) {
-			if (l.isPriority) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean isEdgeContainsPriorityVehicle(final Edge edge) {
-		if (isEdgeOnPathOfPriorityVehicle(edge)) {
-			for (final Lane l : edge.getLanes()) {
-				if(l.hasPriorityVehicles()){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public static boolean isOnTwoWayRoad(final Edge edge) {
-		final Node startNode = edge.startNode;
-		for (final Edge edgeToCheck : edge.endNode.outwardEdges) {
-			if (edgeToCheck.endNode == startNode) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	public static ArrayList<Node> sortEdgesBasedOnAngle(final Node node) {
 		final NodeAngleComparator nodeAngleComparator = new NodeAngleComparator(node);

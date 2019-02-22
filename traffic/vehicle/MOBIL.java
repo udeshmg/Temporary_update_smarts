@@ -129,7 +129,7 @@ public class MOBIL {
 				incentive = 5;
 			}
 			// Encourage change for giving way to priority vehicle based on emergency strategy
-			if (RoadUtil.isEdgeOnPathOfPriorityVehicle(vehicle.lane.edge) && (vehicle.type != VehicleType.PRIORITY)
+			if (vehicle.lane.edge.isEdgeOnPathOfPriorityVehicle() && (vehicle.type != VehicleType.PRIORITY)
 					&& (Settings.emergencyStrategy != EmergencyStrategy.Flexible)) {
 				incentive = 10;
 			}

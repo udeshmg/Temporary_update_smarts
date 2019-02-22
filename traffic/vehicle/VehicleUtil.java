@@ -278,7 +278,7 @@ public class VehicleUtil {
 					if (vehicle.lane.edge.name.equals(e.name) && (vehicle.lane.edge.type == e.type)) {
 						continue;
 					}
-					if (RoadUtil.isEdgeOnPathOfPriorityVehicle(e)) {
+					if (e.isEdgeOnPathOfPriorityVehicle()) {
 						isGiveWayToPriorityVehicle = true;
 						vehicle.isAffectedByPriorityVehicle = true;
 						break;
@@ -374,7 +374,7 @@ public class VehicleUtil {
 		}
 
 		// Set flag that this vehicle is affected by priority vehicle
-		if ((vehicle.type != VehicleType.PRIORITY) && RoadUtil.isEdgeOnPathOfPriorityVehicle(edgeBeingChecked)) {
+		if ((vehicle.type != VehicleType.PRIORITY) && edgeBeingChecked.isEdgeOnPathOfPriorityVehicle()) {
 			vehicle.isAffectedByPriorityVehicle = true;
 		}
 	}

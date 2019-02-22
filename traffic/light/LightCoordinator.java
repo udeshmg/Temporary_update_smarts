@@ -186,7 +186,7 @@ public class LightCoordinator {
 	 */
 	boolean isPriorityVehicleInActiveApproach(final LightGroup egbn) {
 		for (final Edge e : egbn.edgeGroups.get(egbn.inwardEdgeGroupIndexForGYR)) {
-			if (RoadUtil.isEdgeContainsPriorityVehicle(e)) {
+			if (e.isEdgeContainsPriorityVehicle()) {
 				return true;
 			}
 		}
@@ -199,7 +199,7 @@ public class LightCoordinator {
 	boolean isPriorityVehicleInInactiveApproach(final LightGroup egbn) {
 		for (int i = 0; i < egbn.edgeGroups.size(); i++) {
 			for (final Edge e : egbn.edgeGroups.get(i)) {
-				if (RoadUtil.isEdgeContainsPriorityVehicle(e)) {
+				if (e.isEdgeContainsPriorityVehicle()) {
 					return true;
 				}
 			}
@@ -344,7 +344,7 @@ public class LightCoordinator {
 				continue;
 			}
 			for (Edge e : egbn.edgeGroups.get(i)) {
-				if (RoadUtil.isEdgeContainsPriorityVehicle(e)) {
+				if (e.isEdgeContainsPriorityVehicle()) {
 					return i;
 				}
 			}

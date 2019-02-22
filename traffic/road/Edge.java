@@ -233,4 +233,33 @@ public class Edge {
 		// Note: route cannot start from cross-border edge at the starting side of the edge. This is to prevent problem in transferring of vehicle.
 		return  !(length < Settings.minLengthOfRouteStartEndEdge) && !isRoundabout && workareaCells.contains(endNode.gridCell);
 	}
+
+	public boolean isOnTwoWayRoad() {
+		for (final Edge edgeToCheck : endNode.outwardEdges) {
+			if (edgeToCheck.endNode == startNode) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isEdgeOnPathOfPriorityVehicle() {
+		for (final Lane l : lanes) {
+			if (l.isPriority) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isEdgeContainsPriorityVehicle() {
+		if (isEdgeOnPathOfPriorityVehicle()) {
+			for (final Lane l : lanes) {
+				if(l.hasPriorityVehicles()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
