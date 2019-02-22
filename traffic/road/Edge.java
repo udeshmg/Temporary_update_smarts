@@ -224,4 +224,13 @@ public class Edge {
 		}
 		return null;
 	}
+
+	public boolean isSuitableForRouteEndOfInternalVehicle() {
+		return  !(length < Settings.minLengthOfRouteStartEndEdge) && !isRoundabout;
+	}
+
+	public boolean isSuitableForRouteStartOfInternalVehicle(List<GridCell> workareaCells) {
+		// Note: route cannot start from cross-border edge at the starting side of the edge. This is to prevent problem in transferring of vehicle.
+		return  !(length < Settings.minLengthOfRouteStartEndEdge) && !isRoundabout && workareaCells.contains(endNode.gridCell);
+	}
 }

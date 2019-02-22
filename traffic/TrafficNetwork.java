@@ -553,7 +553,7 @@ public class TrafficNetwork extends RoadNetwork {
 								&& isNodeInsideRectangle(node,
 										Settings.listRouteSourceDestinationWindowForInternalVehicle))) {
 					for (final Edge edge : node.outwardEdges) {
-						if (isEdgeSuitableForRouteStartOfInternalVehicle(edge)) {
+						if (edge.isSuitableForRouteStartOfInternalVehicle(workareaCells)) {
 							if (edge.type != RoadType.tram) {
 								internalNonPublicVehicleStartEdges.add(edge);
 								if (edge.busRoutesRef.size() > 0) {
@@ -579,7 +579,7 @@ public class TrafficNetwork extends RoadNetwork {
 					|| ((Settings.listRouteSourceDestinationWindowForInternalVehicle.size() > 0)
 							&& isNodeInsideRectangle(edge.endNode,
 									Settings.listRouteSourceDestinationWindowForInternalVehicle))) {
-				if (isEdgeSuitableForRouteEndOfInternalVehicle(edge)) {
+				if (edge.isSuitableForRouteEndOfInternalVehicle()) {
 					if (edge.type != RoadType.tram) {
 						internalNonPublicVehicleEndEdges.add(edge);
 						if (edge.busRoutesRef.size() > 0) {
@@ -646,15 +646,7 @@ public class TrafficNetwork extends RoadNetwork {
 		}
 	}
 
-	boolean isEdgeSuitableForRouteEndOfInternalVehicle(final Edge edge) {
-		return (edge != null) && (!(edge.length < Settings.minLengthOfRouteStartEndEdge)) && !edge.isRoundabout;
-	}
 
-	boolean isEdgeSuitableForRouteStartOfInternalVehicle(final Edge edge) {
-		// Note: route cannot start from cross-border edge at the starting side of the edge. This is to prevent problem in transferring of vehicle.
-		return (edge != null) && (!(edge.length < Settings.minLengthOfRouteStartEndEdge)) && !edge.isRoundabout
-				&& workareaCells.contains(edge.endNode.gridCell);
-	}
 
 	/**
 	 * Moves vehicle to parking.
