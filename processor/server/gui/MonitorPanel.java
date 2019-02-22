@@ -638,7 +638,7 @@ public class MonitorPanel extends JPanel {
 	 */
 	void blockUnblockLane(final EdgeObject selectedEdge, final int laneNumber, final boolean blocked) {
 		final Edge edge = server.roadNetwork.edges.get(selectedEdge.index);
-		final Lane lane = edge.lanes.get(laneNumber);
+		final Lane lane = edge.getLane(laneNumber);
 
 		// Update the blocked edges for visualization
 		if (blocked) {
@@ -1104,7 +1104,7 @@ public class MonitorPanel extends JPanel {
 			startNodeY = edge.startNode.lat;
 			endNodeX = edge.endNode.lon;
 			endNodeY = edge.endNode.lat;
-			numLanes = edge.lanes.size();
+			numLanes = edge.getLaneCount();
 			String note = "";
 			if (edge.name.length() > 0) {
 				note += "\"" + edge.name + "\", ";

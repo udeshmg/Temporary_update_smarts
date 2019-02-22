@@ -221,11 +221,11 @@ public class RoadUtil {
 	 * in a keep-left system.
 	 */
 	public static int getLaneNumberForTargetEdge(Edge targetEdge, Edge currentEdge, int currentLaneNumber) {
-		int currentLaneNumberFromOppositeSide = currentEdge.lanes.size() - 1 - currentLaneNumber;
+		int currentLaneNumberFromOppositeSide = currentEdge.getLaneCount() - 1 - currentLaneNumber;
 		int nextLaneNumberFromOppositeSide = currentLaneNumberFromOppositeSide;
-		if (nextLaneNumberFromOppositeSide >= targetEdge.lanes.size())
-			nextLaneNumberFromOppositeSide = targetEdge.lanes.size() - 1;
-		int nextLaneNumber = targetEdge.lanes.size() - 1 - nextLaneNumberFromOppositeSide;
+		if (nextLaneNumberFromOppositeSide >= targetEdge.getLaneCount())
+			nextLaneNumberFromOppositeSide = targetEdge.getLaneCount() - 1;
+		int nextLaneNumber = targetEdge.getLaneCount() - 1 - nextLaneNumberFromOppositeSide;
 		return nextLaneNumber;
 	}
 
@@ -259,10 +259,10 @@ public class RoadUtil {
 		// GPS of start point of lane
 		double extendedEdgeStartToEdgeRatio = 1;
 		if (RoadUtil.isOnTwoWayRoad(edge)) {
-			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.lanes.size() - lane.laneNumber))
+			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber))
 					* Settings.laneWidthInMeters) / edge.length;
 		} else {
-			extendedEdgeStartToEdgeRatio = ((-0.5 + ((lane.edge.lanes.size() / 2.0) - lane.laneNumber))
+			extendedEdgeStartToEdgeRatio = ((-0.5 + ((lane.edge.getLaneCount() / 2.0) - lane.laneNumber))
 					* Settings.laneWidthInMeters) / edge.length;
 		}
 		final double lonExtendedEdgeStart = edge.startNode.lon
@@ -280,11 +280,11 @@ public class RoadUtil {
 		double extendedEdgeEndToEdgeRatio = 1;
 		if (RoadUtil.isOnTwoWayRoad(edge)) {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + (lane.edge.lanes.size() - lane.laneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber)) * Settings.laneWidthInMeters)
 							/ edge.length);
 		} else {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + ((lane.edge.lanes.size() / 2.0) - lane.laneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - lane.laneNumber)) * Settings.laneWidthInMeters)
 							/ edge.length);
 		}
 
@@ -353,7 +353,7 @@ public class RoadUtil {
 	}
 
 	public static boolean isEdgeBlocked(final Edge edge) {
-		for (final Lane l : edge.lanes) {
+		for (final Lane l : edge.getLanes()) {
 			if (!l.isBlocked) {
 				return false;
 			}
@@ -362,7 +362,7 @@ public class RoadUtil {
 	}
 
 	public static boolean isEdgeOnPathOfPriorityVehicle(final Edge edge) {
-		for (final Lane l : edge.lanes) {
+		for (final Lane l : edge.getLanes()) {
 			if (l.isPriority) {
 				return true;
 			}
@@ -372,7 +372,7 @@ public class RoadUtil {
 
 	public static boolean isEdgeContainsPriorityVehicle(final Edge edge) {
 		if (isEdgeOnPathOfPriorityVehicle(edge)) {
-			for (final Lane l : edge.lanes) {
+			for (final Lane l : edge.getLanes()) {
 				if(l.hasPriorityVehicles()){
 					return true;
 				}

@@ -465,7 +465,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		if (vehicle.indexLegOnRoute + 1 < vehicle.routeLegs.size()) {
 			RouteLeg legToCheck = vehicle.routeLegs.get(vehicle.indexLegOnRoute + 1);
-			Lane laneToCheck = legToCheck.edge.lanes.get(0);
+			Lane laneToCheck = legToCheck.edge.getFirstLane();
 			if (laneToCheck.getVehicleCount() > 0) {
 				Vehicle vehicleToCheck = laneToCheck.getLastVehicleInLane();
 				double endPosOfLastVehicleOnNextLeg = vehicleToCheck.headPosition + currentEdge.length
@@ -480,7 +480,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		if (vehicle.indexLegOnRoute > 0) {
 			RouteLeg legToCheck = vehicle.routeLegs.get(vehicle.indexLegOnRoute - 1);
-			Lane laneToCheck = legToCheck.edge.lanes.get(0);
+			Lane laneToCheck = legToCheck.edge.getFirstLane();
 			if (laneToCheck.getVehicleCount() > 0) {
 				Vehicle vehicleToCheck = laneToCheck.getFrontVehicleInLane();
 				double headPosOfFirstVehicleOnPreviousLeg = -(laneToCheck.edge.length - vehicleToCheck.headPosition);
@@ -494,10 +494,10 @@ public class TrafficNetwork extends RoadNetwork {
 			return -1;
 
 		final ArrayList<double[]> gaps = new ArrayList<>();
-		if (currentEdge.lanes.get(0).getVehicleCount() > 0) {
+		if (currentEdge.getFirstLane().getVehicleCount() > 0) {
 
 			double gapFront = headPosSpaceFront;
-			for (Vehicle vehicleToCheck : currentEdge.lanes.get(0).getVehicles()) {
+			for (Vehicle vehicleToCheck : currentEdge.getFirstLane().getVehicles()) {
 				if (gapFront - vehicle.length > vehicleToCheck.headPosition) {
 					gaps.add(new double[] { gapFront, vehicleToCheck.headPosition + vehicle.length });
 				}
@@ -776,7 +776,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public boolean startOneVehicleFromParking(final Vehicle vehicle) {
 		final RouteLeg leg = vehicle.routeLegs.get(vehicle.indexLegOnRoute);
 		final Edge edge = leg.edge;
-		final Lane lane = edge.lanes.get(0);// Start from the lane closest to roadside
+		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0(vehicle);
 		if (pos >= 0) {
 			edge.parkedVehicles.remove(vehicle);

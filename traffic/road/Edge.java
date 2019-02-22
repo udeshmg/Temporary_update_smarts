@@ -1,8 +1,10 @@
 package traffic.road;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import common.Settings;
 import traffic.light.LightColor;
 import traffic.vehicle.Vehicle;
 
@@ -43,7 +45,7 @@ public class Edge {
 	/**
 	 * Collection of the lanes belonging to this edge.
 	 */
-	public ArrayList<Lane> lanes = new ArrayList<>();
+	private ArrayList<Lane> lanes = new ArrayList<>();
 	/**
 	 * Remaining time that the tram stops at the station on this edge.
 	 */
@@ -130,5 +132,96 @@ public class Edge {
 		this.numLeftOnlyLanes = numLeftOnlyLanes;
 		this.numRightLanes = numRightLanes;
 		this.numRightOnlyLanes = numRightOnlyLanes;
+	}
+
+	public void clearVehicles(){
+		for (Lane lane : lanes) {
+			lane.clearVehicles();
+		}
+	}
+
+	public int getLaneCount(){
+		return lanes.size();
+	}
+
+	public void addLane(Lane lane){
+		lanes.add(lane);
+	}
+
+	public Lane getFirstLane(){
+		if(!lanes.isEmpty()){
+			return lanes.get(0);
+		}
+		return null;
+	}
+
+	public List<Lane> getLanes(){
+		return Collections.unmodifiableList(lanes);
+	}
+
+	public Lane getLaneAwayFromRoadside(Lane currentLane){
+		int nextLaneNumber = currentLane.laneNumber + 1;
+		if(nextLaneNumber > -1 && nextLaneNumber < lanes.size()){
+			return lanes.get(nextLaneNumber);
+		}
+		return null;
+	}
+
+	public Lane getLaneTowardsRoadside(Lane currentLane){
+		int nextLaneNumber = currentLane.laneNumber - 1;
+		if(nextLaneNumber > -1 && nextLaneNumber < lanes.size()){
+			return lanes.get(nextLaneNumber);
+		}
+		return null;
+	}
+
+	public boolean isAllLanesOnLeftBlocked(int laneNumber){
+		if (Settings.isDriveOnLeft) {
+			for (int num = laneNumber - 1; num >= 0; num--) {
+				if (!lanes.get(num).isBlocked) {
+					return false;
+				}
+			}
+		} else {
+			for (int num = laneNumber + 1; num < lanes.size(); num++) {
+				if (!lanes.get(num).isBlocked) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean isAllLanesOnRightBlocked(int laneNumber) {
+		if (Settings.isDriveOnLeft) {
+			for (int num = laneNumber + 1; num < lanes.size(); num++) {
+				if (!lanes.get(num).isBlocked) {
+					return false;
+				}
+			}
+		} else {
+			for (int num = laneNumber - 1; num >= 0; num--) {
+				if (!lanes.get(num).isBlocked) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean isBlocked() {
+		for (final Lane lane : lanes) {
+			if (!lane.isBlocked) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Lane getLane(int laneNumber){
+		if(laneNumber > -1 && laneNumber < lanes.size()) {
+			return lanes.get(laneNumber);
+		}
+		return null;
 	}
 }

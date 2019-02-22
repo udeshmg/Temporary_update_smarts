@@ -83,41 +83,6 @@ public class VehicleUtil {
 	}
 
 
-
-	public static boolean isAllLanesOnLeftBlocked(Edge edge, int laneNumber) {
-		if (Settings.isDriveOnLeft) {
-			for (int num = laneNumber - 1; num >= 0; num--) {
-				if (!edge.lanes.get(num).isBlocked) {
-					return false;
-				}
-			}
-		} else {
-			for (int num = laneNumber + 1; num < edge.lanes.size(); num++) {
-				if (!edge.lanes.get(num).isBlocked) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	public static boolean isAllLanesOnRightBlocked(Edge edge, int laneNumber) {
-		if (Settings.isDriveOnLeft) {
-			for (int num = laneNumber + 1; num < edge.lanes.size(); num++) {
-				if (!edge.lanes.get(num).isBlocked) {
-					return false;
-				}
-			}
-		} else {
-			for (int num = laneNumber - 1; num >= 0; num--) {
-				if (!edge.lanes.get(num).isBlocked) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * Check whether a vehicle can travel from one node to another through an
 	 * edge
@@ -132,7 +97,7 @@ public class VehicleUtil {
 						return false;
 					}
 				}
-				if (!isEdgeBlocked(e)) {
+				if (!e.isBlocked()) {
 					return true;
 				}
 			}
@@ -140,21 +105,14 @@ public class VehicleUtil {
 		return false;
 	}
 
-	public static boolean isEdgeBlocked(Edge edge) {
-		for (final Lane lane : edge.lanes) {
-			if (!lane.isBlocked) {
-				return false;
-			}
-		}
-		return true;
-	}
+
 
 	public static void updateRoadBlockInfoForVehicle(Vehicle vehicle) {
 		double examinedDist = 0;
 		int indexLegOnRouteBeingChecked = vehicle.indexLegOnRoute;
 		while (indexLegOnRouteBeingChecked <= (vehicle.routeLegs.size() - 1)) {
 			final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
-			if (isEdgeBlocked(edgeBeingChecked)) {
+			if (edgeBeingChecked.isBlocked()) {
 				vehicle.isRoadBlockedAhead = true;
 				return;
 			}
@@ -189,13 +147,13 @@ public class VehicleUtil {
 			final Edge targetEdge = vehicle.routeLegs.get(indexLegOnRoute).edge;
 			if (!isPriority) {
 				// Cancel priority status for all the lanes in the edge
-				for (Lane lane : targetEdge.lanes) {
+				for (Lane lane : targetEdge.getLanes()) {
 					lane.isPriority = false;
 				}
 			} else {
 				// Set priority for the lane that will be used by the vehicle
 				laneNumber = RoadUtil.getLaneNumberForTargetEdge(targetEdge, edge, laneNumber);
-				targetEdge.lanes.get(laneNumber).isPriority = true;
+				targetEdge.getLane(laneNumber).isPriority = true;
 			}
 			examinedDist += targetEdge.length;
 			indexLegOnRoute++;
@@ -297,7 +255,7 @@ public class VehicleUtil {
 			// Gets the earliest time that conflicting traffic arrives at
 			// intersection
 			for (final Edge e : RoadUtil.getConflictingEdges(targetEdge, nextEdge)) {
-				for (final Lane lane : e.lanes) {
+				for (final Lane lane : e.getLanes()) {
 					if (lane.getVehicleCount() > 0) {
 						final Vehicle firstV = lane.getFrontVehicleInLane();
 						if (firstV.speed > 0) {
@@ -359,7 +317,7 @@ public class VehicleUtil {
 				laneNumber);
 
 		// Returns the closest impeding object, whose head position is in front of the given vehicle.
-		final Lane laneBeingChecked = edgeBeingChecked.lanes.get(laneNumberBeingChecked);
+		final Lane laneBeingChecked = edgeBeingChecked.getLane(laneNumberBeingChecked);
 		final Vehicle frontVehicle = laneBeingChecked.getClosestFrontVehicleInLane(vehicle, examinedDist);
 		if (frontVehicle != null) {
 			slowdownObj.speed = frontVehicle.speed;
@@ -404,8 +362,8 @@ public class VehicleUtil {
 				vehicle.lane.laneNumber);
 
 		// Stop vehicle if the emergency strategy requires non-priority vehicles to pull off
-		for (int i = laneNumber + 1; i < edgeBeingChecked.lanes.size(); i++) {
-			if (edgeBeingChecked.lanes.get(i).isPriority
+		for (int i = laneNumber + 1; i < edgeBeingChecked.getLaneCount(); i++) {
+			if (edgeBeingChecked.getLane(i).isPriority
 					&& (Settings.emergencyStrategy == EmergencyStrategy.NonEmergencyPullOffToRoadside)) {
 				final double brakingDist = VehicleUtil.getBrakingDistance(vehicle);
 				slowdownObj.headPosition = vehicle.headPosition + brakingDist;
@@ -431,7 +389,7 @@ public class VehicleUtil {
 			// Adjust lane number based on continuity of lane
 			int laneNumber = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
 					vehicle.lane.laneNumber);
-			final Lane targetLane = edgeBeingChecked.lanes.get(laneNumber);
+			final Lane targetLane = edgeBeingChecked.getLane(laneNumber);
 			if (targetLane.isBlocked) {
 				slowdownObj.speed = 0;
 				slowdownObj.headPosition = (examinedDist
@@ -564,21 +522,21 @@ public class VehicleUtil {
 			if (Settings.isDriveOnLeft) {
 				if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
 						&& laneNumberBeingChecked >= edgeBeingChecked.numLeftLanes
-						&& !isAllLanesOnLeftBlocked(edgeBeingChecked, laneNumberBeingChecked)) {
+						&& !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
 					isNeedToBlock = true;
 				} else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
-						&& laneNumberBeingChecked < edgeBeingChecked.lanes.size() - edgeBeingChecked.numRightLanes
-						&& !isAllLanesOnRightBlocked(edgeBeingChecked, laneNumberBeingChecked)) {
+						&& laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numRightLanes
+						&& !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
 					isNeedToBlock = true;
 				}
 			} else {
 				if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
-						&& laneNumberBeingChecked < edgeBeingChecked.lanes.size() - edgeBeingChecked.numLeftLanes
-						&& !isAllLanesOnLeftBlocked(edgeBeingChecked, laneNumberBeingChecked)) {
+						&& laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numLeftLanes
+						&& !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
 					isNeedToBlock = true;
 				} else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
 						&& laneNumberBeingChecked >= edgeBeingChecked.numRightLanes
-						&& !isAllLanesOnRightBlocked(edgeBeingChecked, laneNumberBeingChecked)) {
+						&& !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
 					isNeedToBlock = true;
 				}
 			}

@@ -192,7 +192,7 @@ public class RandomAStar extends Routing {
 
 	double getFlowDensity(final Edge edge) {
 		double numV = 0;
-		for (final Lane lane : edge.lanes) {
+		for (final Lane lane : edge.getLanes()) {
 			numV += lane.getVehicleCount();
 		}
 		return numV / edge.length;

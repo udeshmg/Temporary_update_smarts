@@ -92,9 +92,9 @@ public class Simulation {
 				final Lane currentLane = vehicle.lane;
 				Lane nextLane = null;
 				if (laneChangeDecision == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-					nextLane = currentLane.edge.lanes.get(currentLane.laneNumber + 1);
+					nextLane = currentLane.edge.getLaneAwayFromRoadside(currentLane);
 				} else if (laneChangeDecision == LaneChangeDirection.TOWARDS_ROADSIDE) {
-					nextLane = currentLane.edge.lanes.get(currentLane.laneNumber - 1);
+					nextLane = currentLane.edge.getLaneTowardsRoadside(currentLane);
 				}
 				currentLane.removeVehicle(vehicle);
 				nextLane.addVehicleToLane(vehicle);
@@ -113,7 +113,7 @@ public class Simulation {
 		for (final Edge edge : edges) {
 			double accumulatedVehicleSpeed = 0;
 			int numVehiclesOnEdge = 0;
-			for (final Lane lane : edge.lanes) {
+			for (final Lane lane : edge.getLanes()) {
 				for (final Vehicle vehicle : lane.getVehicles()) {
 
 					if (!vehicle.active) {
@@ -247,10 +247,10 @@ public class Simulation {
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = vehicle.routeLegs.get(vehicle.indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;
-					if (nextEdge.lanes.size() <= vehicle.lane.laneNumber) {
-						vehicle.lane = nextEdge.lanes.get(nextEdge.lanes.size() - 1);
+					if (nextEdge.getLaneCount() <= vehicle.lane.laneNumber) {
+						vehicle.lane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
 					} else {
-						vehicle.lane = nextEdge.lanes.get(vehicle.lane.laneNumber);
+						vehicle.lane = nextEdge.getLane(vehicle.lane.laneNumber);
 					}
 					// Remember the cluster of traffic lights
 					if (nextEdge.startNode.idLightNodeGroup != 0) {

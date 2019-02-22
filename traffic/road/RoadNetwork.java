@@ -197,7 +197,7 @@ public class RoadNetwork {
 			for (int j = 0; j < Settings.numGridCols; j++) {
 				for (final Node node : grid[i][j].nodes) {
 					for (final Edge edge : node.outwardEdges) {
-						grid[i][j].laneLength += edge.length * edge.lanes.size();
+						grid[i][j].laneLength += edge.length * edge.getLaneCount();
 					}
 				}
 			}
@@ -212,7 +212,7 @@ public class RoadNetwork {
 			final Lane lane = new Lane(edge);
 			lanes.add(lane);
 			lane.laneNumber = i;
-			edge.lanes.add(lane);
+			edge.addLane(lane);
 		}
 	}
 

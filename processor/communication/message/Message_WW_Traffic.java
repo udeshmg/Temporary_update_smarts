@@ -44,7 +44,7 @@ public class Message_WW_Traffic {
 	ArrayList<SerializableFrontVehicleOnBorder> getLastVehiclesLeftReceiver(final Fellow receiver) {
 		final ArrayList<SerializableFrontVehicleOnBorder> serializableInfo = new ArrayList<>();
 		for (final Edge edge : receiver.outwardEdgesAcrossBorder) {
-			for (final Lane lane : edge.lanes) {
+			for (final Lane lane : edge.getLanes()) {
 				final SerializableFrontVehicleOnBorder oneV = new SerializableFrontVehicleOnBorder();
 				oneV.laneIndex = lane.index;
 				final Vehicle lastV = lane.getLastVehicleInLane();
