@@ -59,11 +59,7 @@ public class Edge {
 	 * Color of traffic light at the end of this edge.
 	 */
 	public LightColor lightColor = LightColor.GYR_G;
-	/**
-	 * Whether this edge is on one-way road. If it is on a two-way road, there
-	 * is another edge in the opposite direction.
-	 */
-	public boolean onOneWayRoad;
+	
 	/**
 	 * Tram edge parallel to this edge and is with tram stop.
 	 */
@@ -261,5 +257,18 @@ public class Edge {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Check whether an edge is on one-way road, i.e., there is no edge that
+	 * links the same two end points but is in the opposite direction.
+	 */
+	boolean isOnOneWayRoad() {
+		for (final Edge e : startNode.inwardEdges) {
+			if (e.startNode == endNode) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

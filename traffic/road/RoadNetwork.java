@@ -577,13 +577,6 @@ public class RoadNetwork {
 		}
 
 		/*
-		 * Identify two-way roads
-		 */
-		for (final Edge e : edges) {
-			e.onOneWayRoad = isOnOneWayRoad(e);
-		}
-
-		/*
 		 * Calculate GPS points of lanes
 		 */
 		for (final Lane lane : lanes) {
@@ -612,22 +605,6 @@ public class RoadNetwork {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Check whether an edge is on one-way road, i.e., there is no edge that
-	 * links the same two end points but is in the opposite direction.
-	 */
-	boolean isOnOneWayRoad(final Edge edge) {
-		boolean oneway = true;
-		final Node startNode = edge.startNode;
-		for (final Edge e : startNode.inwardEdges) {
-			if (e.startNode == edge.endNode) {
-				oneway = false;
-				break;
-			}
-		}
-		return oneway;
 	}
 
 	/**
