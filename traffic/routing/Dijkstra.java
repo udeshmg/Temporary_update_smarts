@@ -53,9 +53,9 @@ public class Dijkstra extends Routing {
 			return 0;
 		}
 
-	};
+	}
 
-	enum DijkstraVertexState {
+    enum DijkstraVertexState {
 		Unvisited, Visited, None
 	}
 

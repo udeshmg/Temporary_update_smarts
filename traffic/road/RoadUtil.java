@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -331,7 +332,7 @@ public class RoadUtil {
 	public static String importBuiltinRoadGraphFile() {
 		try {
 			final InputStream inputStream = RoadUtil.class.getResourceAsStream(Settings.inputBuiltinRoadGraph);
-			final Reader reader = new InputStreamReader(inputStream, "UTF-8");
+			final Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 			final StringBuilder sb = new StringBuilder();
 			int numChars = -1;
 			final char[] chars = new char[1000];
@@ -350,15 +351,6 @@ public class RoadUtil {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public static boolean isEdgeBlocked(final Edge edge) {
-		for (final Lane l : edge.getLanes()) {
-			if (!l.isBlocked) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public static boolean isEdgeOnPathOfPriorityVehicle(final Edge edge) {

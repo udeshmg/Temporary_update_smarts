@@ -290,7 +290,7 @@ public class MonitorPanel extends JPanel {
 	ArrayList<Serializable_GUI_Vehicle> vehicleObjects = new ArrayList<>();
 	ArrayList<Serializable_GUI_Light> lightObjects = new ArrayList<>();
 	ArrayList<EdgeObject> edgeObjects = new ArrayList<>(300000);
-	ArrayList<TramStopObject> tramStopObjects = new ArrayList<>(3000);;
+	ArrayList<TramStopObject> tramStopObjects = new ArrayList<>(3000);
 	Point2D.Double queryWindowTopLeft = null, queryWindowBottomRight = null;
 	boolean isReceivingData = false;
 	boolean isComposingObjectImage = false;
@@ -676,11 +676,7 @@ public class MonitorPanel extends JPanel {
 	 * traffic flow)
 	 */
 	public void changeTrafficDrawingMethod(final String type) {
-		if (type.equals("Vehicles")) {
-			isUseTrafficFlowToReplaceVehicle = false;
-		} else {
-			isUseTrafficFlowToReplaceVehicle = true;
-		}
+		isUseTrafficFlowToReplaceVehicle = !type.equals("Vehicles");
 		if (!isReceivingData) {
 			prepareObjectsImage();
 			repaint();
@@ -1940,10 +1936,7 @@ public class MonitorPanel extends JPanel {
 		if (queryWindowTopLeft.x > queryWindowBottomRight.x) {
 			return false;
 		}
-		if (queryWindowTopLeft.y < queryWindowBottomRight.y) {
-			return false;
-		}
-		return true;
+		return !(queryWindowTopLeft.y < queryWindowBottomRight.y);
 	}
 
 	boolean validDisplayX() {
@@ -1951,10 +1944,7 @@ public class MonitorPanel extends JPanel {
 		final double newMaxLonDisplayArea = convertXToLon(displayPanelDimension.getWidth());
 		if (newMinLonDisplayArea < -180) {
 			return false;
-		} else if (newMaxLonDisplayArea > 180) {
-			return false;
-		}
-		return true;
+		} else return !(newMaxLonDisplayArea > 180);
 	}
 
 	boolean validDisplayY() {
@@ -1962,9 +1952,6 @@ public class MonitorPanel extends JPanel {
 		final double newMinLatDisplayArea = convertYToLat(displayPanelDimension.getHeight());
 		if (newMaxLatDisplayArea > 80) {
 			return false;
-		} else if (newMinLatDisplayArea < -80) {
-			return false;
-		}
-		return true;
+		} else return !(newMinLatDisplayArea < -80);
 	}
 }

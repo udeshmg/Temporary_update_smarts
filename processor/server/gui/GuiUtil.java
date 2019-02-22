@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -65,7 +66,7 @@ public class GuiUtil {
 				});
 				timerDownloadStatus.start();
 
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"))) {
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(response, StandardCharsets.UTF_8))) {
 					for (String line; (line = reader.readLine()) != null;) {
 						sb.append(line);
 					}
@@ -153,7 +154,7 @@ public class GuiUtil {
 			BufferedWriter out;
 			try {
 				out = new BufferedWriter(
-						new OutputStreamWriter(new FileOutputStream(Settings.inputOpenStreetMapFile), "UTF-8"));
+						new OutputStreamWriter(new FileOutputStream(Settings.inputOpenStreetMapFile), StandardCharsets.UTF_8));
 				out.write(str);
 				out.close();
 			} catch (final IOException e) {

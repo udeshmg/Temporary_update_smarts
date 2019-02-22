@@ -12,9 +12,9 @@ public abstract class Routing {
 		DIJKSTRA, RANDOM_A_STAR
 	}
 
-	TrafficNetwork trafficNetwork;;
+	TrafficNetwork trafficNetwork;
 
-	public Routing(final TrafficNetwork trafficNetwork) {
+    public Routing(final TrafficNetwork trafficNetwork) {
 		this.trafficNetwork = trafficNetwork;
 	}
 

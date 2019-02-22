@@ -69,7 +69,7 @@ public class RandomAStar extends Routing {
 
 	enum DijkstraVertexState {
 		Unvisited, Visited, None
-	};
+	}
 
 	ArrayList<DijkstraVertex> vertices = new ArrayList<>();
 

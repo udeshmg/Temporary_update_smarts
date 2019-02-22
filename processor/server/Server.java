@@ -159,10 +159,9 @@ public class Server implements MessageHandler, Runnable {
 	 * their neighbors in server-based simulation.
 	 */
 	synchronized void askWorkersSimulateOneStep() {
-		boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < Settings.numGlobalRandomPrivateVehicles
-				? true : false;
-		boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < Settings.numGlobalRandomTrams ? true : false;
-		boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < Settings.numGlobalRandomBuses ? true : false;
+		boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < Settings.numGlobalRandomPrivateVehicles;
+		boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < Settings.numGlobalRandomTrams;
+		boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < Settings.numGlobalRandomBuses;
 
 		// Clear vehicle counts from last step
 		numInternalNonPubVehiclesAtAllWorkers = 0;
@@ -241,11 +240,7 @@ public class Server implements MessageHandler, Runnable {
 			}
 		}
 
-		if (count == workerMetas.size()) {
-			return true;
-		} else {
-			return false;
-		}
+		return count == workerMetas.size();
 
 	}
 

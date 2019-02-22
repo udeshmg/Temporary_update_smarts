@@ -308,12 +308,8 @@ public class MOBIL {
 			return true;
 		} else {
 			final double newAccBackVehicleTargetLane = idm.computeAcceleration(backVehicleInTargetLane, vehicle);
-			if (newAccBackVehicleTargetLane > (-1 * vehicle.driverProfile.MOBIL_b_save)) {
-				return true;
-			} else {
-				// Deceleration of back vehicle in target lane would be too significant: unsafe
-				return false;
-			}
+			// Deceleration of back vehicle in target lane would be too significant: unsafe
+			return newAccBackVehicleTargetLane > (-1 * vehicle.driverProfile.MOBIL_b_save);
 		}
 	}
 }

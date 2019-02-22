@@ -154,12 +154,11 @@ public class RouteLoader {
 				StringBuilder sbOneV = new StringBuilder();
 
 				@Override
-				public void characters(final char ch[], final int start, final int length) throws SAXException {
+				public void characters(final char ch[], final int start, final int length) {
 				}
 
 				@Override
-				public void endElement(final String uri, final String localName, final String qName)
-						throws SAXException {
+				public void endElement(final String uri, final String localName, final String qName) {
 
 					if (qName.equals("vehicle")) {
 						vehicles.add(sbOneV.toString());
@@ -168,7 +167,7 @@ public class RouteLoader {
 
 				@Override
 				public void startElement(final String uri, final String localName, final String qName,
-						final Attributes attributes) throws SAXException {
+						final Attributes attributes) {
 
 					if (qName.equals("vehicle")) {
 						sbOneV.delete(0, sbOneV.length());

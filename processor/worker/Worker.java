@@ -138,7 +138,7 @@ public class Worker implements MessageHandler, Runnable {
 
 					while (isPausingServerlessSim) {
 						try {
-							this.sleep(1);
+							sleep(1);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -253,11 +253,7 @@ public class Worker implements MessageHandler, Runnable {
 			}
 		}
 
-		if (count == connectedFellows.size()) {
-			return true;
-		} else {
-			return false;
-		}
+		return count == connectedFellows.size();
 
 	}
 

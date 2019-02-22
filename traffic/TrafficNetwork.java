@@ -402,12 +402,8 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	boolean isRouteLegWithinWorkarea(RouteLeg leg) {
-		if (!workareaCells.contains(leg.edge.startNode.gridCell)
-				|| !workareaCells.contains(leg.edge.endNode.gridCell)) {
-			return false;
-		} else {
-			return true;
-		}
+		return workareaCells.contains(leg.edge.startNode.gridCell)
+				&& workareaCells.contains(leg.edge.endNode.gridCell);
 	}
 
 	/**
@@ -651,20 +647,13 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	boolean isEdgeSuitableForRouteEndOfInternalVehicle(final Edge edge) {
-		if ((edge == null) || (edge.length < Settings.minLengthOfRouteStartEndEdge) || edge.isRoundabout) {
-			return false;
-		}
-		return true;
+		return (edge != null) && (!(edge.length < Settings.minLengthOfRouteStartEndEdge)) && !edge.isRoundabout;
 	}
 
 	boolean isEdgeSuitableForRouteStartOfInternalVehicle(final Edge edge) {
 		// Note: route cannot start from cross-border edge at the starting side of the edge. This is to prevent problem in transferring of vehicle.
-		if ((edge == null) || (edge.length < Settings.minLengthOfRouteStartEndEdge) || edge.isRoundabout
-				|| !workareaCells.contains(edge.endNode.gridCell)) {
-			return false;
-		}
-
-		return true;
+		return (edge != null) && (!(edge.length < Settings.minLengthOfRouteStartEndEdge)) && !edge.isRoundabout
+				&& workareaCells.contains(edge.endNode.gridCell);
 	}
 
 	/**

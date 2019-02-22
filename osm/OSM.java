@@ -1,16 +1,16 @@
 /*******************************************************************************
- * Copyright (C)  
- * 
+ * Copyright (C)
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -525,13 +526,12 @@ public class OSM {
 				ArrayList<Element> list_member = new ArrayList<>(1000);//Way reference in relation element
 
 				@Override
-				public void characters(final char ch[], final int start, final int length) throws SAXException {
+				public void characters(final char ch[], final int start, final int length) {
 
 				}
 
 				@Override
-				public void endElement(final String uri, final String localName, final String qName)
-						throws SAXException {
+				public void endElement(final String uri, final String localName, final String qName) {
 
 					if (qName.equals("node")) {
 						elements_node.add(e_node);
@@ -562,7 +562,7 @@ public class OSM {
 
 				@Override
 				public void startElement(final String uri, final String localName, final String qName,
-						final Attributes attributes) throws SAXException {
+						final Attributes attributes) {
 
 					if (qName.equals("node")) {
 						b_node = true;
@@ -771,7 +771,7 @@ public class OSM {
 			final File file = new File(filePath);
 			inputStream = new FileInputStream(file);
 
-			final Reader reader = new InputStreamReader(inputStream, "UTF-8");
+			final Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 			final InputSource is = new InputSource(reader);
 			is.setEncoding("UTF-8");
 			saxParser.parse(is, handler);
