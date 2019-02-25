@@ -48,7 +48,7 @@ public class MOBIL {
 	 */
 	double computeAccelerationWithImpedingObject(final Vehicle vehicle, final Lane targetLane,
 			final SlowdownFactor factor) {
-		vehicleUtil.updateImpedingObject(vehicle, vehicle.indexLegOnRoute, targetLane.laneNumber, impedingObject,
+		idm.updateImpedingObject(vehicle, vehicle.indexLegOnRoute, targetLane.laneNumber, impedingObject,
 				factor);
 		return idm.computeAcceleration(vehicle, impedingObject);
 	}
