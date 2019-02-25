@@ -42,6 +42,7 @@ public class Vehicle {
 
 	public Edge edgeBeforeTurnRight = null;
 	public Edge edgeBeforeTurnLeft = null;
+	LaneChange laneChange = new LaneChange();
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -148,6 +149,40 @@ public class Vehicle {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public void changeLane(final double timeNow){
+		if (!((lane == null) || !active || (type == VehicleType.TRAM)
+				|| ((timeNow - timeOfLastLaneChange) < driverProfile.minLaneChangeTimeGap))) {
+
+			LaneChangeDirection laneChangeDecision = LaneChangeDirection.SAME;
+			laneChangeDecision = laneChange.decideLaneChange(this);
+
+			if (laneChangeDecision != LaneChangeDirection.SAME) {
+
+				// Cancel priority lanes
+				if (type == VehicleType.PRIORITY) {
+					VehicleUtil.setPriorityLanes(this, false);
+				}
+
+				timeOfLastLaneChange = timeNow;
+				final Lane currentLane = lane;
+				Lane nextLane = null;
+				if (laneChangeDecision == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
+					nextLane = currentLane.edge.getLaneAwayFromRoadside(currentLane);
+				} else if (laneChangeDecision == LaneChangeDirection.TOWARDS_ROADSIDE) {
+					nextLane = currentLane.edge.getLaneTowardsRoadside(currentLane);
+				}
+				currentLane.removeVehicle(this);
+				nextLane.addVehicleToLane(this);
+				lane = nextLane;
+
+				// Set priority lanes
+				if (type == VehicleType.PRIORITY) {
+					VehicleUtil.setPriorityLanes(this, true);
+				}
+			}
 		}
 	}
 }

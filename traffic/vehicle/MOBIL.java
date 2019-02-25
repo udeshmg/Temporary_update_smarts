@@ -24,7 +24,7 @@ public class MOBIL {
 
 	Vehicle backVehicleInTargetLane = null;
 
-	Vehicle frontVehicleInTargetLane = new Vehicle();
+	Vehicle frontVehicleInTargetLane = null;
 
 	Random random = new Random();
 	ImpedingObject impedingObject = new ImpedingObject();

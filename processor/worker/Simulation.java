@@ -28,7 +28,6 @@ public class Simulation {
 	ArrayList<Fellow> connectedFellows;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
-	LaneChange laneChange = new LaneChange();
 	CarFollow carFollow = new CarFollow();
 
 	public Simulation(final TrafficNetwork trafficNetwork, final ArrayList<Fellow> connectedFellows) {
@@ -72,39 +71,7 @@ public class Simulation {
 	void makeLaneChange(final double timeNow) {
 		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
 			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
-
-			if ((vehicle.lane == null) || !vehicle.active || (vehicle.type == VehicleType.TRAM)
-					|| ((timeNow - vehicle.timeOfLastLaneChange) < vehicle.driverProfile.minLaneChangeTimeGap)) {
-				continue;
-			}
-
-			LaneChangeDirection laneChangeDecision = LaneChangeDirection.SAME;
-			laneChangeDecision = laneChange.decideLaneChange(vehicle);
-
-			if (laneChangeDecision != LaneChangeDirection.SAME) {
-
-				// Cancel priority lanes
-				if (vehicle.type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(vehicle, false);
-				}
-
-				vehicle.timeOfLastLaneChange = timeNow;
-				final Lane currentLane = vehicle.lane;
-				Lane nextLane = null;
-				if (laneChangeDecision == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-					nextLane = currentLane.edge.getLaneAwayFromRoadside(currentLane);
-				} else if (laneChangeDecision == LaneChangeDirection.TOWARDS_ROADSIDE) {
-					nextLane = currentLane.edge.getLaneTowardsRoadside(currentLane);
-				}
-				currentLane.removeVehicle(vehicle);
-				nextLane.addVehicleToLane(vehicle);
-				vehicle.lane = nextLane;
-
-				// Set priority lanes
-				if (vehicle.type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(vehicle, true);
-				}
-			}
+			vehicle.changeLane(timeNow);
 		}
 	}
 
