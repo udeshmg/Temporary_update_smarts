@@ -307,4 +307,15 @@ public class Vehicle {
 		}
 	}
 
+	public void updateLane(Lane lane){
+		if(this.lane != null) {
+			this.lane.removeVehicle(this);
+		}
+		this.lane = lane;
+		if(lane != null) {
+			lane.addVehicleToLane(this);
+		}
+	}
+
+
 }

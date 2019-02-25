@@ -125,15 +125,13 @@ public class Simulation {
 					VehicleUtil.setPriorityLanes(vehicle, false);
 				}
 
-				final Lane oldLane = vehicle.lane;
-
 				while ((vehicle.indexLegOnRoute < vehicle.routeLegs.size()) && (overshootDist >= 0)) {
 					// Update head position
 					vehicle.headPosition -= vehicle.lane.edge.length;
 					// Update route leg
 					vehicle.indexLegOnRoute++;
 
-					// Check whether vehicle finishes trip					
+					// Check whether vehicle finishes trip
 					if (vehicle.active && (vehicle.indexLegOnRoute >= vehicle.routeLegs.size())) {
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
 						if (vehicle.isForeground) {
@@ -144,11 +142,13 @@ public class Simulation {
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = vehicle.routeLegs.get(vehicle.indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;
+					Lane newLane = null;
 					if (nextEdge.getLaneCount() <= vehicle.lane.laneNumber) {
-						vehicle.lane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
+						newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
 					} else {
-						vehicle.lane = nextEdge.getLane(vehicle.lane.laneNumber);
+						newLane = nextEdge.getLane(vehicle.lane.laneNumber);
 					}
+					vehicle.updateLane(newLane);
 					// Remember the cluster of traffic lights
 					if (nextEdge.startNode.idLightNodeGroup != 0) {
 						vehicle.idLightGroupPassed = nextEdge.startNode.idLightNodeGroup;
@@ -166,13 +166,6 @@ public class Simulation {
 						vehicle.park(false, timeNow);
 						break;
 					}
-				}
-
-				// Remove vehicle from old lane
-				oldLane.removeVehicle(vehicle);
-				// Add vehicle to new lane
-				if (vehicle.lane != null) {
-					vehicle.lane.addVehicleToLane(vehicle);
 				}
 
 				// Set priority lanes
