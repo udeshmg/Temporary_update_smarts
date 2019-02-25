@@ -39,12 +39,7 @@ public class Simulation {
 		oneStepData_allVehiclesReachedDestination.clear();
 	}
 
-	void makeLaneChange(final double timeNow) {
-		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
-			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
-			vehicle.changeLane(timeNow);
-		}
-	}
+
 
 	ArrayList<Vehicle> moveVehicleForward(final double timeNow, final ArrayList<Edge> edges, Worker worker) {
 		final ArrayList<Vehicle> vehicles = new ArrayList<>();
@@ -242,7 +237,7 @@ public class Simulation {
 		transferDataTofellow(worker);
 		moveVehiclesNotAroundBorder(worker);
 		removeTripFinishedVehicles();
-		makeLaneChange(worker.timeNow);
+		trafficNetwork.changeLaneOfVehicles(worker.timeNow);
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			trafficNetwork.lightCoordinator.updateLights();
 		}

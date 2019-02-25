@@ -700,4 +700,11 @@ public class TrafficNetwork extends RoadNetwork {
 			vehicle.blockAtTramStop();
 		}
 	}
+
+	public void changeLaneOfVehicles(final double timeNow) {
+		for (int i = 0; i < vehicles.size(); i++) {
+			final Vehicle vehicle = vehicles.get(i);
+			vehicle.changeLane(timeNow);
+		}
+	}
 }
