@@ -138,20 +138,19 @@ public class Vehicle {
 	/**
 	 * Moves vehicle from parking area onto roads.
 	 */
-	public boolean startFromParking() {
-		final RouteLeg leg = routeLegs.get(indexLegOnRoute);
-		final Edge edge = leg.edge;
-		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
-		final double pos = getStartPositionInLane0();
-		if (pos >= 0) {
-			edge.removeParkedVehicle(this);
-			this.lane = lane;
-			headPosition = pos;
-			speed = 0;
-			lane.addVehicleToLane(this);
-			return true;
-		} else {
-			return false;
+	public void startFromParking(double timeNow) {
+		if (active && (lane == null) && (timeNow >= earliestTimeToLeaveParking)) {
+			final RouteLeg leg = routeLegs.get(indexLegOnRoute);
+			final Edge edge = leg.edge;
+			final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
+			final double pos = getStartPositionInLane0();
+			if (pos >= 0) {
+				edge.removeParkedVehicle(this);
+				this.lane = lane;
+				headPosition = pos;
+				speed = 0;
+				lane.addVehicleToLane(this);
+			}
 		}
 	}
 
