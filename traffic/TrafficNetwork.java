@@ -654,7 +654,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void parkOneVehicle(final Vehicle vehicle, final boolean isNewVehicle, final double timeNow) {
 		vehicle.speed = 0;
 		vehicle.acceleration = 0;
-		vehicle.routeLegs.get(vehicle.indexLegOnRoute).edge.parkedVehicles.add(vehicle);
+		vehicle.routeLegs.get(vehicle.indexLegOnRoute).edge.addParkedVehicle(vehicle);
 		if (isNewVehicle) {
 			vehicle.earliestTimeToLeaveParking = vehicle.timeRouteStart + vehicle.routeLegs.get(0).stopover;
 		} else {
@@ -740,7 +740,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		// Clear parked vehicles from edges
 		for (final Edge edge : edges) {
-			edge.parkedVehicles.clear();
+			edge.clearParkedVehicles();
 		}
 
 		// Reset temporary values
@@ -760,7 +760,7 @@ public class TrafficNetwork extends RoadNetwork {
 		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0(vehicle);
 		if (pos >= 0) {
-			edge.parkedVehicles.remove(vehicle);
+			edge.removeParkedVehicle(vehicle);
 			vehicle.lane = lane;
 			vehicle.headPosition = pos;
 			vehicle.speed = 0;

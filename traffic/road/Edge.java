@@ -59,7 +59,7 @@ public class Edge {
 	 * Color of traffic light at the end of this edge.
 	 */
 	public LightColor lightColor = LightColor.GYR_G;
-	
+
 	/**
 	 * Tram edge parallel to this edge and is with tram stop.
 	 */
@@ -73,7 +73,7 @@ public class Edge {
 	/**
 	 * Collection of vehicles that are parked along this edge.
 	 */
-	public ArrayList<Vehicle> parkedVehicles = new ArrayList<>(100);
+	private ArrayList<Vehicle> parkedVehicles = new ArrayList<>(100);
 	/**
 	 * List of tram routes passing this edge.
 	 */
@@ -270,5 +270,17 @@ public class Edge {
 			}
 		}
 		return true;
+	}
+
+	public void addParkedVehicle(Vehicle v){
+		parkedVehicles.add(v);
+	}
+
+	public void removeParkedVehicle(Vehicle v){
+		parkedVehicles.remove(v);
+	}
+
+	public void clearParkedVehicles(){
+		parkedVehicles.clear();
 	}
 }
