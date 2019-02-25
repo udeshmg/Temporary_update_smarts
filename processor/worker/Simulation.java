@@ -330,7 +330,7 @@ public class Simulation {
 		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
 			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
 			if (vehicle.active && (vehicle.lane == null) && (timeNow >= vehicle.earliestTimeToLeaveParking)) {
-				trafficNetwork.startOneVehicleFromParking(vehicle);
+				vehicle.startFromParking();
 			}
 		}
 	}

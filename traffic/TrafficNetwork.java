@@ -667,25 +667,7 @@ public class TrafficNetwork extends RoadNetwork {
 		timeLastPublicVehicleCreated = 0;
 	}
 
-	/**
-	 * Moves vehicle from parking area onto roads.
-	 */
-	public boolean startOneVehicleFromParking(final Vehicle vehicle) {
-		final RouteLeg leg = vehicle.routeLegs.get(vehicle.indexLegOnRoute);
-		final Edge edge = leg.edge;
-		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
-		final double pos = vehicle.getStartPositionInLane0();
-		if (pos >= 0) {
-			edge.removeParkedVehicle(vehicle);
-			vehicle.lane = lane;
-			vehicle.headPosition = pos;
-			vehicle.speed = 0;
-			vehicle.lane.addVehicleToLane(vehicle);
-			return true;
-		} else {
-			return false;
-		}
-	}
+
 
 	/**
 	 * Update the timers related to tram stops.
