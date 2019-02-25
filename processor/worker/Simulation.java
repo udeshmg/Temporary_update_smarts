@@ -38,27 +38,7 @@ public class Simulation {
 		final double lookAheadDist = Settings.lookAheadDistance;
 		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
 			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
-			if (!vehicle.active || (vehicle.lane == null)) {
-				continue;
-			}
-
-			if (vehicle.type == VehicleType.TRAM) {
-				final double brakingDist = VehicleUtil.getBrakingDistance(vehicle);
-				double examinedDist = 0;
-				for (int j = vehicle.indexLegOnRoute; j < vehicle.routeLegs.size(); j++) {
-					final Edge edge = vehicle.routeLegs.get(j).edge;
-					examinedDist += edge.length;
-					if (edge.endNode.tramStop && ((examinedDist - vehicle.headPosition) < (2 * brakingDist))
-							&& ((examinedDist - vehicle.headPosition) > brakingDist) && (edge.timeNoTramStopping <= 0)
-							&& (edge.timeTramStopping <= 0)) {
-						edge.timeTramStopping = Settings.periodOfTrafficWaitForTramAtStop;
-						break;
-					}
-					if ((examinedDist - vehicle.headPosition) > lookAheadDist) {
-						break;
-					}
-				}
-			}
+			vehicle.blockAtTramStop();
 		}
 	}
 

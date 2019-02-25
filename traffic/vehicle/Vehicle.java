@@ -288,4 +288,24 @@ public class Vehicle {
 		}
 	}
 
+	public void blockAtTramStop(){
+		if (active && lane!= null && type == VehicleType.TRAM) {
+			final double brakingDist = VehicleUtil.getBrakingDistance(this);
+			double examinedDist = 0;
+			for (int j = indexLegOnRoute; j < routeLegs.size(); j++) {
+				final Edge edge = routeLegs.get(j).edge;
+				examinedDist += edge.length;
+				if (edge.endNode.tramStop && ((examinedDist - headPosition) < (2 * brakingDist))
+						&& ((examinedDist - headPosition) > brakingDist) && (edge.timeNoTramStopping <= 0)
+						&& (edge.timeTramStopping <= 0)) {
+					edge.timeTramStopping = Settings.periodOfTrafficWaitForTramAtStop;
+					break;
+				}
+				if ((examinedDist - headPosition) > Settings.lookAheadDistance) {
+					break;
+				}
+			}
+		}
+	}
+
 }
