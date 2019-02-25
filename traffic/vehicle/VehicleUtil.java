@@ -35,42 +35,7 @@ public class VehicleUtil {
 		return coords;
 	}
 
-	public static void findEdgeBeforeNextTurn(final Vehicle vehicle) {
-		double examinedDist = 0;
-		vehicle.edgeBeforeTurnLeft = null;
-		vehicle.edgeBeforeTurnRight = null;
-		int indexLegOnRouteBeingChecked = vehicle.indexLegOnRoute;
-		while (indexLegOnRouteBeingChecked < (vehicle.routeLegs.size() - 1)) {
-			final Edge e1 = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
-			final Edge e2 = vehicle.routeLegs.get(indexLegOnRouteBeingChecked + 1).edge;
 
-			if (e1.startNode == e2.endNode) {
-				// Vehicle is going to make U-turn
-				vehicle.edgeBeforeTurnRight = e1;
-			} else if (!e1.name.equals(e2.name) || (e1.type != e2.type)) {
-				final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * Settings.lonVsLat,
-						e1.endNode.lon, e1.endNode.lat * Settings.lonVsLat);
-				final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * Settings.lonVsLat);
-				if (ccw < 0) {
-					vehicle.edgeBeforeTurnLeft = e1;
-				} else if (ccw > 0) {
-					vehicle.edgeBeforeTurnRight = e1;
-				}
-			}
-
-			if ((vehicle.edgeBeforeTurnLeft != null) || (vehicle.edgeBeforeTurnRight != null)) {
-				break;
-			}
-
-			examinedDist += e1.length;
-			if (((examinedDist - vehicle.headPosition) < Settings.lookAheadDistance)
-					&& (indexLegOnRouteBeingChecked < (vehicle.routeLegs.size() - 1))) {
-				indexLegOnRouteBeingChecked++;
-			} else {
-				break;
-			}
-		}
-	}
 
 	public static double getAverageSpeedOfTrip(final Vehicle vehicle) {
 		// Get total road length in the trip

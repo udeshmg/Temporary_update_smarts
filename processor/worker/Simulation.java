@@ -93,7 +93,7 @@ public class Simulation {
 					// Reset priority vehicle effect flag
 					vehicle.isAffectedByPriorityVehicle = false;
 					// Update information regarding turning
-					VehicleUtil.findEdgeBeforeNextTurn(vehicle);
+					vehicle.findEdgeBeforeNextTurn();
 					// Find impeding objects and compute acceleration based on the objects
 					vehicle.acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(vehicle);
 					// Update vehicle speed, which must be between 0 and free-flow speed

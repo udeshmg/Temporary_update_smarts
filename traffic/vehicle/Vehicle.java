@@ -208,4 +208,42 @@ public class Vehicle {
 		}
 		isRoadBlockedAhead = false;
 	}
+
+	public void findEdgeBeforeNextTurn() {
+		double examinedDist = 0;
+		edgeBeforeTurnLeft = null;
+		edgeBeforeTurnRight = null;
+		int indexLegOnRouteBeingChecked = indexLegOnRoute;
+		while (indexLegOnRouteBeingChecked < (routeLegs.size() - 1)) {
+			final Edge e1 = routeLegs.get(indexLegOnRouteBeingChecked).edge;
+			final Edge e2 = routeLegs.get(indexLegOnRouteBeingChecked + 1).edge;
+
+			if (e1.startNode == e2.endNode) {
+				// Vehicle is going to make U-turn
+				edgeBeforeTurnRight = e1;
+			} else if (!e1.name.equals(e2.name) || (e1.type != e2.type)) {
+				final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * Settings.lonVsLat,
+						e1.endNode.lon, e1.endNode.lat * Settings.lonVsLat);
+				final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * Settings.lonVsLat);
+				if (ccw < 0) {
+					edgeBeforeTurnLeft = e1;
+				} else if (ccw > 0) {
+					edgeBeforeTurnRight = e1;
+				}
+			}
+
+			if ((edgeBeforeTurnLeft != null) || (edgeBeforeTurnRight != null)) {
+				break;
+			}
+
+			examinedDist += e1.length;
+			if (((examinedDist - headPosition) < Settings.lookAheadDistance)
+					&& (indexLegOnRouteBeingChecked < (routeLegs.size() - 1))) {
+				indexLegOnRouteBeingChecked++;
+			} else {
+				break;
+			}
+		}
+	}
+
 }
