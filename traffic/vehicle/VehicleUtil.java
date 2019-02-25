@@ -182,7 +182,7 @@ public class VehicleUtil {
 	 *            Type of the impeding object, e.g., traffic lights
 	 */
 	public void updateImpedingObject(final Vehicle vehicle, int indexLegOnRouteBeingChecked, final int laneNumber,
-			final Vehicle impedingObj, final SlowdownFactor factor) {
+			final ImpedingObject impedingObj, final SlowdownFactor factor) {
 		double examinedDist = 0;
 		impedingObj.headPosition = -1; // Initialize front vehicle's position.
 		while ((impedingObj.headPosition < 0) && (indexLegOnRouteBeingChecked <= (vehicle.routeLegs.size() - 1))) {
@@ -241,7 +241,7 @@ public class VehicleUtil {
 	 *
 	 */
 	void updateImpedingObject_Conflict(final Vehicle vehicle, final double examinedDist,
-			final int indexLegOnRouteBeingChecked, final Vehicle slowdownObj) {
+			final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
 		/*
 		 * Search for traffic from possible conflicting approaches at the end of
 		 * the current edge.
@@ -309,7 +309,7 @@ public class VehicleUtil {
 	 * of the given vehicle.
 	 */
 	void updateImpedingObject_Front(final Vehicle vehicle, final double examinedDist,
-			final int indexLegOnRouteBeingChecked, int laneNumber, final Vehicle slowdownObj) {
+			final int indexLegOnRouteBeingChecked, int laneNumber, final ImpedingObject slowdownObj) {
 
 		final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
 		// Adjust lane number based on continuity of lane
@@ -351,7 +351,7 @@ public class VehicleUtil {
 	 * Find impeding object caused by priority vehicle, e.g. ambulance.
 	 */
 	void updateImpedingObject_PriorityVehicle(final Vehicle vehicle, final double examinedDist,
-			final int indexLegOnRouteBeingChecked, final Vehicle slowdownObj) {
+			final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
 		if (vehicle.type == VehicleType.PRIORITY) {
 			return;
 		}
@@ -383,7 +383,7 @@ public class VehicleUtil {
 	 * Find impeding object that is a blocked lane.
 	 */
 	void updateImpedingObject_LaneBlock(final Vehicle vehicle, final double examinedDist,
-			final int indexLegOnRouteBeingChecked, final Vehicle slowdownObj) {
+			final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
 		if (indexLegOnRouteBeingChecked < vehicle.routeLegs.size()) {
 			final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
 			// Adjust lane number based on continuity of lane
@@ -405,7 +405,7 @@ public class VehicleUtil {
 	 * Find impeding object that is a traffic light.
 	 */
 	void updateImpedingObject_Light(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
-			final Vehicle slowdownObj) {
+			final ImpedingObject slowdownObj) {
 		if (vehicle.type == VehicleType.PRIORITY) {
 			// Priority vehicle ignores any traffic light
 			return;
@@ -467,7 +467,7 @@ public class VehicleUtil {
 	 * parallel to an edge are identified during pre-processing.
 	 */
 	void updateImpedingObject_Tram(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
-			final Vehicle slowdownObj) {
+			final ImpedingObject slowdownObj) {
 
 		if ((vehicle.type == VehicleType.TRAM) && (targetEdge.timeTramStopping > 0)) {
 			slowdownObj.speed = 0;
@@ -512,7 +512,7 @@ public class VehicleUtil {
 	 *
 	 */
 	void updateImpedingObject_Turn(final Vehicle vehicle, final double examinedDist,
-			final int indexLegOnRouteBeingChecked, final Vehicle slowdownObj) {
+			final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
 		Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
 		if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft || edgeBeingChecked == vehicle.edgeBeforeTurnRight) {
 			// Block vehicle if vehicle's lane cannot be used for turning

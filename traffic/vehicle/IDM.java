@@ -23,7 +23,7 @@ public class IDM {
 	 * impeding object.
 	 *
 	 */
-	public double computeAcceleration(final Vehicle vehicle, final Vehicle impedingObject) {
+	public double computeAcceleration(final Vehicle vehicle, final ImpedingObject impedingObject) {
 		/*
 		 * Actual bumper-to-bumper distance from the end of the front vehicle to
 		 * the head of this vehicle. Value is in meters.
@@ -71,7 +71,7 @@ public class IDM {
 	 * First, the impeding object for this factor is found. Next, the
 	 * acceleration is computed based on the impeding object.
 	 */
-	public double computeAccelerationWithImpedingObject(final Vehicle vehicle, final Vehicle impedingObject,
+	public double computeAccelerationWithImpedingObject(final Vehicle vehicle, final ImpedingObject impedingObject,
 			final Lane targetLane, final SlowdownFactor factor) {
 		vehicleUtil.updateImpedingObject(vehicle, vehicle.indexLegOnRoute, targetLane.laneNumber, impedingObject,
 				factor);
@@ -85,7 +85,7 @@ public class IDM {
 	 *
 	 *
 	 */
-	double getLowerAccelerationAndUpdateSlowdownFactor(final Vehicle vehicle, final Vehicle impedingObject,
+	double getLowerAccelerationAndUpdateSlowdownFactor(final Vehicle vehicle, final ImpedingObject impedingObject,
 			final double acc1, final double acc2) {
 		if (acc1 > acc2) {
 			vehicle.distToImpedingObject = impedingObject.headPosition - impedingObject.length - vehicle.headPosition;
@@ -102,7 +102,7 @@ public class IDM {
 	 *
 	 */
 	public double updateBasedOnAllFactors(final Vehicle vehicle) {
-		final Vehicle impedingObject = new Vehicle();
+		final ImpedingObject impedingObject = new ImpedingObject();
 		double lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, 10000,
 				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.FRONT));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,

@@ -32,7 +32,7 @@ public class MOBIL {
 
 	Random random = new Random();
 	VehicleUtil vehicleUtil;
-	Vehicle impedingObject = new Vehicle();
+	ImpedingObject impedingObject = new ImpedingObject();
 	IDM idm;
 
 	public MOBIL() {
@@ -179,7 +179,7 @@ public class MOBIL {
 			return vehicle.driverProfile.MOBIL_a_thr;
 		} else {
 			final double currentAccBackVehicleTargetLane = backVehicleInTargetLane.acceleration;
-			final double nextAccBackVehicleTargetLane = idm.computeAcceleration(backVehicleInTargetLane, vehicle);
+			final double nextAccBackVehicleTargetLane = idm.computeAcceleration(backVehicleInTargetLane, new ImpedingObject(vehicle));
 			return (vehicle.driverProfile.MOBIL_p * (currentAccBackVehicleTargetLane - nextAccBackVehicleTargetLane))
 					+ vehicle.driverProfile.MOBIL_a_thr;
 		}
@@ -307,7 +307,7 @@ public class MOBIL {
 			// No back vehicle: safe
 			return true;
 		} else {
-			final double newAccBackVehicleTargetLane = idm.computeAcceleration(backVehicleInTargetLane, vehicle);
+			final double newAccBackVehicleTargetLane = idm.computeAcceleration(backVehicleInTargetLane, new ImpedingObject(vehicle));
 			// Deceleration of back vehicle in target lane would be too significant: unsafe
 			return newAccBackVehicleTargetLane > (-1 * vehicle.driverProfile.MOBIL_b_save);
 		}
