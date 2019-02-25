@@ -28,7 +28,6 @@ public class Simulation {
 	ArrayList<Fellow> connectedFellows;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
-	CarFollow carFollow = new CarFollow();
 
 	public Simulation(final TrafficNetwork trafficNetwork, final ArrayList<Fellow> connectedFellows) {
 		this.trafficNetwork = trafficNetwork;
@@ -90,46 +89,10 @@ public class Simulation {
 					vehicles.add(vehicle);
 					numVehiclesOnEdge++;
 
-					// Reset priority vehicle effect flag
-					vehicle.isAffectedByPriorityVehicle = false;
-					// Update information regarding turning
-					vehicle.findEdgeBeforeNextTurn();
-					// Find impeding objects and compute acceleration based on the objects
-					vehicle.acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(vehicle);
-					// Update vehicle speed, which must be between 0 and free-flow speed
-					vehicle.speed += vehicle.acceleration / Settings.numStepsPerSecond;
-					if (vehicle.speed > vehicle.lane.edge.freeFlowSpeed) {
-						vehicle.speed = vehicle.lane.edge.freeFlowSpeed;
-					}
-					if (vehicle.speed < 0) {
-						vehicle.speed = 0;
-					}
-					// Vehicle cannot collide with its impeding object
-					final double distToImpedingObjectAtNextStep = vehicle.distToImpedingObject
-							+ ((vehicle.spdOfImpedingObject - vehicle.speed) / Settings.numStepsPerSecond);
-					if (distToImpedingObjectAtNextStep < vehicle.driverProfile.IDM_s0) {
-						vehicle.speed = 0;
-						vehicle.acceleration = 0;
-					}
+					vehicle.moveForward(timeNow);
 
 					// Update accumulated vehicle speed
 					accumulatedVehicleSpeed += vehicle.speed;
-
-					/*
-					 * Move forward in the current lane
-					 */
-					vehicle.headPosition += vehicle.speed / Settings.numStepsPerSecond;
-
-					/*
-					 * Reset jam start time if vehicle is not in jam
-					 */
-					if (vehicle.speed > Settings.congestionSpeedThreshold) {
-						vehicle.timeJamStart = timeNow;
-					}
-
-					// Check whether road is explicitly blocked on vehicle's route
-					vehicle.updateRoadBlockInfo();
-
 					/*
 					 * Re-route vehicle in certain situations
 					 */

@@ -45,6 +45,7 @@ public class Vehicle {
 	public Edge edgeBeforeTurnRight = null;
 	public Edge edgeBeforeTurnLeft = null;
 	LaneChange laneChange = new LaneChange();
+	CarFollow carFollow = new CarFollow();
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -243,6 +244,47 @@ public class Vehicle {
 			} else {
 				break;
 			}
+		}
+	}
+
+	public void moveForward(double timeNow){
+		if(active) {
+			// Reset priority vehicle effect flag
+			isAffectedByPriorityVehicle = false;
+			// Update information regarding turning
+			findEdgeBeforeNextTurn();
+			// Find impeding objects and compute acceleration based on the objects
+			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
+			// Update vehicle speed, which must be between 0 and free-flow speed
+			speed += acceleration / Settings.numStepsPerSecond;
+			if (speed > lane.edge.freeFlowSpeed) {
+				speed = lane.edge.freeFlowSpeed;
+			}
+			if (speed < 0) {
+				speed = 0;
+			}
+			// Vehicle cannot collide with its impeding object
+			final double distToImpedingObjectAtNextStep = distToImpedingObject
+					+ ((spdOfImpedingObject - speed) / Settings.numStepsPerSecond);
+			if (distToImpedingObjectAtNextStep < driverProfile.IDM_s0) {
+				speed = 0;
+				acceleration = 0;
+			}
+
+			/*
+			 * Move forward in the current lane
+			 */
+			headPosition += speed / Settings.numStepsPerSecond;
+
+			/*
+			 * Reset jam start time if vehicle is not in jam
+			 */
+			if (speed > Settings.congestionSpeedThreshold) {
+				timeJamStart = timeNow;
+			}
+
+			// Check whether road is explicitly blocked on vehicle's route
+			updateRoadBlockInfo();
 		}
 	}
 
