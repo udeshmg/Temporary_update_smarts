@@ -693,4 +693,11 @@ public class TrafficNetwork extends RoadNetwork {
 
 		}
 	}
+
+	public void blockTramAtTramStop() {
+		for (int i = 0; i < vehicles.size(); i++) {
+			final Vehicle vehicle = vehicles.get(i);
+			vehicle.blockAtTramStop();
+		}
+	}
 }

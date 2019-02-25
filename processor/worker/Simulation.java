@@ -34,14 +34,6 @@ public class Simulation {
 		this.connectedFellows = connectedFellows;
 	}
 
-	void blockTramAtTramStop() {
-		final double lookAheadDist = Settings.lookAheadDistance;
-		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
-			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
-			vehicle.blockAtTramStop();
-		}
-	}
-
 	void clearOneStepData() {
 		oneStepData_vehiclesReachedFellowWorker.clear();
 		oneStepData_allVehiclesReachedDestination.clear();
@@ -256,7 +248,7 @@ public class Simulation {
 		}
 		trafficNetwork.updateTramStopTimers();
 		releaseVehicleFromParking(worker.timeNow);
-		blockTramAtTramStop();
+		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
 		trafficNetwork.createInternalVehicles(worker.numLocalRandomPrivateVehicles, worker.numLocalRandomTrams,
 				worker.numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
