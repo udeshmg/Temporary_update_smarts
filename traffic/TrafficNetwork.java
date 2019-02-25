@@ -408,9 +408,8 @@ public class TrafficNetwork extends RoadNetwork {
 
 	/**
 	 * Generate a route.
-	 *
-	 * @param workarea
-	 * @param strategy
+	 * @param type
+	 * @return
 	 */
 	ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
 		final Edge edgeStart = internalNonPublicVehicleStartEdges
