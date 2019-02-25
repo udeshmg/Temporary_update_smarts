@@ -1,6 +1,7 @@
 package traffic.vehicle;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -41,4 +42,74 @@ public class Vehicle {
 
 	public Edge edgeBeforeTurnRight = null;
 	public Edge edgeBeforeTurnLeft = null;
+
+	/**
+	 * This method tries to find a start position for a vehicle such that the
+	 * vehicle will be unlikely to collide with an existing vehicle. For
+	 * simplicity, this method only checks the current route leg and the two
+	 * adjacent legs. Therefore it is not guaranteed that the new position is
+	 * safe, especially when all the three legs are very short.
+	 */
+	public double getStartPositionInLane0() {
+		Edge currentEdge = routeLegs.get(indexLegOnRoute).edge;
+
+		double headPosSpaceFront = currentEdge.length;
+
+		if (indexLegOnRoute + 1 < routeLegs.size()) {
+			RouteLeg legToCheck = routeLegs.get(indexLegOnRoute + 1);
+			Lane laneToCheck = legToCheck.edge.getFirstLane();
+			if (laneToCheck.getVehicleCount() > 0) {
+				Vehicle vehicleToCheck = laneToCheck.getLastVehicleInLane();
+				double endPosOfLastVehicleOnNextLeg = vehicleToCheck.headPosition + currentEdge.length
+						- vehicleToCheck.length;
+				if (endPosOfLastVehicleOnNextLeg < headPosSpaceFront) {
+					headPosSpaceFront = endPosOfLastVehicleOnNextLeg;
+				}
+			}
+		}
+
+		double headPosSpaceBack = 0;
+
+		if (indexLegOnRoute > 0) {
+			RouteLeg legToCheck = routeLegs.get(indexLegOnRoute - 1);
+			Lane laneToCheck = legToCheck.edge.getFirstLane();
+			if (laneToCheck.getVehicleCount() > 0) {
+				Vehicle vehicleToCheck = laneToCheck.getFrontVehicleInLane();
+				double headPosOfFirstVehicleOnPreviousLeg = -(laneToCheck.edge.length - vehicleToCheck.headPosition);
+				if (headPosSpaceBack - length < headPosOfFirstVehicleOnPreviousLeg) {
+					headPosSpaceBack = headPosOfFirstVehicleOnPreviousLeg + length;
+				}
+			}
+		}
+
+		if (headPosSpaceFront <= headPosSpaceBack)
+			return -1;
+
+		final ArrayList<double[]> gaps = new ArrayList<>();
+		if (currentEdge.getFirstLane().getVehicleCount() > 0) {
+
+			double gapFront = headPosSpaceFront;
+			for (Vehicle vehicleToCheck : currentEdge.getFirstLane().getVehicles()) {
+				if (gapFront - length > vehicleToCheck.headPosition) {
+					gaps.add(new double[] { gapFront, vehicleToCheck.headPosition + length });
+				}
+				gapFront = vehicleToCheck.headPosition - vehicleToCheck.length;
+				if (gapFront < headPosSpaceBack) {
+					break;
+				}
+			}
+		} else {
+			gaps.add(new double[] { headPosSpaceFront, headPosSpaceBack });
+		}
+
+		if (gaps.size() == 0) {
+			return -1;
+		} else {
+			Random random = new Random();
+			// Pick a random position within a random gap
+			final double[] gap = gaps.get(random.nextInt(gaps.size()));
+			final double pos = gap[0] - (random.nextDouble() * (gap[0] - gap[1]));
+			return pos;
+		}
+	}
 }
