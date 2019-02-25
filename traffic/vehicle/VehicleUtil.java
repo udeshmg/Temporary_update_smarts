@@ -106,28 +106,6 @@ public class VehicleUtil {
 	}
 
 
-
-	public static void updateRoadBlockInfoForVehicle(Vehicle vehicle) {
-		double examinedDist = 0;
-		int indexLegOnRouteBeingChecked = vehicle.indexLegOnRoute;
-		while (indexLegOnRouteBeingChecked <= (vehicle.routeLegs.size() - 1)) {
-			final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
-			if (edgeBeingChecked.isBlocked()) {
-				vehicle.isRoadBlockedAhead = true;
-				return;
-			}
-			examinedDist += vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge.length;
-			// Proceeds to the next leg on route if look-ahead distance is not exhausted
-			if (((examinedDist - vehicle.headPosition) < Settings.lookAheadDistance)
-					&& (indexLegOnRouteBeingChecked < (vehicle.routeLegs.size() - 1))) {
-				indexLegOnRouteBeingChecked++;
-			} else {
-				break;
-			}
-		}
-		vehicle.isRoadBlockedAhead = false;
-	}
-
 	/**
 	 * Get the braking distance for stopping a vehicle completely.
 	 */

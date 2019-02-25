@@ -1,8 +1,10 @@
 package traffic.vehicle;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Random;
 
+import common.Settings;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.routing.RouteLeg;
@@ -184,5 +186,26 @@ public class Vehicle {
 				}
 			}
 		}
+	}
+
+	public void updateRoadBlockInfo() {
+		double examinedDist = 0;
+		int indexLegOnRouteBeingChecked = indexLegOnRoute;
+		while (indexLegOnRouteBeingChecked <= (routeLegs.size() - 1)) {
+			final Edge edgeBeingChecked = routeLegs.get(indexLegOnRouteBeingChecked).edge;
+			if (edgeBeingChecked.isBlocked()) {
+				isRoadBlockedAhead = true;
+				return;
+			}
+			examinedDist += routeLegs.get(indexLegOnRouteBeingChecked).edge.length;
+			// Proceeds to the next leg on route if look-ahead distance is not exhausted
+			if (((examinedDist - headPosition) < Settings.lookAheadDistance)
+					&& (indexLegOnRouteBeingChecked < (routeLegs.size() - 1))) {
+				indexLegOnRouteBeingChecked++;
+			} else {
+				break;
+			}
+		}
+		isRoadBlockedAhead = false;
 	}
 }

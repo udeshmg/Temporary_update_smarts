@@ -128,7 +128,7 @@ public class Simulation {
 					}
 
 					// Check whether road is explicitly blocked on vehicle's route
-					VehicleUtil.updateRoadBlockInfoForVehicle(vehicle);
+					vehicle.updateRoadBlockInfo();
 
 					/*
 					 * Re-route vehicle in certain situations
