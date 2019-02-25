@@ -217,18 +217,7 @@ public class Simulation {
 		return false;
 	}
 
-	/**
-	 * Try to move vehicle from parking area onto roads. A vehicle can only be
-	 * released from parking if the current time has passed the earliest start
-	 * time of the vehicle.
-	 *
-	 */
-	void releaseVehicleFromParking(final double timeNow) {
-		for (int i = 0; i < trafficNetwork.vehicles.size(); i++) {
-			final Vehicle vehicle = trafficNetwork.vehicles.get(i);
-			vehicle.startFromParking(timeNow);
-		}
-	}
+
 
 	synchronized void simulateOneStep(final Worker worker, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
@@ -242,7 +231,7 @@ public class Simulation {
 			trafficNetwork.lightCoordinator.updateLights();
 		}
 		trafficNetwork.updateTramStopTimers();
-		releaseVehicleFromParking(worker.timeNow);
+		trafficNetwork.releaseVehicleFromParking(worker.timeNow);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
 		trafficNetwork.createInternalVehicles(worker.numLocalRandomPrivateVehicles, worker.numLocalRandomTrams,

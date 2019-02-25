@@ -707,4 +707,17 @@ public class TrafficNetwork extends RoadNetwork {
 			vehicle.changeLane(timeNow);
 		}
 	}
+
+	/**
+	 * Try to move vehicle from parking area onto roads. A vehicle can only be
+	 * released from parking if the current time has passed the earliest start
+	 * time of the vehicle.
+	 *
+	 */
+	public void releaseVehicleFromParking(final double timeNow) {
+		for (int i = 0; i < vehicles.size(); i++) {
+			final Vehicle vehicle = vehicles.get(i);
+			vehicle.startFromParking(timeNow);
+		}
+	}
 }
