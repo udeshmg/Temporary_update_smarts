@@ -1,15 +1,11 @@
 package traffic.vehicle;
 
-import java.util.HashMap;
 import java.util.Random;
 
 import common.Settings;
 import traffic.light.LightColor;
 import traffic.road.Edge;
 import traffic.road.Lane;
-import traffic.road.RoadUtil;
-import traffic.vehicle.SlowdownFactor;
-import traffic.vehicle.LaneChangeDirection;
 
 /**
  * MOBIL model for lane-changing.
@@ -31,12 +27,10 @@ public class MOBIL {
 	Vehicle frontVehicleInTargetLane = new Vehicle();
 
 	Random random = new Random();
-	VehicleUtil vehicleUtil;
 	ImpedingObject impedingObject = new ImpedingObject();
 	IDM idm;
 
 	public MOBIL() {
-		vehicleUtil = new VehicleUtil();
 		idm = new IDM();
 	}
 
