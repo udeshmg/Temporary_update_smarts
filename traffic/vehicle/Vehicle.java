@@ -7,6 +7,7 @@ import java.util.Random;
 import common.Settings;
 import traffic.road.Edge;
 import traffic.road.Lane;
+import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 
 public class Vehicle {
@@ -164,9 +165,7 @@ public class Vehicle {
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
 
 				// Cancel priority lanes
-				if (type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(this, false);
-				}
+				setPriorityLanes(false);
 
 				timeOfLastLaneChange = timeNow;
 				final Lane currentLane = lane;
@@ -181,9 +180,7 @@ public class Vehicle {
 				lane = nextLane;
 
 				// Set priority lanes
-				if (type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(this, true);
-				}
+				setPriorityLanes(true);
 			}
 		}
 	}
@@ -314,6 +311,33 @@ public class Vehicle {
 		this.lane = lane;
 		if(lane != null) {
 			lane.addVehicleToLane(this);
+		}
+	}
+
+	/**
+	 * Set or cancel priority lanes within a certain distance.
+	 */
+	public void setPriorityLanes(final boolean isPriority) {
+		if (type == VehicleType.PRIORITY) {
+			double examinedDist = 0;
+			int laneNumber = lane.laneNumber;
+			Edge edge = lane.edge;
+			while ((examinedDist < Settings.lookAheadDistance) && (indexLegOnRoute < (routeLegs.size() - 1))) {
+				final Edge targetEdge = routeLegs.get(indexLegOnRoute).edge;
+				if (!isPriority) {
+					// Cancel priority status for all the lanes in the edge
+					for (Lane lane : targetEdge.getLanes()) {
+						lane.isPriority = false;
+					}
+				} else {
+					// Set priority for the lane that will be used by the vehicle
+					laneNumber = RoadUtil.getLaneNumberForTargetEdge(targetEdge, edge, laneNumber);
+					targetEdge.getLane(laneNumber).isPriority = true;
+				}
+				examinedDist += targetEdge.length;
+				indexLegOnRoute++;
+				edge = targetEdge;
+			}
 		}
 	}
 

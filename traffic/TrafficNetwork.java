@@ -589,9 +589,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		for (final Vehicle v : vehiclesToBeRemoved) {
 			// Cancel priority lanes
-			if (v.type == VehicleType.PRIORITY) {
-				VehicleUtil.setPriorityLanes(v, false);
-			}
+			v.setPriorityLanes(false);
 
 			// Makes vehicle inactive
 			v.active = false;

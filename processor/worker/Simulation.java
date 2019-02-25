@@ -75,9 +75,7 @@ public class Simulation {
 
 						if (reRoute) {
 							// Cancel priority lanes
-							if (vehicle.type == VehicleType.PRIORITY) {
-								VehicleUtil.setPriorityLanes(vehicle, false);
-							}
+							vehicle.setPriorityLanes(false);
 
 							// Reroute vehicle
 							trafficNetwork.routingAlgorithm.reRoute(vehicle);
@@ -94,9 +92,7 @@ public class Simulation {
 					}
 
 					// Set priority lanes
-					if (vehicle.type == VehicleType.PRIORITY) {
-						VehicleUtil.setPriorityLanes(vehicle, true);
-					}
+					vehicle.setPriorityLanes(true);
 				}
 
 			}
@@ -121,9 +117,7 @@ public class Simulation {
 			if (overshootDist >= 0) {
 
 				// Cancel priority lanes
-				if (vehicle.type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(vehicle, false);
-				}
+				vehicle.setPriorityLanes(false);
 
 				while ((vehicle.indexLegOnRoute < vehicle.routeLegs.size()) && (overshootDist >= 0)) {
 					// Update head position
@@ -169,9 +163,7 @@ public class Simulation {
 				}
 
 				// Set priority lanes
-				if (vehicle.type == VehicleType.PRIORITY) {
-					VehicleUtil.setPriorityLanes(vehicle, true);
-				}
+				vehicle.setPriorityLanes(true);
 			}
 		}
 

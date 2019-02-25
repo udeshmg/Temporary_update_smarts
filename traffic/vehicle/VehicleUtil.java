@@ -78,31 +78,7 @@ public class VehicleUtil {
 		return (vehicle.speed * vehicle.speed) / 2.0 / vehicle.driverProfile.IDM_b;
 	}
 
-	/**
-	 * Set or cancel priority lanes within a certain distance.
-	 */
-	public static void setPriorityLanes(final Vehicle vehicle, final boolean isPriority) {
-		double examinedDist = 0;
-		int indexLegOnRoute = vehicle.indexLegOnRoute;
-		int laneNumber = vehicle.lane.laneNumber;
-		Edge edge = vehicle.lane.edge;
-		while ((examinedDist < Settings.lookAheadDistance) && (indexLegOnRoute < (vehicle.routeLegs.size() - 1))) {
-			final Edge targetEdge = vehicle.routeLegs.get(indexLegOnRoute).edge;
-			if (!isPriority) {
-				// Cancel priority status for all the lanes in the edge
-				for (Lane lane : targetEdge.getLanes()) {
-					lane.isPriority = false;
-				}
-			} else {
-				// Set priority for the lane that will be used by the vehicle
-				laneNumber = RoadUtil.getLaneNumberForTargetEdge(targetEdge, edge, laneNumber);
-				targetEdge.getLane(laneNumber).isPriority = true;
-			}
-			examinedDist += targetEdge.length;
-			indexLegOnRoute++;
-			edge = targetEdge;
-		}
-	}
+
 
 
 
