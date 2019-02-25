@@ -162,12 +162,12 @@ public class TrafficNetwork extends RoadNetwork {
 			// Add vehicle to system
 			vehicles.add(vehicle);
 
-			parkOneVehicle(vehicle, true, timeRouteStart);
+			vehicle.park(true, timeRouteStart);
 		} else {
 			// Add external vehicle to system
 			vehicle.id = externalId;
 			vehicles.add(vehicle);
-			parkOneVehicle(vehicle, true, timeRouteStart);
+			vehicle.park(true, timeRouteStart);
 		}
 
 		// Certain information about this vehicle will be reported to server
@@ -192,7 +192,7 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 		}
 		if (vehicle.routeLegs.get(vehicle.indexLegOnRoute).stopover > 0) {
-			parkOneVehicle(vehicle, false, timeNow);
+			vehicle.park(false, timeNow);
 		}
 	}
 
@@ -580,23 +580,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 
 
-	/**
-	 * Moves vehicle to parking.
-	 */
-	public void parkOneVehicle(final Vehicle vehicle, final boolean isNewVehicle, final double timeNow) {
-		vehicle.speed = 0;
-		vehicle.acceleration = 0;
-		vehicle.routeLegs.get(vehicle.indexLegOnRoute).edge.addParkedVehicle(vehicle);
-		if (isNewVehicle) {
-			vehicle.earliestTimeToLeaveParking = vehicle.timeRouteStart + vehicle.routeLegs.get(0).stopover;
-		} else {
-			vehicle.earliestTimeToLeaveParking = timeNow + vehicle.routeLegs.get(vehicle.indexLegOnRoute).stopover;
-		}
-		if (vehicle.lane != null) {
-			vehicle.lane.removeVehicle(vehicle);
-			vehicle.lane = null;
-		}
-	}
+
 
 	/**
 	 * Remove vehicles from their lanes and the whole traffic network.

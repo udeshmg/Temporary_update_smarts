@@ -266,7 +266,7 @@ public class Simulation {
 					// Park vehicle as plan if vehicle remains on the same
 					// worker
 					if (nextLeg.stopover > 0) {
-						trafficNetwork.parkOneVehicle(vehicle, false, timeNow);
+						vehicle.park(false, timeNow);
 						break;
 					}
 				}

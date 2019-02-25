@@ -112,4 +112,22 @@ public class Vehicle {
 			return pos;
 		}
 	}
+
+	/**
+	 * Moves vehicle to parking.
+	 */
+	public void park(final boolean isNewVehicle, final double timeNow) {
+		speed = 0;
+		acceleration = 0;
+		routeLegs.get(indexLegOnRoute).edge.addParkedVehicle(this);
+		if (isNewVehicle) {
+			earliestTimeToLeaveParking = timeRouteStart + routeLegs.get(0).stopover;
+		} else {
+			earliestTimeToLeaveParking = timeNow + routeLegs.get(indexLegOnRoute).stopover;
+		}
+		if (lane != null) {
+			lane.removeVehicle(this);
+			lane = null;
+		}
+	}
 }
