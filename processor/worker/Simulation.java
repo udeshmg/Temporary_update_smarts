@@ -2,6 +2,7 @@ package processor.worker;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import common.Settings;
 import processor.communication.message.SerializableTrajectoryPoint;
@@ -25,7 +26,7 @@ import traffic.vehicle.VehicleUtil;
  */
 public class Simulation {
 	TrafficNetwork trafficNetwork;
-	ArrayList<Fellow> connectedFellows;
+	private List<Fellow> connectedFellows;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 
@@ -150,7 +151,7 @@ public class Simulation {
 					// Update the overshoot distance of vehicle
 					overshootDist -= nextEdge.length;
 					// Check whether vehicle reaches fellow worker
-					if (reachFellow(vehicle)) {
+					if (reachFellow( connectedFellows, vehicle)) {
 						oneStepData_vehiclesReachedFellowWorker.add(vehicle);
 						break;
 					}
@@ -186,7 +187,7 @@ public class Simulation {
 	/**
 	 * Check whether a vehicle reaches the work area of a fellow worker.
 	 */
-	boolean reachFellow(final Vehicle vehicle) {
+	public static boolean reachFellow(List<Fellow> connectedFellows, final Vehicle vehicle) {
 		if (vehicle.lane == null) {
 			return false;
 		}
