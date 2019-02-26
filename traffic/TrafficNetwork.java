@@ -15,6 +15,7 @@ import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableRouteLeg;
 import processor.worker.Fellow;
 import traffic.light.LightCoordinator;
+import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.road.GridCell;
 import traffic.road.Lane;
@@ -716,6 +717,12 @@ public class TrafficNetwork extends RoadNetwork {
 		for (int i = 0; i < vehicles.size(); i++) {
 			final Vehicle vehicle = vehicles.get(i);
 			vehicle.startFromParking(timeNow);
+		}
+	}
+
+	public void updateTrafficLights(){
+		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+			lightCoordinator.updateLights();
 		}
 	}
 }

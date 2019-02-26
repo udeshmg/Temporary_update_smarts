@@ -140,9 +140,7 @@ public class Simulation {
 		moveVehiclesNotAroundBorder(worker);
 		removeTripFinishedVehicles();
 		trafficNetwork.changeLaneOfVehicles(worker.timeNow);
-		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
-			trafficNetwork.lightCoordinator.updateLights();
-		}
+		trafficNetwork.updateTrafficLights();
 		trafficNetwork.updateTramStopTimers();
 		trafficNetwork.releaseVehicleFromParking(worker.timeNow);
 		trafficNetwork.blockTramAtTramStop();
