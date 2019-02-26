@@ -61,36 +61,7 @@ public class Simulation {
 
 					// Update accumulated vehicle speed
 					accumulatedVehicleSpeed += vehicle.speed;
-					/*
-					 * Re-route vehicle in certain situations
-					 */
-					if ((vehicle.type != VehicleType.TRAM) && (Settings.isAllowReroute)) {
-						boolean reRoute = false;
-						// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
-						if (vehicle.indexLegOnRoute < (vehicle.getRouteLegs().size() - 1)) {
-							if ((timeNow - vehicle.timeJamStart) > vehicle.driverProfile.minRerouteTimeGap
-									|| vehicle.isRoadBlockedAhead) {
-								reRoute = true;
-							}
-						}
-
-						if (reRoute) {
-							// Cancel priority lanes
-							vehicle.setPriorityLanes(false);
-
-							// Reroute vehicle
-							trafficNetwork.routingAlgorithm.reRoute(vehicle);
-
-							// Reset jam start time
-							vehicle.timeJamStart = timeNow;
-							// Increment reroute count
-							vehicle.numReRoute++;
-							// Limit number of re-route for internal vehicle
-							if ((vehicle.numReRoute > Settings.maxNumReRouteOfInternalVehicle) && !vehicle.isExternal) {
-								vehicle.markAsFinished();
-							}
-						}
-					}
+					vehicle.reRoute(timeNow, trafficNetwork.routingAlgorithm);
 					if(vehicle.isFinished()){
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
 					}

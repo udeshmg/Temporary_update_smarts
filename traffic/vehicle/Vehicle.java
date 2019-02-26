@@ -11,6 +11,7 @@ import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
+import traffic.routing.Routing;
 
 public class Vehicle {
 	public String id = "";
@@ -392,5 +393,71 @@ public class Vehicle {
 
 	public void markAsFinished() {
 		this.finished = true;
+	}
+
+	public void reRoute(double timeNow, Routing routingAlgorithm){
+		/*
+		 * Re-route vehicle in certain situations
+		 */
+		if ((type != VehicleType.TRAM) && (Settings.isAllowReroute)) {
+			boolean reRoute = false;
+			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
+			if (indexLegOnRoute < (getRouteLegs().size() - 1)) {
+				if ((timeNow - timeJamStart) > driverProfile.minRerouteTimeGap || isRoadBlockedAhead) {
+					reRoute = true;
+				}
+			}
+
+			if (reRoute) {
+				// Cancel priority lanes
+				setPriorityLanes(false);
+
+				// Reroute vehicle
+				reRoute(routingAlgorithm);
+
+				// Reset jam start time
+				timeJamStart = timeNow;
+				// Increment reroute count
+				numReRoute++;
+				// Limit number of re-route for internal vehicle
+				if ((numReRoute > Settings.maxNumReRouteOfInternalVehicle) && !isExternal) {
+					markAsFinished();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Create a new route from a given vehicle's current edge to its
+	 * destination. The new route must be different to the old route.
+	 */
+	private void reRoute(Routing routingAlgorithm) {
+
+		List<RouteLeg> oldRoute = getRouteLegs();
+		int currentIndexOnOldRoute = indexLegOnRoute;
+
+		// No re-route if vehicle is on last leg
+		if (currentIndexOnOldRoute >= oldRoute.size() - 1) {
+			return;
+		}
+
+		// Copy earlier parts of old route to new route
+		ArrayList<RouteLeg> newRoute = new ArrayList<RouteLeg>();
+		for (int i = 0; i <= currentIndexOnOldRoute; i++) {
+			newRoute.add(oldRoute.get(i));
+		}
+
+		// Try a few times for computing new route.
+		for (int i = 0; i < 3; i++) {
+			ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute + 1).edge,
+					oldRoute.get(oldRoute.size() - 1).edge, type);
+			// The next leg on the old route cannot be the next leg on the new route!
+			if (partialRoute != null && partialRoute.get(0).edge != oldRoute.get(currentIndexOnOldRoute + 1).edge) {
+				newRoute.addAll(partialRoute);
+				setRouteLegs(newRoute);
+				break;
+			}
+		}
+
 	}
 }
