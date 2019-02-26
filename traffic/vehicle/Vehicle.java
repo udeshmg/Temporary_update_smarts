@@ -49,6 +49,7 @@ public class Vehicle {
 	public Edge edgeBeforeTurnLeft = null;
 	LaneChange laneChange = new LaneChange();
 	CarFollow carFollow = new CarFollow();
+	private boolean finished = false;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -385,5 +386,11 @@ public class Vehicle {
 		return routeLegs.size();
 	}
 
+	public boolean isFinished() {
+		return finished;
+	}
 
+	public void markAsFinished() {
+		this.finished = true;
+	}
 }

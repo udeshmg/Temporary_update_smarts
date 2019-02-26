@@ -87,11 +87,13 @@ public class Simulation {
 							vehicle.numReRoute++;
 							// Limit number of re-route for internal vehicle
 							if ((vehicle.numReRoute > Settings.maxNumReRouteOfInternalVehicle) && !vehicle.isExternal) {
-								oneStepData_allVehiclesReachedDestination.add(vehicle);
+								vehicle.markAsFinished();
 							}
 						}
 					}
-
+					if(vehicle.isFinished()){
+						oneStepData_allVehiclesReachedDestination.add(vehicle);
+					}
 					// Set priority lanes
 					vehicle.setPriorityLanes(true);
 				}
@@ -128,7 +130,7 @@ public class Simulation {
 
 					// Check whether vehicle finishes trip
 					if (vehicle.active && (vehicle.indexLegOnRoute >= vehicle.getRouteLegCount())) {
-						oneStepData_allVehiclesReachedDestination.add(vehicle);
+						vehicle.markAsFinished();
 						if (vehicle.isForeground) {
 							vehicle.timeTravel = timeNow - vehicle.timeRouteStart;
 						}
@@ -161,6 +163,9 @@ public class Simulation {
 						vehicle.park(false, timeNow);
 						break;
 					}
+				}
+				if(vehicle.isFinished()){
+					oneStepData_allVehiclesReachedDestination.add(vehicle);
 				}
 
 				// Set priority lanes
