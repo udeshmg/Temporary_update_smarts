@@ -125,7 +125,7 @@ public class Simulation {
 					overshootDist -= nextEdge.length;
 					// Check whether vehicle reaches fellow worker
 					if (reachFellow( connectedFellows, vehicle)) {
-						oneStepData_vehiclesReachedFellowWorker.add(vehicle);
+						vehicle.markAsReachedFellow();
 						break;
 					}
 					// Park vehicle as plan if vehicle remains on the same
@@ -135,12 +135,15 @@ public class Simulation {
 						break;
 					}
 				}
-				if(vehicle.isFinished()){
-					oneStepData_allVehiclesReachedDestination.add(vehicle);
-				}
 
 				// Set priority lanes
 				vehicle.setPriorityLanes(true);
+			}
+			if(vehicle.isFinished()){
+				oneStepData_allVehiclesReachedDestination.add(vehicle);
+			}
+			if(vehicle.isReachedFellow()){
+				oneStepData_vehiclesReachedFellowWorker.add(vehicle);
 			}
 		}
 

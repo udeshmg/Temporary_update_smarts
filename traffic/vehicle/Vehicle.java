@@ -51,6 +51,7 @@ public class Vehicle {
 	LaneChange laneChange = new LaneChange();
 	CarFollow carFollow = new CarFollow();
 	private boolean finished = false;
+	private boolean reachedFellow = false;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -459,5 +460,13 @@ public class Vehicle {
 			}
 		}
 
+	}
+
+	public boolean isReachedFellow() {
+		return reachedFellow;
+	}
+
+	public void markAsReachedFellow() {
+		this.reachedFellow = true;
 	}
 }
