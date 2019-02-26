@@ -67,7 +67,7 @@ public class Simulation {
 					if ((vehicle.type != VehicleType.TRAM) && (Settings.isAllowReroute)) {
 						boolean reRoute = false;
 						// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
-						if (vehicle.indexLegOnRoute < (vehicle.routeLegs.size() - 1)) {
+						if (vehicle.indexLegOnRoute < (vehicle.getRouteLegs().size() - 1)) {
 							if ((timeNow - vehicle.timeJamStart) > vehicle.driverProfile.minRerouteTimeGap
 									|| vehicle.isRoadBlockedAhead) {
 								reRoute = true;
@@ -120,14 +120,14 @@ public class Simulation {
 				// Cancel priority lanes
 				vehicle.setPriorityLanes(false);
 
-				while ((vehicle.indexLegOnRoute < vehicle.routeLegs.size()) && (overshootDist >= 0)) {
+				while ((vehicle.indexLegOnRoute < vehicle.getRouteLegCount()) && (overshootDist >= 0)) {
 					// Update head position
 					vehicle.headPosition -= vehicle.lane.edge.length;
 					// Update route leg
 					vehicle.indexLegOnRoute++;
 
 					// Check whether vehicle finishes trip
-					if (vehicle.active && (vehicle.indexLegOnRoute >= vehicle.routeLegs.size())) {
+					if (vehicle.active && (vehicle.indexLegOnRoute >= vehicle.getRouteLegCount())) {
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
 						if (vehicle.isForeground) {
 							vehicle.timeTravel = timeNow - vehicle.timeRouteStart;
@@ -135,7 +135,7 @@ public class Simulation {
 						break;
 					}
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
-					final RouteLeg nextLeg = vehicle.routeLegs.get(vehicle.indexLegOnRoute);
+					final RouteLeg nextLeg = vehicle.getRouteLeg(vehicle.indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;
 					Lane newLane = null;
 					if (nextEdge.getLaneCount() <= vehicle.lane.laneNumber) {

@@ -173,7 +173,7 @@ public class Worker implements MessageHandler, Runnable {
 		final Vehicle vehicle = new Vehicle();
 		vehicle.type = VehicleType.getVehicleTypeFromName(serializableVehicle.type);
 		vehicle.length = vehicle.type.length;
-		vehicle.routeLegs = RouteUtil.parseReceivedRoute(serializableVehicle.routeLegs, trafficNetwork.edges);
+		vehicle.setRouteLegs(RouteUtil.parseReceivedRoute(serializableVehicle.routeLegs, trafficNetwork.edges));
 		vehicle.indexLegOnRoute = serializableVehicle.indexRouteLeg;
 		vehicle.lane = trafficNetwork.lanes.get(serializableVehicle.laneIndex);
 		vehicle.headPosition = serializableVehicle.headPosition;

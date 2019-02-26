@@ -6,7 +6,6 @@ import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.RoadUtil;
-import traffic.vehicle.SlowdownFactor;
 
 /**
  * This class computes ideal acceleration based on various types of impeding
@@ -151,15 +150,15 @@ public class IDM {
 									 final ImpedingObject impedingObj, final SlowdownFactor factor) {
 		double examinedDist = 0;
 		impedingObj.headPosition = -1; // Initialize front vehicle's position.
-		while ((impedingObj.headPosition < 0) && (indexLegOnRouteBeingChecked <= (vehicle.routeLegs.size() - 1))) {
+		while ((impedingObj.headPosition < 0) && (indexLegOnRouteBeingChecked <= (vehicle.getRouteLegCount() - 1))) {
 			if (factor == SlowdownFactor.FRONT) {
 				updateImpedingObject_Front(vehicle, examinedDist, indexLegOnRouteBeingChecked, laneNumber, impedingObj);
 			} else if (factor == SlowdownFactor.TRAM) {
 				updateImpedingObject_Tram(vehicle, examinedDist,
-						vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge, impedingObj);
+						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impedingObj);
 			} else if (factor == SlowdownFactor.LIGHT) {
 				updateImpedingObject_Light(vehicle, examinedDist,
-						vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge, impedingObj);
+						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impedingObj);
 			} else if (factor == SlowdownFactor.CONFLICT) {
 				updateImpedingObject_Conflict(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
 			} else if (factor == SlowdownFactor.LANEBLOCK) {
@@ -170,11 +169,11 @@ public class IDM {
 				updateImpedingObject_PriorityVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
 			}
 			if (impedingObj.headPosition < 0) {
-				examinedDist += vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge.length;
+				examinedDist += vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length;
 				// Proceeds to the next leg on route if look-ahead distance is
 				// not exhausted
 				if (((examinedDist - vehicle.headPosition) < Settings.lookAheadDistance)
-						&& (indexLegOnRouteBeingChecked < (vehicle.routeLegs.size() - 1))) {
+						&& (indexLegOnRouteBeingChecked < (vehicle.getRouteLegCount() - 1))) {
 					indexLegOnRouteBeingChecked++;
 				} else {
 					// If no impeding object is found within look-ahead
@@ -212,9 +211,9 @@ public class IDM {
 		 * Search for traffic from possible conflicting approaches at the end of
 		 * the current edge.
 		 */
-		if (indexLegOnRouteBeingChecked < (vehicle.routeLegs.size() - 1)) {
-			final Edge targetEdge = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
-			final Edge nextEdge = vehicle.routeLegs.get(indexLegOnRouteBeingChecked + 1).edge;
+		if (indexLegOnRouteBeingChecked < (vehicle.getRouteLegCount() - 1)) {
+			final Edge targetEdge = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
+			final Edge nextEdge = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked + 1);
 
 			double earliestTime = 10000;
 
@@ -277,7 +276,7 @@ public class IDM {
 	void updateImpedingObject_Front(final Vehicle vehicle, final double examinedDist,
 									final int indexLegOnRouteBeingChecked, int laneNumber, final ImpedingObject slowdownObj) {
 
-		final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
+		final Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		// Adjust lane number based on continuity of lane
 		int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
 				laneNumber);
@@ -322,7 +321,7 @@ public class IDM {
 			return;
 		}
 
-		final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
+		final Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		// Adjust lane number based on continuity of lane
 		int laneNumber = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
 				vehicle.lane.laneNumber);
@@ -350,8 +349,8 @@ public class IDM {
 	 */
 	void updateImpedingObject_LaneBlock(final Vehicle vehicle, final double examinedDist,
 										final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
-		if (indexLegOnRouteBeingChecked < vehicle.routeLegs.size()) {
-			final Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
+		if (indexLegOnRouteBeingChecked < vehicle.getRouteLegCount()) {
+			final Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 			// Adjust lane number based on continuity of lane
 			int laneNumber = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
 					vehicle.lane.laneNumber);
@@ -359,7 +358,7 @@ public class IDM {
 			if (targetLane.isBlocked) {
 				slowdownObj.speed = 0;
 				slowdownObj.headPosition = (examinedDist
-						+ vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge.length + vehicle.driverProfile.IDM_s0)
+						+ vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length + vehicle.driverProfile.IDM_s0)
 						- 0.00001;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
@@ -479,7 +478,7 @@ public class IDM {
 	 */
 	void updateImpedingObject_Turn(final Vehicle vehicle, final double examinedDist,
 								   final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
-		Edge edgeBeingChecked = vehicle.routeLegs.get(indexLegOnRouteBeingChecked).edge;
+		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft || edgeBeingChecked == vehicle.edgeBeforeTurnRight) {
 			// Block vehicle if vehicle's lane cannot be used for turning
 			int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,

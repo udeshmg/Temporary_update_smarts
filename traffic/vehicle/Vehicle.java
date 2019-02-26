@@ -2,6 +2,8 @@ package traffic.vehicle;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import common.Settings;
@@ -12,7 +14,7 @@ import traffic.routing.RouteLeg;
 
 public class Vehicle {
 	public String id = "";
-	public ArrayList<RouteLeg> routeLegs = new ArrayList<>(1000);
+	private List<RouteLeg> routeLegs = new ArrayList<>(1000);
 	public VehicleType type = null;
 	public double headPosition = 0;
 	public Lane lane = null;
@@ -339,6 +341,48 @@ public class Vehicle {
 				edge = targetEdge;
 			}
 		}
+	}
+
+	public Edge getCurrentEdge(){
+		RouteLeg routeLeg = getCurrentLeg();
+		if(routeLeg != null) {
+			return routeLeg.edge;
+		}
+		return null;
+	}
+
+	public RouteLeg getCurrentLeg(){
+		if(indexLegOnRoute > -1 && indexLegOnRoute < routeLegs.size()) {
+			return routeLegs.get(indexLegOnRoute);
+		}
+		return null;
+	}
+
+	public RouteLeg getRouteLeg(int indexOfRouteLeg){
+		if(indexOfRouteLeg > -1 && indexOfRouteLeg < routeLegs.size()) {
+			return routeLegs.get(indexOfRouteLeg);
+		}
+		return null;
+	}
+
+	public Edge getRouteLegEdge(int indexOfRouteLeg){
+		RouteLeg routeLeg = getRouteLeg(indexOfRouteLeg);
+		if(routeLeg != null){
+			return routeLeg.edge;
+		}
+		return null;
+	}
+
+	public List<RouteLeg> getRouteLegs(){
+		return Collections.unmodifiableList(routeLegs);
+	}
+
+	public void setRouteLegs(List<RouteLeg> routeLegs){
+		this.routeLegs = routeLegs;
+	}
+
+	public int getRouteLegCount(){
+		return routeLegs.size();
 	}
 
 

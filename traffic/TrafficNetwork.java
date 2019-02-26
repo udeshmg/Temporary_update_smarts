@@ -141,7 +141,7 @@ public class TrafficNetwork extends RoadNetwork {
 		// Length of vehicle
 		vehicle.length = type.length;
 		// Legs of route
-		vehicle.routeLegs = routeLegs;
+		vehicle.setRouteLegs(routeLegs);
 		// Driver profile
 		vehicle.driverProfile = dP;
 		// Set as active
@@ -191,7 +191,7 @@ public class TrafficNetwork extends RoadNetwork {
 				numInternalNonPublicVehicle++;
 			}
 		}
-		if (vehicle.routeLegs.get(vehicle.indexLegOnRoute).stopover > 0) {
+		if (vehicle.getCurrentLeg().stopover > 0) {
 			vehicle.park(false, timeNow);
 		}
 	}

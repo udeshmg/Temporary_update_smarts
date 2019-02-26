@@ -111,7 +111,7 @@ public class MOBIL {
 	double getAdditionalIncentive(final Vehicle vehicle, final LaneChangeDirection direction) {
 
 		double incentive = 0;
-		final Edge currentEdge = vehicle.routeLegs.get(vehicle.indexLegOnRoute).edge;
+		final Edge currentEdge = vehicle.getCurrentEdge();
 
 		if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
 			// Encourage change for making a turn			

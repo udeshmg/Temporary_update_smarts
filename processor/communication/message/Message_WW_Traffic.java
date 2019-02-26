@@ -63,7 +63,7 @@ public class Message_WW_Traffic {
 
 	ArrayList<SerializableRouteLeg> getSerializableRoute(final Vehicle vehicle) {
 		final ArrayList<SerializableRouteLeg> legs = new ArrayList<>();
-		for (final RouteLeg leg : vehicle.routeLegs) {
+		for (final RouteLeg leg : vehicle.getRouteLegs()) {
 			legs.add(new SerializableRouteLeg(leg.edge.index, leg.stopover));
 		}
 		return legs;

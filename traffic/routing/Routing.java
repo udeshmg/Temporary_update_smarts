@@ -1,6 +1,7 @@
 package traffic.routing;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
@@ -26,7 +27,7 @@ public abstract class Routing {
 	 */
 	public void reRoute(Vehicle vehicle) {
 
-		ArrayList<RouteLeg> oldRoute = vehicle.routeLegs;
+		List<RouteLeg> oldRoute = vehicle.getRouteLegs();
 		int currentIndexOnOldRoute = vehicle.indexLegOnRoute;
 
 		// No re-route if vehicle is on last leg
@@ -47,7 +48,7 @@ public abstract class Routing {
 			// The next leg on the old route cannot be the next leg on the new route!
 			if (partialRoute != null && partialRoute.get(0).edge != oldRoute.get(currentIndexOnOldRoute + 1).edge) {
 				newRoute.addAll(partialRoute);
-				vehicle.routeLegs = newRoute;
+				vehicle.setRouteLegs(newRoute);
 				break;
 			}
 		}

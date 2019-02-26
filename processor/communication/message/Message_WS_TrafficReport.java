@@ -67,7 +67,7 @@ public class Message_WS_TrafficReport {
 				sVehicle.latHead = coordinates[1];
 				sVehicle.lonTail = coordinates[2];
 				sVehicle.latTail = coordinates[3];
-				sVehicle.numLinksToGo = v.routeLegs.size() - 1 - v.indexLegOnRoute;
+				sVehicle.numLinksToGo = v.getRouteLegCount() - 1 - v.indexLegOnRoute;
 				sVehicle.id = v.id;
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
@@ -105,9 +105,9 @@ public class Message_WS_TrafficReport {
 		for (final Vehicle vehicle : vehicles) {
 			final ArrayList<SerializableRouteDumpPoint> routeDumpPoints = new ArrayList<>();
 			final SerializableRouteDumpPoint startPoint = new SerializableRouteDumpPoint(
-					vehicle.routeLegs.get(0).edge.startNode.osmId, vehicle.routeLegs.get(0).stopover);
+					vehicle.getRouteLegEdge(0).startNode.osmId, vehicle.getRouteLeg(0).stopover);
 			routeDumpPoints.add(startPoint);
-			for (final RouteLeg routeLeg : vehicle.routeLegs) {
+			for (final RouteLeg routeLeg : vehicle.getRouteLegs()) {
 				final SerializableRouteDumpPoint point = new SerializableRouteDumpPoint(routeLeg.edge.endNode.osmId,
 						routeLeg.stopover);
 				routeDumpPoints.add(point);
