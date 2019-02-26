@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import common.Settings;
+import processor.worker.Fellow;
+import processor.worker.Simulation;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.RoadUtil;
@@ -468,5 +470,63 @@ public class Vehicle {
 
 	public void markAsReachedFellow() {
 		this.reachedFellow = true;
+	}
+
+	public void moveToNextLink(double timeNow, List<Fellow> connectedFellows){
+		if (active) {
+			double overshootDist = headPosition - lane.edge.length;
+
+			if (overshootDist >= 0) {
+
+				// Cancel priority lanes
+				setPriorityLanes(false);
+
+				while ((indexLegOnRoute < getRouteLegCount()) && (overshootDist >= 0)) {
+					// Update head position
+					headPosition -= lane.edge.length;
+					// Update route leg
+					indexLegOnRoute++;
+
+					// Check whether vehicle finishes trip
+					if (active && (indexLegOnRoute >= getRouteLegCount())) {
+						markAsFinished();
+						if (isForeground) {
+							timeTravel = timeNow - timeRouteStart;
+						}
+						break;
+					}
+					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
+					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
+					final Edge nextEdge = nextLeg.edge;
+					Lane newLane = null;
+					if (nextEdge.getLaneCount() <= lane.laneNumber) {
+						newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
+					} else {
+						newLane = nextEdge.getLane(lane.laneNumber);
+					}
+					updateLane(newLane);
+					// Remember the cluster of traffic lights
+					if (nextEdge.startNode.idLightNodeGroup != 0) {
+						idLightGroupPassed = nextEdge.startNode.idLightNodeGroup;
+					}
+					// Update the overshoot distance of vehicle
+					overshootDist -= nextEdge.length;
+					// Check whether vehicle reaches fellow worker
+					if (Simulation.reachFellow(connectedFellows, this)) {
+						markAsReachedFellow();
+						break;
+					}
+					// Park vehicle as plan if vehicle remains on the same
+					// worker
+					if (nextLeg.stopover > 0) {
+						park(false, timeNow);
+						break;
+					}
+				}
+
+				// Set priority lanes
+				setPriorityLanes(true);
+			}
+		}
 	}
 }

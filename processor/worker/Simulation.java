@@ -86,59 +86,7 @@ public class Simulation {
 			if (!vehicle.active) {
 				continue;
 			}
-			double overshootDist = vehicle.headPosition - vehicle.lane.edge.length;
-
-			if (overshootDist >= 0) {
-
-				// Cancel priority lanes
-				vehicle.setPriorityLanes(false);
-
-				while ((vehicle.indexLegOnRoute < vehicle.getRouteLegCount()) && (overshootDist >= 0)) {
-					// Update head position
-					vehicle.headPosition -= vehicle.lane.edge.length;
-					// Update route leg
-					vehicle.indexLegOnRoute++;
-
-					// Check whether vehicle finishes trip
-					if (vehicle.active && (vehicle.indexLegOnRoute >= vehicle.getRouteLegCount())) {
-						vehicle.markAsFinished();
-						if (vehicle.isForeground) {
-							vehicle.timeTravel = timeNow - vehicle.timeRouteStart;
-						}
-						break;
-					}
-					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
-					final RouteLeg nextLeg = vehicle.getRouteLeg(vehicle.indexLegOnRoute);
-					final Edge nextEdge = nextLeg.edge;
-					Lane newLane = null;
-					if (nextEdge.getLaneCount() <= vehicle.lane.laneNumber) {
-						newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
-					} else {
-						newLane = nextEdge.getLane(vehicle.lane.laneNumber);
-					}
-					vehicle.updateLane(newLane);
-					// Remember the cluster of traffic lights
-					if (nextEdge.startNode.idLightNodeGroup != 0) {
-						vehicle.idLightGroupPassed = nextEdge.startNode.idLightNodeGroup;
-					}
-					// Update the overshoot distance of vehicle
-					overshootDist -= nextEdge.length;
-					// Check whether vehicle reaches fellow worker
-					if (reachFellow( connectedFellows, vehicle)) {
-						vehicle.markAsReachedFellow();
-						break;
-					}
-					// Park vehicle as plan if vehicle remains on the same
-					// worker
-					if (nextLeg.stopover > 0) {
-						vehicle.park(false, timeNow);
-						break;
-					}
-				}
-
-				// Set priority lanes
-				vehicle.setPriorityLanes(true);
-			}
+			vehicle.moveToNextLink(timeNow, connectedFellows);
 			if(vehicle.isFinished()){
 				oneStepData_allVehiclesReachedDestination.add(vehicle);
 			}
