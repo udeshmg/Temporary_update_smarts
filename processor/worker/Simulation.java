@@ -1,22 +1,13 @@
 package processor.worker;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import common.Settings;
-import processor.communication.message.SerializableTrajectoryPoint;
 import traffic.TrafficNetwork;
-import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.road.Lane;
-import traffic.routing.RouteLeg;
-import traffic.vehicle.CarFollow;
-import traffic.vehicle.LaneChange;
-import traffic.vehicle.LaneChangeDirection;
 import traffic.vehicle.Vehicle;
-import traffic.vehicle.VehicleType;
-import traffic.vehicle.VehicleUtil;
 
 /**
  * This class performs simulation at worker. The simulation includes a sequence

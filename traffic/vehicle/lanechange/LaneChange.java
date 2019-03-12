@@ -1,4 +1,6 @@
-package traffic.vehicle;
+package traffic.vehicle.lanechange;
+
+import traffic.vehicle.Vehicle;
 
 /**
  * This class makes lane-change decisions. Current implementation uses MOBIL

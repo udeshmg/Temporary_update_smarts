@@ -1,4 +1,4 @@
-package traffic.vehicle;
+package traffic.vehicle.lanechange;
 
 import java.util.Random;
 
@@ -6,6 +6,10 @@ import common.Settings;
 import traffic.light.LightColor;
 import traffic.road.Edge;
 import traffic.road.Lane;
+import traffic.vehicle.*;
+import traffic.vehicle.carfollow.IDM;
+import traffic.vehicle.carfollow.ImpedingObject;
+import traffic.vehicle.carfollow.SlowdownFactor;
 
 /**
  * MOBIL model for lane-changing.

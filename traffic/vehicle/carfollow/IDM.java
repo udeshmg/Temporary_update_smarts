@@ -1,4 +1,4 @@
-package traffic.vehicle;
+package traffic.vehicle.carfollow;
 
 import common.Settings;
 import traffic.light.LightColor;
@@ -6,6 +6,7 @@ import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.RoadUtil;
+import traffic.vehicle.*;
 
 /**
  * This class computes ideal acceleration based on various types of impeding

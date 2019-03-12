@@ -21,6 +21,6 @@ public abstract class Routing {
 
 	public abstract ArrayList<RouteLeg> createCompleteRoute(Edge startEdge, Edge endEdge, VehicleType type);
 
-	
+
 
 }

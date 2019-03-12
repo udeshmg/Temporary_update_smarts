@@ -1,5 +1,8 @@
-package traffic.vehicle;
+package traffic.vehicle.carfollow;
 
+
+import traffic.vehicle.Vehicle;
+import traffic.vehicle.VehicleType;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.

@@ -1,4 +1,6 @@
-package traffic.vehicle;
+package traffic.vehicle.carfollow;
+
+import traffic.vehicle.Vehicle;
 
 /**
  * This class computes vehicle's acceleration based on car-following model and

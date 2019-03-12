@@ -14,6 +14,9 @@ import traffic.road.Lane;
 import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
+import traffic.vehicle.carfollow.CarFollow;
+import traffic.vehicle.lanechange.LaneChange;
+import traffic.vehicle.lanechange.LaneChangeDirection;
 
 public class Vehicle {
 	public String id = "";

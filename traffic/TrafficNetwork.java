@@ -13,7 +13,6 @@ import java.util.Random;
 import common.Settings;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableRouteLeg;
-import processor.worker.Fellow;
 import traffic.light.LightCoordinator;
 import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
@@ -22,17 +21,14 @@ import traffic.road.Lane;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
 import traffic.road.RoadType;
-import traffic.road.RoadUtil;
 import traffic.routing.Dijkstra;
 import traffic.routing.RandomAStar;
 import traffic.routing.ReferenceBasedSearch;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
 import traffic.vehicle.DriverProfile;
-import traffic.vehicle.SlowdownFactor;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleType;
-import traffic.vehicle.VehicleUtil;
 
 /**
  * A trafficNetwork contains vehicles and traffic lights on top of a road
