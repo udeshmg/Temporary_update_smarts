@@ -34,7 +34,7 @@ public class MOBIL {
 	 *
 	 * @return One of the possible lane-changing decisions.
 	 */
-	public LaneChangeDirection decideLaneChange(final Vehicle vehicle) {
+	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
 		LaneChangeDirection decision = LaneChangeDirection.SAME;
 		double overallGainForChangeTowardsRoadside = 0, overallGainForChangeAwayFromRoadside = 0;
 

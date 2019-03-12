@@ -19,7 +19,7 @@ public class LaneChange {
 	 * Uses a lane-changing model to decide lane change.
 	 *
 	 */
-	public LaneChangeDirection decideLaneChange(final Vehicle vehicle) {
-		return mobil.decideLaneChange(vehicle);
+	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
+		return mobil.decideLaneChange(input, vehicle);
 	}
 }

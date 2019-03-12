@@ -17,6 +17,7 @@ import traffic.routing.Routing;
 import traffic.vehicle.carfollow.CarFollow;
 import traffic.vehicle.lanechange.LaneChange;
 import traffic.vehicle.lanechange.LaneChangeDirection;
+import traffic.vehicle.lanechange.MOBILInput;
 
 public class Vehicle {
 	public String id = "";
@@ -170,7 +171,8 @@ public class Vehicle {
 				|| ((timeNow - timeOfLastLaneChange) < driverProfile.minLaneChangeTimeGap))) {
 
 			LaneChangeDirection laneChangeDecision = LaneChangeDirection.SAME;
-			laneChangeDecision = laneChange.decideLaneChange(this);
+			MOBILInput mobilInput = new MOBILInput();
+			laneChangeDecision = laneChange.decideLaneChange(mobilInput, this);
 
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
 
