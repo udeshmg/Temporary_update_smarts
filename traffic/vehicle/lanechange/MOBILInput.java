@@ -30,5 +30,13 @@ public class MOBILInput {
         this.lane = lane;
     }
 
+    public boolean isLaneMostRoadSide(){
+        return lane.laneNumber == 0;
+    }
+
+    public boolean isLaneMostAwayFromRoadSide(){
+        return lane.laneNumber == lane.edge.getLaneCount()-1;
+    }
+
 
 }

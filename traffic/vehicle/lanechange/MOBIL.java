@@ -176,7 +176,7 @@ public class MOBIL {
 		if (Settings.isDriveOnLeft) {
 			// Drive on LEFT
 			if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
-				if (vehicle.lane.laneNumber == 0) {
+				if (input.isLaneMostRoadSide()) {
 					// Vehicle is already in the left-most lane
 					return false;
 				} else if ((vehicle.edgeBeforeTurnLeft == null)
@@ -196,7 +196,7 @@ public class MOBIL {
 					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
 				}
 			} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-				if (vehicle.lane.laneNumber == (vehicle.lane.edge.getLaneCount() - 1)) {
+				if (input.isLaneMostAwayFromRoadSide()) {
 					// Vehicle is already in the right-most lane
 					return false;
 				} else if ((vehicle.edgeBeforeTurnRight == null)
@@ -220,7 +220,7 @@ public class MOBIL {
 		} else {
 			// Drive on RIGHT
 			if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
-				if (vehicle.lane.laneNumber == 0) {
+				if (input.isLaneMostRoadSide()) {
 					// Vehicle is already in the right-most lane
 					return false;
 				} else if ((vehicle.edgeBeforeTurnRight == null)
@@ -241,7 +241,7 @@ public class MOBIL {
 					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
 				}
 			} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-				if (vehicle.lane.laneNumber == (vehicle.lane.edge.getLaneCount() - 1)) {
+				if (input.isLaneMostAwayFromRoadSide()) {
 					// Vehicle is already in the left-most lane
 					return false;
 				} else if ((vehicle.edgeBeforeTurnLeft == null)
