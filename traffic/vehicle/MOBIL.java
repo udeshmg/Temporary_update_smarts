@@ -13,25 +13,16 @@ import traffic.road.Lane;
  */
 public class MOBIL {
 
-	/**
-	 * Calculate the advantage gain in terms of acceleration rate for a vehicle
-	 * if it changes lane
-	 *
-	 */
-	static double getPotentialAdvatangeGainOfThisVehicleInTargetLane(final double newAcc, final double oldAcc) {
-		return newAcc - oldAcc;
-	}
-
-	Vehicle backVehicleInTargetLane = null;
-
-	Vehicle frontVehicleInTargetLane = null;
-
-	Random random = new Random();
-	ImpedingObject impedingObject = new ImpedingObject();
-	IDM idm;
+	private Vehicle backVehicleInTargetLane = null;
+	private Vehicle frontVehicleInTargetLane = null;
+	private Random random;
+	private ImpedingObject impedingObject;
+	private IDM idm;
 
 	public MOBIL() {
 		idm = new IDM();
+		impedingObject = new ImpedingObject();
+		random = new Random();
 	}
 
 	/**
@@ -141,6 +132,15 @@ public class MOBIL {
 
 		return incentive;
 
+	}
+
+	/**
+	 * Calculate the advantage gain in terms of acceleration rate for a vehicle
+	 * if it changes lane
+	 *
+	 */
+	static double getPotentialAdvatangeGainOfThisVehicleInTargetLane(final double newAcc, final double oldAcc) {
+		return newAcc - oldAcc;
 	}
 
 	/**
