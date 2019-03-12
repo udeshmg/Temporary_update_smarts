@@ -1,5 +1,7 @@
 package traffic.vehicle.lanechange;
 
+import traffic.road.Lane;
+
 /**
  * Copyright (c) 2019, The University of Melbourne.
  * All rights reserved.
@@ -22,4 +24,11 @@ package traffic.vehicle.lanechange;
  * Created by tmuthugama on 3/12/2019
  */
 public class MOBILInput {
+    private Lane lane;
+
+    public MOBILInput(Lane lane) {
+        this.lane = lane;
+    }
+
+
 }

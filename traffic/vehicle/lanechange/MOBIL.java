@@ -38,7 +38,7 @@ public class MOBIL {
 		LaneChangeDirection decision = LaneChangeDirection.SAME;
 		double overallGainForChangeTowardsRoadside = 0, overallGainForChangeAwayFromRoadside = 0;
 
-		if (isSafeToChange(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
+		if (isSafeToChange(input, vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
 			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
 					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
@@ -53,7 +53,7 @@ public class MOBIL {
 			overallGainForChangeTowardsRoadside += getAdditionalIncentive(vehicle,
 					LaneChangeDirection.TOWARDS_ROADSIDE);
 		}
-		if (isSafeToChange(vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
+		if (isSafeToChange(input, vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
 			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
 					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
@@ -166,7 +166,7 @@ public class MOBIL {
 	 *
 	 *
 	 */
-	boolean isSafeToChange(final Vehicle vehicle, final LaneChangeDirection direction) {
+	boolean isSafeToChange(MOBILInput input, final Vehicle vehicle, final LaneChangeDirection direction) {
 		// Do not allow tram to change lane
 		if (vehicle.type == VehicleType.TRAM) {
 			return false;
