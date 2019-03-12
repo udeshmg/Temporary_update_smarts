@@ -30,19 +30,6 @@ public class MOBIL {
 	}
 
 	/**
-	 * Gets the potential acceleration of vehicle based on a slow-down factor.
-	 * First, the impeding object for this factor is found. Next, the
-	 * acceleration is computed based on the impeding object.
-	 *
-	 */
-	double computeAccelerationWithImpedingObject(final Vehicle vehicle, final Lane targetLane,
-			final SlowdownFactor factor) {
-		idm.updateImpedingObject(vehicle, vehicle.indexLegOnRoute, targetLane.laneNumber, impedingObject,
-				factor);
-		return idm.computeAcceleration(vehicle, impedingObject);
-	}
-
-	/**
 	 * Makes decision about lane-changing.
 	 *
 	 * @return One of the possible lane-changing decisions.
@@ -300,5 +287,18 @@ public class MOBIL {
 			// Deceleration of back vehicle in target lane would be too significant: unsafe
 			return newAccBackVehicleTargetLane > (-1 * vehicle.driverProfile.MOBIL_b_save);
 		}
+	}
+
+	/**
+	 * Gets the potential acceleration of vehicle based on a slow-down factor.
+	 * First, the impeding object for this factor is found. Next, the
+	 * acceleration is computed based on the impeding object.
+	 *
+	 */
+	double computeAccelerationWithImpedingObject(final Vehicle vehicle, final Lane targetLane,
+												 final SlowdownFactor factor) {
+		idm.updateImpedingObject(vehicle, vehicle.indexLegOnRoute, targetLane.laneNumber, impedingObject,
+				factor);
+		return idm.computeAcceleration(vehicle, impedingObject);
 	}
 }
