@@ -1,5 +1,6 @@
 package traffic.vehicle.lanechange;
 
+import traffic.road.Edge;
 import traffic.road.Lane;
 
 /**
@@ -38,5 +39,12 @@ public class MOBILInput {
         return lane.laneNumber == lane.edge.getLaneCount()-1;
     }
 
+    public boolean isAllLanesOnLeftBlocked(){
+        return lane.edge.isAllLanesOnLeftBlocked(lane.laneNumber);
+    }
+
+    public boolean isAllLanesOnRightBlocked(){
+        return lane.edge.isAllLanesOnRightBlocked(lane.laneNumber);
+    }
 
 }
