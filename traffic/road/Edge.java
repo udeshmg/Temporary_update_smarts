@@ -205,6 +205,24 @@ public class Edge {
 		return true;
 	}
 
+	public boolean isAllLanesOnRoadSideBlocked(int laneNumber){
+		for (int num = laneNumber - 1; num >= 0; num--) {
+			if (!lanes.get(num).isBlocked) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isAllLanesAwayRoadSideBlocked(int laneNumber){
+		for (int num = laneNumber + 1; num < lanes.size(); num++) {
+			if (!lanes.get(num).isBlocked) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public boolean isBlocked() {
 		for (final Lane lane : lanes) {
 			if (!lane.isBlocked) {

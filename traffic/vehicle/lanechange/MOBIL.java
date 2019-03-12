@@ -189,7 +189,7 @@ public class MOBIL {
 						&& !vehicle.lane.isBlocked) {
 					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
 					return false;
-				} else if (input.isAllLanesOnLeftBlocked()) {
+				} else if (input.isAllLanesOnRoadSideBlocked()) {
 					// Cannot move to left as all lanes on the left are blocked
 					return false;
 				} else {
@@ -210,7 +210,7 @@ public class MOBIL {
 						&& !vehicle.lane.isBlocked) {
 					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
 					return false;
-				} else if (input.isAllLanesOnRightBlocked()) {
+				} else if (input.isAllLanesAwayRoadSideBlocked()) {
 					// Cannot move to right as all lanes on the right are blocked
 					return false;
 				} else {
@@ -234,7 +234,7 @@ public class MOBIL {
 						&& !vehicle.lane.isBlocked) {
 					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
 					return false;
-				} else if (input.isAllLanesOnRightBlocked()) {
+				} else if (input.isAllLanesOnRoadSideBlocked()) {
 					// Cannot move to right as all lanes on the right are blocked
 					return false;
 				} else {
@@ -255,7 +255,7 @@ public class MOBIL {
 						&& !vehicle.lane.isBlocked) {
 					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
 					return false;
-				} else if (input.isAllLanesOnLeftBlocked()) {
+				} else if (input.isAllLanesAwayRoadSideBlocked()) {
 					// Cannot move to left as all lanes on the left are blocked
 					return false;
 				} else {
