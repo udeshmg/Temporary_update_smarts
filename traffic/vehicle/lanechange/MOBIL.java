@@ -263,7 +263,11 @@ public class MOBIL {
 				}
 			}
 		}
+		return isSafeToChangeToTargetLane(targetLane, vehicle);
 
+	}
+
+	private boolean isSafeToChangeToTargetLane(Lane targetLane, Vehicle vehicle){
 		// Cannot change if front vehicle in target lane is too close
 		frontVehicleInTargetLane = targetLane.getClosestFrontVehicleInLane(vehicle, 0);
 		if ((frontVehicleInTargetLane != null) && ((frontVehicleInTargetLane.headPosition
