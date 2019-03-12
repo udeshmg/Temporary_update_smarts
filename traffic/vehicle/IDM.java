@@ -16,11 +16,8 @@ import traffic.road.RoadUtil;
  */
 public class IDM {
 
-	VehicleUtil vehicleUtil;
 
-	public IDM() {
-		vehicleUtil = new VehicleUtil();
-	}
+	public IDM() {}
 
 	/**
 	 * Calculates the acceleration of vehicle based on its relation to an
