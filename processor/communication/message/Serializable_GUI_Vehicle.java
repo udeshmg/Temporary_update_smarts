@@ -3,15 +3,18 @@ package processor.communication.message;
 public class Serializable_GUI_Vehicle {
 	public String type;
 	public double speed;
+	public double acceleration;
 	public double lonHead;
 	public double latHead;
 	public double lonTail;
 	public double latTail;
+	public double length;
 	public int numLinksToGo;
 	public String id;
 	public String worker;
 	public String driverProfile;
 	public int edgeIndex;
+	public int laneIndex;
 	public double originalEdgeMaxSpeed;
 	public boolean isAffectedByPriorityVehicle;
 

@@ -62,16 +62,19 @@ public class Message_WS_TrafficReport {
 					sVehicle.type = v.type.name();
 				}
 				sVehicle.speed = v.speed;
+				sVehicle.acceleration = v.acceleration;
 				final double[] coordinates = VehicleUtil.calculateCoordinates(v);
 				sVehicle.lonHead = coordinates[0];
 				sVehicle.latHead = coordinates[1];
 				sVehicle.lonTail = coordinates[2];
 				sVehicle.latTail = coordinates[3];
+				sVehicle.length = v.type.length;
 				sVehicle.numLinksToGo = v.getRouteLegCount() - 1 - v.indexLegOnRoute;
 				sVehicle.id = v.id;
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
 				sVehicle.edgeIndex = v.lane.edge.index;
+				sVehicle.laneIndex = v.lane.index;
 				sVehicle.originalEdgeMaxSpeed = v.lane.edge.freeFlowSpeed;
 				sVehicle.isAffectedByPriorityVehicle = v.isAffectedByPriorityVehicle;
 				list.add(sVehicle);
