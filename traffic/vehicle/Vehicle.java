@@ -50,8 +50,8 @@ public class Vehicle {
 
 	public Edge edgeBeforeTurnRight = null;
 	public Edge edgeBeforeTurnLeft = null;
-	LaneChange laneChange = new LaneChange();
-	CarFollow carFollow = new CarFollow();
+	private LaneChange laneChange = new LaneChange();
+	private CarFollow carFollow = new CarFollow();
 	private boolean finished = false;
 	private boolean reachedFellow = false;
 
