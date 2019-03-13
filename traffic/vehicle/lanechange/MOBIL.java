@@ -67,7 +67,7 @@ public class MOBIL {
 						newAccByChangeTowardsRoadside, vehicle.acceleration)
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
-			gain += getAdditionalIncentive(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE);
+			gain += getAdditionalIncentive(input, LaneChangeDirection.TOWARDS_ROADSIDE);
 		}
 		return gain;
 	}
@@ -85,8 +85,7 @@ public class MOBIL {
 						newAccByChangeAwayFromRoadside, vehicle.acceleration)
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
-			gain += getAdditionalIncentive(vehicle,
-					LaneChangeDirection.AWAY_FROM_ROADSIDE);
+			gain += getAdditionalIncentive(input, LaneChangeDirection.AWAY_FROM_ROADSIDE);
 		}
 		return gain;
 	}
@@ -95,33 +94,23 @@ public class MOBIL {
 	 * Get additional incentive of changing. A positive incentive encourages
 	 * change. A negative incentive discourages change.
 	 */
-	double getAdditionalIncentive(final Vehicle vehicle, final LaneChangeDirection direction) {
+	double getAdditionalIncentive(MOBILInput input, final LaneChangeDirection direction) {
 
 		double incentive = 0;
-		final Edge currentEdge = vehicle.getCurrentEdge();
 
 		if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
 			// Encourage change for making a turn			
-			if (Settings.isDriveOnLeft && vehicle.edgeBeforeTurnLeft != null
-					&& vehicle.lane.laneNumber >= currentEdge.numLeftLanes) {
-				incentive = 5;
-			} else if (!Settings.isDriveOnLeft && vehicle.edgeBeforeTurnRight != null
-					&& vehicle.lane.laneNumber >= currentEdge.numRightLanes) {
+			if (input.isEncouragedToChangeTowardsRoadSide()) {
 				incentive = 5;
 			}
 			// Encourage change for giving way to priority vehicle based on emergency strategy
-			if (vehicle.lane.edge.isEdgeOnPathOfPriorityVehicle() && (vehicle.type != VehicleType.PRIORITY)
-					&& (Settings.emergencyStrategy != EmergencyStrategy.Flexible)) {
+			if (input.isEncouragedToGiveWayToPriorityVehicles()) {
 				incentive = 10;
 			}
 
 		} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
 			// Encourage change for making a turn
-			if (Settings.isDriveOnLeft && vehicle.edgeBeforeTurnRight != null
-					&& (vehicle.lane.laneNumber < (currentEdge.getLaneCount() - currentEdge.numRightLanes))) {
-				incentive = 5;
-			} else if (!Settings.isDriveOnLeft && vehicle.edgeBeforeTurnLeft != null
-					&& (vehicle.lane.laneNumber < (currentEdge.getLaneCount() - currentEdge.numLeftLanes))) {
+			if (input.isEncouragedToChangeAwayFromRoadSide()) {
 				incentive = 5;
 			}
 		}

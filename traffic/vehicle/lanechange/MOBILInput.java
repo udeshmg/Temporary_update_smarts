@@ -5,6 +5,8 @@ import traffic.light.LightColor;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.routing.RouteLeg;
+import traffic.vehicle.EmergencyStrategy;
+import traffic.vehicle.VehicleType;
 
 import java.awt.geom.Line2D;
 import java.util.List;
@@ -37,14 +39,16 @@ public class MOBILInput {
     private boolean aboutToTurnAwayFromRoadSide;
     private int towardsRoadSideOnlyLanes;
     private int awayFromRoadSideOnlyLanes;
+    private VehicleType type;
 
-    public MOBILInput(Lane lane, List<RouteLeg> routeLookAhead) {
+    public MOBILInput(Lane lane, List<RouteLeg> routeLookAhead, VehicleType type) {
         this.lane = lane;
         this.routeLookAhead = routeLookAhead;
         this.aboutToTurnTowardsRoadSide = false;
         this.aboutToTurnAwayFromRoadSide = false;
         this.towardsRoadSideOnlyLanes = 0;
         this.awayFromRoadSideOnlyLanes = 0;
+        this.type = type;
         updateAboutToTurnDetails();
         updateLanes();
     }
@@ -124,5 +128,18 @@ public class MOBILInput {
 
     public boolean isLaneInRedLight(){
         return lane.edge.lightColor == LightColor.KEEP_RED || lane.edge.lightColor == LightColor.GYR_R;
+    }
+
+    public boolean isEncouragedToChangeTowardsRoadSide(){
+        return aboutToTurnTowardsRoadSide && lane.laneNumber >= towardsRoadSideOnlyLanes;
+    }
+
+    public boolean isEncouragedToChangeAwayFromRoadSide(){
+        return aboutToTurnAwayFromRoadSide && lane.laneNumber < lane.edge.getLaneCount() - awayFromRoadSideOnlyLanes;
+    }
+
+    public boolean isEncouragedToGiveWayToPriorityVehicles(){
+        return lane.edge.isEdgeOnPathOfPriorityVehicle() && (type != VehicleType.PRIORITY)
+                && (Settings.emergencyStrategy != EmergencyStrategy.Flexible);
     }
 }
