@@ -35,54 +35,60 @@ public class MOBIL {
 	 * @return One of the possible lane-changing decisions.
 	 */
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
+
 		LaneChangeDirection decision = LaneChangeDirection.SAME;
-		double overallGainForChangeTowardsRoadside = 0;
-		double overallGainForChangeAwayFromRoadside = 0;
+		double gainByTowardsRoadside = getGainFromChangeTowardsRoadSide(input, vehicle);
+		double gainByAwayFromRoadside = getGainFromChangeAwayFromRoadSide(input, vehicle);
 
-		if (isSafeToChange(input, vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
-				// Do not attempt lane-change for the vehicle that is the closest one to a red light
-				overallGainForChangeTowardsRoadside = 0;
-			} else {
-				final double newAccByChangeTowardsRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
-						vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1));
-				overallGainForChangeTowardsRoadside = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
-						newAccByChangeTowardsRoadside, vehicle.acceleration)
-						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
-			}
-			overallGainForChangeTowardsRoadside += getAdditionalIncentive(vehicle,
-					LaneChangeDirection.TOWARDS_ROADSIDE);
-		}
-		if (isSafeToChange(input, vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
-				// Do not attempt lane-change for the vehicle that is the closest one to a red light
-				overallGainForChangeAwayFromRoadside = 0;
-			} else {
-				final double newAccByChangeAwayFromRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
-						vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1));
-				overallGainForChangeAwayFromRoadside = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
-						newAccByChangeAwayFromRoadside, vehicle.acceleration)
-						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
-			}
-			overallGainForChangeAwayFromRoadside += getAdditionalIncentive(vehicle,
-					LaneChangeDirection.AWAY_FROM_ROADSIDE);
-		}
-
-		if ((overallGainForChangeAwayFromRoadside > 0)
-				&& ((overallGainForChangeAwayFromRoadside - overallGainForChangeTowardsRoadside) > 0)) {
+		if ((gainByAwayFromRoadside > 0) && ((gainByAwayFromRoadside - gainByTowardsRoadside) > 0)) {
 			decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
-		} else if ((overallGainForChangeTowardsRoadside > 0)
-				&& ((overallGainForChangeTowardsRoadside - overallGainForChangeAwayFromRoadside) > 0)) {
+		} else if ((gainByTowardsRoadside > 0) && ((gainByTowardsRoadside - gainByAwayFromRoadside) > 0)) {
 			decision = LaneChangeDirection.TOWARDS_ROADSIDE;
-		} else if ((overallGainForChangeAwayFromRoadside > 0) && (overallGainForChangeTowardsRoadside > 0)) {
+		} else if ((gainByAwayFromRoadside > 0) && (gainByTowardsRoadside > 0)) {
 			if (random.nextBoolean()) {
 				decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
 			} else {
 				decision = LaneChangeDirection.TOWARDS_ROADSIDE;
 			}
 		}
-
 		return decision;
+	}
+
+	private double getGainFromChangeTowardsRoadSide(MOBILInput input, Vehicle vehicle){
+		double gain = 0;
+		if (isSafeToChange(input, vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
+				// Do not attempt lane-change for the vehicle that is the closest one to a red light
+				gain = 0;
+			} else {
+				final double newAccByChangeTowardsRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
+						vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1));
+				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
+						newAccByChangeTowardsRoadside, vehicle.acceleration)
+						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
+			}
+			gain += getAdditionalIncentive(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE);
+		}
+		return gain;
+	}
+
+	private double getGainFromChangeAwayFromRoadSide(MOBILInput input, Vehicle vehicle){
+		double gain = 0;
+		if (isSafeToChange(input, vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
+				// Do not attempt lane-change for the vehicle that is the closest one to a red light
+				gain = 0;
+			} else {
+				final double newAccByChangeAwayFromRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
+						vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1));
+				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
+						newAccByChangeAwayFromRoadside, vehicle.acceleration)
+						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
+			}
+			gain += getAdditionalIncentive(vehicle,
+					LaneChangeDirection.AWAY_FROM_ROADSIDE);
+		}
+		return gain;
 	}
 
 	/**
