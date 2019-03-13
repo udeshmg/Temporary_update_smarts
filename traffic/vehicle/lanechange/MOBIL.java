@@ -37,14 +37,14 @@ public class MOBIL {
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
 
 		LaneChangeDirection decision = LaneChangeDirection.SAME;
-		double gainByTowardsRoadside = getGainFromChangeTowardsRoadSide(input, vehicle);
-		double gainByAwayFromRoadside = getGainFromChangeAwayFromRoadSide(input, vehicle);
+		double gainTowardsRoadside = getGainFromChangeTowardsRoadSide(input, vehicle);
+		double gainAwayFromRoadside = getGainFromChangeAwayFromRoadSide(input, vehicle);
 
-		if ((gainByAwayFromRoadside > 0) && ((gainByAwayFromRoadside - gainByTowardsRoadside) > 0)) {
+		if ((gainAwayFromRoadside > 0) && ((gainAwayFromRoadside - gainTowardsRoadside) > 0)) {
 			decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
-		} else if ((gainByTowardsRoadside > 0) && ((gainByTowardsRoadside - gainByAwayFromRoadside) > 0)) {
+		} else if ((gainTowardsRoadside > 0) && ((gainTowardsRoadside - gainAwayFromRoadside) > 0)) {
 			decision = LaneChangeDirection.TOWARDS_ROADSIDE;
-		} else if ((gainByAwayFromRoadside > 0) && (gainByTowardsRoadside > 0)) {
+		} else if ((gainAwayFromRoadside > 0) && (gainTowardsRoadside > 0)) {
 			if (random.nextBoolean()) {
 				decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
 			} else {
