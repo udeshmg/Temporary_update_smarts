@@ -25,7 +25,7 @@ public class IDM {
 	 * impeding object.
 	 *
 	 */
-	public double computeAcceleration(final Vehicle vehicle, final ImpedingObject impedingObject) {
+	public static double computeAcceleration(final Vehicle vehicle, final ImpedingObject impedingObject) {
 		/*
 		 * Actual bumper-to-bumper distance from the end of the front vehicle to
 		 * the head of this vehicle. Value is in meters.
