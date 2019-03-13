@@ -36,11 +36,11 @@ public class MOBIL {
 	 */
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
 		LaneChangeDirection decision = LaneChangeDirection.SAME;
-		double overallGainForChangeTowardsRoadside = 0, overallGainForChangeAwayFromRoadside = 0;
+		double overallGainForChangeTowardsRoadside = 0;
+		double overallGainForChangeAwayFromRoadside = 0;
 
 		if (isSafeToChange(input, vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
-					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				overallGainForChangeTowardsRoadside = 0;
 			} else {
@@ -54,8 +54,7 @@ public class MOBIL {
 					LaneChangeDirection.TOWARDS_ROADSIDE);
 		}
 		if (isSafeToChange(input, vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
-					|| (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
+			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				overallGainForChangeAwayFromRoadside = 0;
 			} else {
