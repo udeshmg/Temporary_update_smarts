@@ -255,6 +255,21 @@ public class Vehicle {
 		}
 	}
 
+	public List<RouteLeg> getRouteInLookAheadDistance(){
+		List<RouteLeg> legsAhead = new ArrayList<>();
+		double examinedDist = 0;
+		for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
+			final Edge e1 = routeLegs.get(i).edge;
+			examinedDist += e1.length;
+			if((examinedDist - headPosition) < Settings.lookAheadDistance){
+				legsAhead.add(routeLegs.get(i));
+			}else{
+				break;
+			}
+		}
+		return legsAhead;
+	}
+
 	public void moveForward(double timeNow){
 		if(active) {
 			// Reset priority vehicle effect flag
