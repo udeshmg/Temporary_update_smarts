@@ -61,10 +61,7 @@ public class MOBIL {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
 			} else {
-				final double newAccByChangeTowardsRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
-						vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1));
-				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
-						newAccByChangeTowardsRoadside, vehicle.acceleration)
+				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(vehicle, input.getNextTowardsRoadSideLane())
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
 			gain += getAdditionalIncentive(input, LaneChangeDirection.TOWARDS_ROADSIDE);
@@ -79,10 +76,7 @@ public class MOBIL {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
 			} else {
-				final double newAccByChangeAwayFromRoadside = getPotentialAccelerationOfThisVehicleInTargetLane(vehicle,
-						vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1));
-				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(
-						newAccByChangeAwayFromRoadside, vehicle.acceleration)
+				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(vehicle, input.getNextAwayFromRoadSideLane())
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
 			gain += getAdditionalIncentive(input, LaneChangeDirection.AWAY_FROM_ROADSIDE);
@@ -124,19 +118,11 @@ public class MOBIL {
 	 * if it changes lane
 	 *
 	 */
-	static double getPotentialAdvatangeGainOfThisVehicleInTargetLane(final double newAcc, final double oldAcc) {
-		return newAcc - oldAcc;
+	double getPotentialAdvatangeGainOfThisVehicleInTargetLane(final Vehicle vehicle, final Lane lane) {
+		double newAcc = computeAccelerationWithImpedingObject(vehicle, lane, SlowdownFactor.FRONT);
+		return newAcc - vehicle.acceleration;
 	}
-
-	/**
-	 * Gets the potential acceleration of vehicle if it changes to the given
-	 * lane at this moment.
-	 *
-	 *
-	 */
-	double getPotentialAccelerationOfThisVehicleInTargetLane(final Vehicle vehicle, final Lane lane) {
-		return computeAccelerationWithImpedingObject(vehicle, lane, SlowdownFactor.FRONT);
-	}
+	
 
 	/**
 	 * Calculate the disadvantage in terms of acceleration rate for the back
