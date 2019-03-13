@@ -179,14 +179,10 @@ public class MOBIL {
 				if (input.isLaneMostRoadSide()) {
 					// Vehicle is already in the left-most lane
 					return false;
-				} else if ((vehicle.edgeBeforeTurnLeft == null)
-						&& (vehicle.lane.laneNumber <= vehicle.lane.edge.numLeftOnlyLanes) && !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfNotTurnTowardsRoadSide()) {
 					// Cannot move to left-only lane if vehicle will not turn left, unless the current lane is blocked
 					return false;
-				} else if ((vehicle.edgeBeforeTurnRight != null)
-						&& ((vehicle.lane.edge.getLaneCount()
-								- (vehicle.lane.laneNumber - 1) > vehicle.lane.edge.numRightLanes))
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfTurnAwayFromRoadSide()) {
 					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
 					return false;
 				} else if (input.isAllLanesOnRoadSideBlocked()) {
@@ -199,15 +195,10 @@ public class MOBIL {
 				if (input.isLaneMostAwayFromRoadSide()) {
 					// Vehicle is already in the right-most lane
 					return false;
-				} else if ((vehicle.edgeBeforeTurnRight == null)
-						&& ((vehicle.lane.edge.getLaneCount()
-								- (vehicle.lane.laneNumber + 1)) <= vehicle.lane.edge.numRightOnlyLanes)
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfNotTurnAwayFromRoadSide()) {
 					// Cannot move to right-only lane if vehicle will not turn right, unless the current lane is blocked
 					return false;
-				} else if ((vehicle.edgeBeforeTurnLeft != null)
-						&& ((vehicle.lane.laneNumber + 1) >= vehicle.lane.edge.numLeftLanes)
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfTurnTowardsRoadSide()) {
 					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
 					return false;
 				} else if (input.isAllLanesAwayRoadSideBlocked()) {
@@ -223,15 +214,10 @@ public class MOBIL {
 				if (input.isLaneMostRoadSide()) {
 					// Vehicle is already in the right-most lane
 					return false;
-				} else if ((vehicle.edgeBeforeTurnRight == null)
-						&& (vehicle.lane.laneNumber <= vehicle.lane.edge.numRightOnlyLanes)
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfNotTurnTowardsRoadSide()) {
 					// Cannot move to right-only lane if vehicle will not turn right, unless the current lane is blocked
 					return false;
-				} else if ((vehicle.edgeBeforeTurnLeft != null)
-						&& ((vehicle.lane.edge.getLaneCount()
-								- (vehicle.lane.laneNumber - 1) > vehicle.lane.edge.numLeftLanes))
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfTurnAwayFromRoadSide()) {
 					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
 					return false;
 				} else if (input.isAllLanesOnRoadSideBlocked()) {
@@ -244,15 +230,10 @@ public class MOBIL {
 				if (input.isLaneMostAwayFromRoadSide()) {
 					// Vehicle is already in the left-most lane
 					return false;
-				} else if ((vehicle.edgeBeforeTurnLeft == null)
-						&& ((vehicle.lane.edge.getLaneCount()
-								- (vehicle.lane.laneNumber + 1)) <= vehicle.lane.edge.numLeftOnlyLanes)
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfNotTurnAwayFromRoadSide()) {
 					// Cannot move to left-only lane if vehicle will not turn left, unless the current lane is blocked
 					return false;
-				} else if ((vehicle.edgeBeforeTurnRight != null)
-						&& ((vehicle.lane.laneNumber + 1) >= vehicle.lane.edge.numRightLanes)
-						&& !vehicle.lane.isBlocked) {
+				} else if (input.canLeaveLaneIfTurnTowardsRoadSide()) {
 					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
 					return false;
 				} else if (input.isAllLanesAwayRoadSideBlocked()) {

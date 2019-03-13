@@ -3,6 +3,10 @@ package traffic.vehicle.lanechange;
 import common.Settings;
 import traffic.road.Edge;
 import traffic.road.Lane;
+import traffic.routing.RouteLeg;
+
+import java.awt.geom.Line2D;
+import java.util.List;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -27,11 +31,21 @@ import traffic.road.Lane;
  */
 public class MOBILInput {
     private Lane lane;
-    private Edge edgeBeforeTurnLeft;
-    private Edge edgeBeforeTurnRight;
+    private List<RouteLeg> routeLookAhead;
+    private boolean aboutToTurnTowardsRoadSide;
+    private boolean aboutToTurnAwayFromRoadSide;
+    private int towardsRoadSideOnlyLanes;
+    private int awayFromRoadSideOnlyLanes;
 
-    public MOBILInput(Lane lane) {
+    public MOBILInput(Lane lane, List<RouteLeg> routeLookAhead) {
         this.lane = lane;
+        this.routeLookAhead = routeLookAhead;
+        this.aboutToTurnTowardsRoadSide = false;
+        this.aboutToTurnAwayFromRoadSide = false;
+        this.towardsRoadSideOnlyLanes = 0;
+        this.awayFromRoadSideOnlyLanes = 0;
+        updateAboutToTurnDetails();
+        updateLanes();
     }
 
     public boolean isLaneMostRoadSide(){
@@ -50,4 +64,60 @@ public class MOBILInput {
         return lane.edge.isAllLanesAwayRoadSideBlocked(lane.laneNumber);
     }
 
+    public void updateAboutToTurnDetails() {
+        for (int i = 0; i < routeLookAhead.size() - 1; i++) {
+            Edge e1 = routeLookAhead.get(i).edge;
+            Edge e2 = routeLookAhead.get(i + 1).edge;
+            if (e1.startNode == e2.endNode) {
+                // Vehicle is going to make U-turn
+                aboutToTurnAwayFromRoadSide = true;
+            } else if (!e1.name.equals(e2.name) || (e1.type != e2.type)) {
+                final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * Settings.lonVsLat,
+                        e1.endNode.lon, e1.endNode.lat * Settings.lonVsLat);
+                final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * Settings.lonVsLat);
+                if(Settings.isDriveOnLeft) {
+                    if (ccw < 0) {
+                        aboutToTurnTowardsRoadSide = true;
+                    } else if (ccw > 0) {
+                        aboutToTurnAwayFromRoadSide = true;
+                    }
+                }else{
+                    if (ccw < 0) {
+                        aboutToTurnAwayFromRoadSide = true;
+                    } else if (ccw > 0) {
+                        aboutToTurnTowardsRoadSide = true;
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateLanes(){
+        if(Settings.isDriveOnLeft){
+            towardsRoadSideOnlyLanes = lane.edge.numLeftOnlyLanes;
+            awayFromRoadSideOnlyLanes = lane.edge.numRightOnlyLanes;
+        }else{
+            towardsRoadSideOnlyLanes = lane.edge.numRightOnlyLanes;
+            awayFromRoadSideOnlyLanes = lane.edge.numLeftOnlyLanes;
+        }
+    }
+
+    public boolean canLeaveLaneIfNotTurnTowardsRoadSide(){
+        return !aboutToTurnTowardsRoadSide &&
+                (lane.laneNumber <= towardsRoadSideOnlyLanes) && !lane.isBlocked;
+    }
+
+    public boolean canLeaveLaneIfTurnAwayFromRoadSide() {
+        return aboutToTurnAwayFromRoadSide &&
+                ((lane.edge.getLaneCount() - (lane.laneNumber - 1) > awayFromRoadSideOnlyLanes)) && !lane.isBlocked;
+    }
+
+    public boolean canLeaveLaneIfNotTurnAwayFromRoadSide(){
+        return !aboutToTurnAwayFromRoadSide &&
+                ((lane.edge.getLaneCount() - (lane.laneNumber + 1)) <= awayFromRoadSideOnlyLanes) && !lane.isBlocked;
+    }
+
+    public boolean canLeaveLaneIfTurnTowardsRoadSide() {
+        return aboutToTurnTowardsRoadSide && ((lane.laneNumber + 1) >= towardsRoadSideOnlyLanes) && !lane.isBlocked;
+    }
 }

@@ -171,7 +171,7 @@ public class Vehicle {
 				|| ((timeNow - timeOfLastLaneChange) < driverProfile.minLaneChangeTimeGap))) {
 
 			LaneChangeDirection laneChangeDecision = LaneChangeDirection.SAME;
-			MOBILInput mobilInput = new MOBILInput(lane);
+			MOBILInput mobilInput = new MOBILInput(lane, getRouteInLookAheadDistance());
 			laneChangeDecision = laneChange.decideLaneChange(mobilInput, this);
 
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
