@@ -173,75 +173,37 @@ public class MOBIL {
 		}
 
 		Lane targetLane = null;
-		if (Settings.isDriveOnLeft) {
-			// Drive on LEFT
-			if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
-				if (input.isLaneMostRoadSide()) {
-					// Vehicle is already in the left-most lane
-					return false;
-				} else if (input.canLeaveLaneIfNotTurnTowardsRoadSide()) {
-					// Cannot move to left-only lane if vehicle will not turn left, unless the current lane is blocked
-					return false;
-				} else if (input.canLeaveLaneIfTurnAwayFromRoadSide()) {
-					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
-					return false;
-				} else if (input.isAllLanesOnRoadSideBlocked()) {
-					// Cannot move to left as all lanes on the left are blocked
-					return false;
-				} else {
-					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
-				}
-			} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-				if (input.isLaneMostAwayFromRoadSide()) {
-					// Vehicle is already in the right-most lane
-					return false;
-				} else if (input.canLeaveLaneIfNotTurnAwayFromRoadSide()) {
-					// Cannot move to right-only lane if vehicle will not turn right, unless the current lane is blocked
-					return false;
-				} else if (input.canLeaveLaneIfTurnTowardsRoadSide()) {
-					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
-					return false;
-				} else if (input.isAllLanesAwayRoadSideBlocked()) {
-					// Cannot move to right as all lanes on the right are blocked
-					return false;
-				} else {
-					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1);
-				}
+		if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
+			if (input.isLaneMostRoadSide()) {
+				// Vehicle is already in the most roadside lane
+				return false;
+			} else if (input.canLeaveLaneIfNotTurnTowardsRoadSide()) {
+				// Cannot move to roadside-only lane if vehicle will not turn roadside, unless the current lane is blocked
+				return false;
+			} else if (input.canLeaveLaneIfTurnAwayFromRoadSide()) {
+				// Cannot leave a lane allowing away from roadside -turn if vehicle will turn awayFromRoadSide, unless the current lane is blocked
+				return false;
+			} else if (input.isAllLanesOnRoadSideBlocked()) {
+				// Cannot move to roadside as all lanes on the roadside are blocked
+				return false;
+			} else {
+				targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
 			}
-		} else {
-			// Drive on RIGHT
-			if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
-				if (input.isLaneMostRoadSide()) {
-					// Vehicle is already in the right-most lane
-					return false;
-				} else if (input.canLeaveLaneIfNotTurnTowardsRoadSide()) {
-					// Cannot move to right-only lane if vehicle will not turn right, unless the current lane is blocked
-					return false;
-				} else if (input.canLeaveLaneIfTurnAwayFromRoadSide()) {
-					// Cannot leave a lane allowing left-turn if vehicle will turn left, unless the current lane is blocked
-					return false;
-				} else if (input.isAllLanesOnRoadSideBlocked()) {
-					// Cannot move to right as all lanes on the right are blocked
-					return false;
-				} else {
-					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
-				}
-			} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
-				if (input.isLaneMostAwayFromRoadSide()) {
-					// Vehicle is already in the left-most lane
-					return false;
-				} else if (input.canLeaveLaneIfNotTurnAwayFromRoadSide()) {
-					// Cannot move to left-only lane if vehicle will not turn left, unless the current lane is blocked
-					return false;
-				} else if (input.canLeaveLaneIfTurnTowardsRoadSide()) {
-					// Cannot leave a lane allowing right-turn if vehicle will turn right, unless the current lane is blocked
-					return false;
-				} else if (input.isAllLanesAwayRoadSideBlocked()) {
-					// Cannot move to left as all lanes on the left are blocked
-					return false;
-				} else {
-					targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1);
-				}
+		} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
+			if (input.isLaneMostAwayFromRoadSide()) {
+				// Vehicle is already in the most AwayFrom roadside lane
+				return false;
+			} else if (input.canLeaveLaneIfNotTurnAwayFromRoadSide()) {
+				// Cannot move to away from roadside-only lane if vehicle will not turn away from roadside, unless the current lane is blocked
+				return false;
+			} else if (input.canLeaveLaneIfTurnTowardsRoadSide()) {
+				// Cannot leave a lane allowing roadside-turn if vehicle will turn roadside, unless the current lane is blocked
+				return false;
+			} else if (input.isAllLanesAwayRoadSideBlocked()) {
+				// Cannot move to away from roadside as all lanes on the away from roadside are blocked
+				return false;
+			} else {
+				targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1);
 			}
 		}
 		return isSafeToChangeToTargetLane(targetLane, vehicle);
