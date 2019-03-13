@@ -162,7 +162,7 @@ public class MOBIL {
 	 */
 	boolean isSafeToChange(MOBILInput input, final Vehicle vehicle, final LaneChangeDirection direction) {
 		// Do not allow tram to change lane
-		if (vehicle.type == VehicleType.TRAM) {
+		if (!input.isALaneChangingVehicle()) {
 			return false;
 		}
 
@@ -181,7 +181,7 @@ public class MOBIL {
 				// Cannot move to roadside as all lanes on the roadside are blocked
 				return false;
 			} else {
-				targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber - 1);
+				targetLane = input.getNextTowardsRoadSideLane();
 			}
 		} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
 			if (input.isLaneMostAwayFromRoadSide()) {
@@ -197,7 +197,7 @@ public class MOBIL {
 				// Cannot move to away from roadside as all lanes on the away from roadside are blocked
 				return false;
 			} else {
-				targetLane = vehicle.lane.edge.getLane(vehicle.lane.laneNumber + 1);
+				targetLane = input.getNextAwayFromRoadSideLane();
 			}
 		}
 		return isSafeToChangeToTargetLane(targetLane, vehicle);

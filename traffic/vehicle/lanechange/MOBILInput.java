@@ -142,4 +142,16 @@ public class MOBILInput {
         return lane.edge.isEdgeOnPathOfPriorityVehicle() && (type != VehicleType.PRIORITY)
                 && (Settings.emergencyStrategy != EmergencyStrategy.Flexible);
     }
+
+    public boolean isALaneChangingVehicle(){
+        return type != VehicleType.TRAM;
+    }
+
+    public Lane getNextTowardsRoadSideLane(){
+        return lane.edge.getLane(lane.laneNumber - 1);
+    }
+
+    public Lane getNextAwayFromRoadSideLane(){
+        return lane.edge.getLane(lane.laneNumber + 1);
+    }
 }
