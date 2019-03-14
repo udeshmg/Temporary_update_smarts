@@ -11,6 +11,8 @@ import traffic.vehicle.carfollow.IDM;
 import traffic.vehicle.carfollow.ImpedingObject;
 import traffic.vehicle.carfollow.SlowdownFactor;
 
+import static traffic.vehicle.lanechange.LaneChangeDirection.*;
+
 /**
  * MOBIL model for lane-changing.
  *
@@ -36,19 +38,19 @@ public class MOBIL {
 	 */
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
 
-		LaneChangeDirection decision = LaneChangeDirection.SAME;
+		LaneChangeDirection decision = SAME;
 		double gainTowardsRoadside = getGainFromChangeTowardsRoadSide(input, vehicle);
 		double gainAwayFromRoadside = getGainFromChangeAwayFromRoadSide(input, vehicle);
 
 		if ((gainAwayFromRoadside > 0) && ((gainAwayFromRoadside - gainTowardsRoadside) > 0)) {
-			decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
+			decision = AWAY_FROM_ROADSIDE;
 		} else if ((gainTowardsRoadside > 0) && ((gainTowardsRoadside - gainAwayFromRoadside) > 0)) {
-			decision = LaneChangeDirection.TOWARDS_ROADSIDE;
+			decision = TOWARDS_ROADSIDE;
 		} else if ((gainAwayFromRoadside > 0) && (gainTowardsRoadside > 0)) {
 			if (random.nextBoolean()) {
-				decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
+				decision = AWAY_FROM_ROADSIDE;
 			} else {
-				decision = LaneChangeDirection.TOWARDS_ROADSIDE;
+				decision = TOWARDS_ROADSIDE;
 			}
 		}
 		return decision;
@@ -56,7 +58,7 @@ public class MOBIL {
 
 	private double getGainFromChangeTowardsRoadSide(MOBILInput input, Vehicle vehicle){
 		double gain = 0;
-		if (isSafeToChange(input, vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
+		if (isSafeToChange(input, vehicle, TOWARDS_ROADSIDE)) {
 			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
@@ -64,14 +66,14 @@ public class MOBIL {
 				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(vehicle, input.getNextTowardsRoadSideLane())
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
-			gain += getAdditionalIncentive(input, LaneChangeDirection.TOWARDS_ROADSIDE);
+			gain += getAdditionalIncentive(input, TOWARDS_ROADSIDE);
 		}
 		return gain;
 	}
 
 	private double getGainFromChangeAwayFromRoadSide(MOBILInput input, Vehicle vehicle){
 		double gain = 0;
-		if (isSafeToChange(input, vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
+		if (isSafeToChange(input, vehicle, AWAY_FROM_ROADSIDE)) {
 			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
@@ -79,7 +81,7 @@ public class MOBIL {
 				gain = getPotentialAdvatangeGainOfThisVehicleInTargetLane(vehicle, input.getNextAwayFromRoadSideLane())
 						- getPotentialDisadvantageGainOfBackVehicleInTargetLane(vehicle);
 			}
-			gain += getAdditionalIncentive(input, LaneChangeDirection.AWAY_FROM_ROADSIDE);
+			gain += getAdditionalIncentive(input, AWAY_FROM_ROADSIDE);
 		}
 		return gain;
 	}
@@ -92,7 +94,7 @@ public class MOBIL {
 
 		double incentive = 0;
 
-		if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
+		if (direction == TOWARDS_ROADSIDE) {
 			// Encourage change for making a turn			
 			if (input.isEncouragedToChangeTowardsRoadSide()) {
 				incentive = 5;
@@ -102,7 +104,7 @@ public class MOBIL {
 				incentive = 10;
 			}
 
-		} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
+		} else if (direction == AWAY_FROM_ROADSIDE) {
 			// Encourage change for making a turn
 			if (input.isEncouragedToChangeAwayFromRoadSide()) {
 				incentive = 5;
@@ -122,7 +124,7 @@ public class MOBIL {
 		double newAcc = computeAccelerationWithImpedingObject(vehicle, lane, SlowdownFactor.FRONT);
 		return newAcc - vehicle.acceleration;
 	}
-	
+
 
 	/**
 	 * Calculate the disadvantage in terms of acceleration rate for the back
@@ -153,7 +155,7 @@ public class MOBIL {
 		}
 
 		Lane targetLane = null;
-		if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
+		if (direction == TOWARDS_ROADSIDE) {
 			if (input.isLaneMostRoadSide()) {
 				// Vehicle is already in the most roadside lane
 				return false;
@@ -169,7 +171,7 @@ public class MOBIL {
 			} else {
 				targetLane = input.getNextTowardsRoadSideLane();
 			}
-		} else if (direction == LaneChangeDirection.AWAY_FROM_ROADSIDE) {
+		} else if (direction == AWAY_FROM_ROADSIDE) {
 			if (input.isLaneMostAwayFromRoadSide()) {
 				// Vehicle is already in the most AwayFrom roadside lane
 				return false;
