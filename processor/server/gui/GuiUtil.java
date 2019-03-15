@@ -32,13 +32,11 @@ public class GuiUtil {
 	static class OSMDownloader extends SwingWorker<String, String> {
 		MonitorPanel monitor;
 		GUI gui;
-		Server server;
 		String nameDownloadedFile = "download.osm";
 
-		OSMDownloader(final MonitorPanel monitor, final GUI gui, final Server server) {
+		OSMDownloader(final MonitorPanel monitor, final GUI gui) {
 			this.monitor = monitor;
 			this.gui = gui;
-			this.server = server;
 		}
 
 		@Override

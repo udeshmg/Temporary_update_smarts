@@ -41,6 +41,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import common.Settings;
 import common.SysUtil;
+import processor.SimulationProcessor;
 import processor.communication.message.Serializable_GUI_Light;
 import processor.communication.message.Serializable_GUI_Vehicle;
 import processor.server.Server;
@@ -280,7 +281,7 @@ public class MonitorPanel extends JPanel {
 		normal, mousePoint
 	}
 
-	Server server;
+	SimulationProcessor processor;
 	GUI gui;
 	public GuiStatistic guiStatistic;
 	public Dimension displayPanelDimension;
@@ -375,16 +376,17 @@ public class MonitorPanel extends JPanel {
 
 	Random random = new Random();
 
-	public MonitorPanel(final Server server, final GUI gui, final GuiStatistic qDialog,
-			final Dimension displayPanelDimension) {
+	public MonitorPanel(SimulationProcessor processor, final GUI gui, final GuiStatistic qDialog,
+						final Dimension displayPanelDimension) {
 		setBackground(Color.WHITE);
-		this.server = server;
+		this.processor = processor;
 		this.gui = gui;
 		this.guiStatistic = qDialog;
-		this.minLon = server.roadNetwork.minLon;
-		this.minLat = server.roadNetwork.minLat;
-		this.maxLon = server.roadNetwork.maxLon;
-		this.maxLat = server.roadNetwork.maxLat;
+		RoadNetwork roadNetwork = processor.getRoadNetwork();
+		this.minLon = roadNetwork.minLon;
+		this.minLat = roadNetwork.minLat;
+		this.maxLon = roadNetwork.maxLon;
+		this.maxLat = roadNetwork.maxLat;
 		this.displayPanelDimension = displayPanelDimension;
 		this.setBounds(0, 0, displayPanelDimension.width, displayPanelDimension.height);
 		setLayout(null);
@@ -599,7 +601,7 @@ public class MonitorPanel extends JPanel {
 		/*
 		 * Import road edges
 		 */
-		importRoadEdges(server.roadNetwork, minLon, minLat, maxLon, maxLat);
+		importRoadEdges(roadNetwork, minLon, minLat, maxLon, maxLat);
 		/*
 		 * Prepare road network image
 		 */
@@ -637,7 +639,7 @@ public class MonitorPanel extends JPanel {
 	 * Block/unblock lanes
 	 */
 	void blockUnblockLane(final EdgeObject selectedEdge, final int laneNumber, final boolean blocked) {
-		final Edge edge = server.roadNetwork.edges.get(selectedEdge.index);
+		final Edge edge = processor.getRoadNetwork().edges.get(selectedEdge.index);
 		final Lane lane = edge.getLane(laneNumber);
 
 		// Update the blocked edges for visualization
@@ -659,7 +661,7 @@ public class MonitorPanel extends JPanel {
 		}
 
 		// Inform server about the action
-		server.askWorkersChangeLaneBlock(lane.index, blocked);
+		processor.askWorkersChangeLaneBlock(lane.index, blocked);
 	}
 
 	void changeMap(final double minLon, final double minLat, final double maxLon, final double maxLat) {
@@ -667,7 +669,7 @@ public class MonitorPanel extends JPanel {
 		this.minLat = minLat;
 		this.maxLon = maxLon;
 		this.maxLat = maxLat;
-		importRoadEdges(server.roadNetwork, minLon, minLat, maxLon, maxLat);
+		importRoadEdges(processor.getRoadNetwork(), minLon, minLat, maxLon, maxLat);
 		resetMap();
 	}
 
@@ -972,7 +974,7 @@ public class MonitorPanel extends JPanel {
 
 		final double lat = maxLat - (ratioYtoHeight * Math.abs(maxLat - minLat));
 		final double lon = minLon + (ratioXtoWidth * Math.abs(maxLon - minLon));
-		final Edge edgeAtPoint = server.roadNetwork.getEdgeAtPoint(lat, lon);
+		final Edge edgeAtPoint = processor.getRoadNetwork().getEdgeAtPoint(lat, lon);
 		if (edgeAtPoint != null) {
 			// Check whether an intersection should be selected
 			final double distToStartPoint = RoadUtil.getDistInMeters(lat, lon, edgeAtPoint.startNode.lat,
@@ -1036,11 +1038,11 @@ public class MonitorPanel extends JPanel {
 	}
 
 	Edge getSelectedRoadEdge() {
-		return server.roadNetwork.edges.get(roadEdgeAtMousePoint.index);
+		return processor.getRoadNetwork().edges.get(roadEdgeAtMousePoint.index);
 	}
 
 	Node getSelectedRoadIntersectionNode() {
-		final Edge edge = server.roadNetwork.edges.get(roadIntersectionAtMousePoint.edgeIndex);
+		final Edge edge = processor.getRoadNetwork().edges.get(roadIntersectionAtMousePoint.edgeIndex);
 		if (roadIntersectionAtMousePoint.isAtEdgeStart) {
 			return edge.startNode;
 		} else {
@@ -1628,7 +1630,7 @@ public class MonitorPanel extends JPanel {
 
 					public void actionPerformed(final ActionEvent event) {
 						// If there is light, remove it, vice versa
-						server.setLightChangeNode(nodeSelected);
+						processor.setLightChangeNode(nodeSelected);
 						// Change light object list
 						if (event.getActionCommand().equalsIgnoreCase("Add light")) {
 							final Serializable_GUI_Light lightObject = new Serializable_GUI_Light(nodeSelected.lon,
@@ -1682,7 +1684,7 @@ public class MonitorPanel extends JPanel {
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Download road network")) {
-							new GuiUtil.OSMDownloader(MonitorPanel.this, gui, server).execute();
+							new GuiUtil.OSMDownloader(MonitorPanel.this, gui).execute();
 						} else if (event.getActionCommand().equalsIgnoreCase("Remove source/destination window")) {
 							removeSourceDestinationWindow(windowSelected);
 							// Overlay image
@@ -1836,11 +1838,12 @@ public class MonitorPanel extends JPanel {
 	}
 
 	void updateMapAreaDimension() {
-		final double mapWidthInMeters = RoadUtil.getDistInMeters(server.roadNetwork.maxLat, server.roadNetwork.minLon,
-				server.roadNetwork.maxLat, server.roadNetwork.maxLon);
-		final double mapHeightInMeters = RoadUtil.getDistInMeters(server.roadNetwork.minLat, server.roadNetwork.minLon,
-				server.roadNetwork.maxLat, server.roadNetwork.minLon);
-		final double metersPerPixel = getMetersPerPixel(server.roadNetwork.maxLat, currentZoom);
+		RoadNetwork roadNetwork = processor.getRoadNetwork();
+		final double mapWidthInMeters = RoadUtil.getDistInMeters(roadNetwork.maxLat, roadNetwork.minLon,
+				roadNetwork.maxLat, roadNetwork.maxLon);
+		final double mapHeightInMeters = RoadUtil.getDistInMeters(roadNetwork.minLat, roadNetwork.minLon,
+				roadNetwork.maxLat, roadNetwork.minLon);
+		final double metersPerPixel = getMetersPerPixel(roadNetwork.maxLat, currentZoom);
 		mapAreaWidthInPixelsOld = mapAreaWidthInPixels;
 		mapAreaWidthInPixels = mapWidthInMeters / metersPerPixel;
 		mapAreaHeightInPixels = mapHeightInMeters / metersPerPixel;
