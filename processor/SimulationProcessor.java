@@ -32,4 +32,8 @@ public interface SimulationProcessor {
     void pauseSim();
     void askWorkersChangeLaneBlock(int laneIndex, boolean block);
     void setLightChangeNode(Node nodeSelected);
+    void changeMap();
+    void onClose();
+    void changeSpeed(int pauseTimeEachStep);
+    void setupNewSim();
 }

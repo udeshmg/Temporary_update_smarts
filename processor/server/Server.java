@@ -210,6 +210,11 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		roadNetwork = new RoadNetwork();//Build road network based on new road graph
 	}
 
+	@Override
+	public void onClose() {
+		killConnectedWorkers();
+	}
+
 	/**
 	 * Change simulation speed by setting pause time after doing a step at all
 	 * workers. Note that this will affect simulation time. By default there is
