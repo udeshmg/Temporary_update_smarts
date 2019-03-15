@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
 import common.Settings;
 import common.SysUtil;
@@ -36,7 +35,6 @@ import processor.communication.message.SerializableDouble;
 import processor.communication.message.SerializableFrontVehicleOnBorder;
 import processor.communication.message.SerializableGridCell;
 import processor.communication.message.SerializableInt;
-import processor.communication.message.SerializableLaneIndex;
 import processor.communication.message.SerializableVehicle;
 import processor.communication.message.SerializableWorkerMetadata;
 import processor.communication.message.Serializable_GPS_Rectangle;
@@ -44,7 +42,6 @@ import traffic.TrafficNetwork;
 import traffic.light.LightUtil;
 import traffic.road.Edge;
 import traffic.road.GridCell;
-import traffic.road.Lane;
 import traffic.road.Node;
 import traffic.road.RoadUtil;
 import traffic.routing.RouteUtil;
@@ -198,7 +195,7 @@ public class Worker implements MessageHandler, Runnable {
 	 * Divide edges overlapping with the responsible area of this worker into
 	 * two sets based on their closeness to the border of the responsible area.
 	 */
-	void divideLaneSetForServerlessSim() {
+	void divideLaneSetForSim() {
 		final HashSet<Edge> edgeSet = new HashSet<>();
 		for (final Fellow fellow : fellowWorkers) {
 			for (final Edge e : fellow.inwardEdgesAcrossBorder) {
@@ -435,7 +432,7 @@ public class Worker implements MessageHandler, Runnable {
 			processReceivedMetadataOfWorkers(received.metadataWorkers);
 
 			simulation = new Simulation(trafficNetwork, connectedFellows);
-			divideLaneSetForServerlessSim();
+			divideLaneSetForSim();
 		} else {
 			// Reset existing network
 			for (final Edge edge : trafficNetwork.edges) {
