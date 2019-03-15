@@ -63,8 +63,7 @@ public class Server implements MessageHandler, Runnable {
 	int numTrajectoriesReceived = 0;//Number of complete trajectories received from workers
 	int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
 	int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
-	Server server;
-	Scanner sc = new Scanner(System.in);
+	private ConsoleUI consoleUI;
 	boolean isOpenForNewWorkers = true;
 	ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
 	ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
@@ -110,7 +109,7 @@ public class Server implements MessageHandler, Runnable {
 			} else {
 				if (workerMetas.size() == Settings.numWorkers) {
 					isOpenForNewWorkers = false;// No need for more workers					
-					acceptSimScriptFromConsole();// Let user input simulation script path
+					consoleUI.acceptSimScriptFromConsole();// Let user input simulation script path
 				}
 
 			}
@@ -323,67 +322,15 @@ public class Server implements MessageHandler, Runnable {
 		if (Settings.isVisualize) {
 			buildGui();
 		} else {
-			acceptInitialConfigFromConsole();
+			consoleUI = new ConsoleUI(this);
+			consoleUI.acceptInitialConfigFromConsole();
 		}
 
 		// Prepare to receive connection request from workers
 		new IncomingConnectionBuilder(Settings.serverListeningPortForWorkers, this).start();
 	}
 
-	void acceptInitialConfigFromConsole() {
-		// Let user input number of workers
-		System.out.println("Please specify the number of workers.");
-		Settings.numWorkers = Integer.parseInt(sc.nextLine());
-		while (Settings.numWorkers <= 0) {
-			System.out.println("Please specify the number of workers.");
-			Settings.numWorkers = Integer.parseInt(sc.nextLine());
-		}
-		// Kill all connected workers
-		killConnectedWorkers();
-		// Inform user next step
-		System.out.println("Please launch workers now.");
-	}
 
-	void acceptSimStartCommandFromConsole() {
-		System.out.println("Ready to simulate. Start (y/n)?");
-		String choice = sc.nextLine();
-		if (choice.equals("y") || choice.equals("Y")) {
-			startSimulationFromLoadedScript();
-		} else if (choice.equals("n") || choice.equals("N")) {
-			System.out.println("Quit system.");
-			killConnectedWorkers();
-			System.exit(0);
-		} else {
-			System.out.println("Ready to simulate. Start (y/n)?");
-		}
-	}
-
-	void acceptConsoleCommandAtSimEnd() {
-		System.out.println("Simulations are completed. Exit (y/n)?");
-		String choice = sc.nextLine();
-		if (choice.equals("y") || choice.equals("Y")) {
-			// Kill all connected workers
-			System.out.println("Quit system.");
-			killConnectedWorkers();
-			System.exit(0);
-		} else if (choice.equals("n") || choice.equals("N")) {
-			acceptSimScriptFromConsole();
-		} else {
-			System.out.println("Simulations are completed. Exit (y/n)?");
-		}
-	}
-
-	void acceptSimScriptFromConsole() {
-		System.out.println("Please specify the simulation script path.");
-		Settings.inputSimulationScript = sc.nextLine();
-		while (!scriptLoader.loadScriptFile()) {
-			System.out.println("Please specify the simulation script path.");
-			Settings.inputSimulationScript = sc.nextLine();
-		}
-		if (workerMetas.size() == Settings.numWorkers) {
-			acceptSimStartCommandFromConsole();
-		}
-	}
 
 	public void resumeSim() {
 		isSimulating = true;
@@ -529,7 +476,7 @@ public class Server implements MessageHandler, Runnable {
 			}
 		} else {
 			if (scriptLoader.isEmpty()) {
-				acceptConsoleCommandAtSimEnd();
+				consoleUI.acceptConsoleCommandAtSimEnd();
 			} else {
 				System.out.println("Loading configuration of new simulation...");
 				startSimulationFromLoadedScript();
