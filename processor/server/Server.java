@@ -271,93 +271,17 @@ public class Server implements MessageHandler, Runnable {
 	@Override
 	synchronized public void processReceivedMsg(final Object message) {
 		if (message instanceof Message_WS_Join) {
-			if (isOpenForNewWorkers)
-				addWorker((Message_WS_Join) message);
+			onWSJoinMessage((Message_WS_Join) message);
 		} else if (message instanceof Message_WS_SetupCreatingVehicles) {
-			numVehiclesCreatedDuringSetup += ((Message_WS_SetupCreatingVehicles) message).numVehicles;
-
-			double createdVehicleRatio = (double) numVehiclesCreatedDuringSetup / numVehiclesNeededAtStart;
-			if (createdVehicleRatio > 1) {
-				createdVehicleRatio = 1;
-			}
-
-			if (Settings.isVisualize) {
-				gui.updateSetupProgress(createdVehicleRatio);
-			}
+			onWSSetupCreatingVehiclesMsg((Message_WS_SetupCreatingVehicles) message);
 		} else if (message instanceof Message_WS_SetupDone) {
-			updateWorkerState(((Message_WS_SetupDone) message).workerName, WorkerState.READY);
-			totalNumWwCommChannels += (((Message_WS_SetupDone) message).numFellowWorkers);
-			if (isAllWorkersAtState(WorkerState.READY)) {
-				if (Settings.isVisualize) {
-					gui.stepToDraw = 0;
-				}
-				startSimulation();
-			}
+			onWSSetupDoneMsg((Message_WS_SetupDone) message);
 		} else if (message instanceof Message_WS_ServerBased_SharedMyTrafficWithNeighbor) {
-			if (!isSimulating) {
-				// No need to process the message if simulation was stopped
-				return;
-			}
-
-			Message_WS_ServerBased_SharedMyTrafficWithNeighbor messageToProcess = (Message_WS_ServerBased_SharedMyTrafficWithNeighbor) message;
-
-			for (final WorkerMeta w : workerMetas) {
-				if (w.name.equals(messageToProcess.workerName) && (w.state == WorkerState.SHARING_STARTED)) {
-					updateWorkerState(messageToProcess.workerName, WorkerState.SHARED);
-					if (isAllWorkersAtState(WorkerState.SHARED)) {
-						askWorkersSimulateOneStep();
-					}
-					break;
-				}
-			}
-
+			onWSServerBasedShareMyTrafficWithNeighbourMsg((Message_WS_ServerBased_SharedMyTrafficWithNeighbor) message);
 		} else if (message instanceof Message_WS_TrafficReport) {
-			if (!isSimulating) {
-				// No need to process the message if simulation was stopped
-				return;
-			}
-
-			final Message_WS_TrafficReport received = (Message_WS_TrafficReport) message;
-
-			// Cache received reports 
-			receivedTrafficReportCache.add(received);
-
-			// Output data from the reports
-			processCachedReceivedTrafficReports();
-
-			// Stop if max number of steps is reached in server-based mode
-			if (Settings.isServerBased) {
-				updateWorkerState(received.workerName, WorkerState.FINISHED_ONE_STEP);
-				if (isAllWorkersAtState(WorkerState.FINISHED_ONE_STEP)) {
-					updateSimulationTime();
-					if (step >= Settings.maxNumSteps) {
-						stopSim();
-					} else if (isSimulating) {
-						askWorkersShareTrafficDataWithFellowWorkers();
-					}
-				}
-			} else {
-				// Update time step in server-less mode
-				if (received.step > step) {
-					step = received.step;
-				}
-			}
+			onWSTrafficReportMsg((Message_WS_TrafficReport) message);
 		} else if (message instanceof Message_WS_Serverless_Complete) {
-			if (!isSimulating) {
-				// No need to process the message if simulation was stopped
-				return;
-			}
-			final Message_WS_Serverless_Complete received = (Message_WS_Serverless_Complete) message;
-			if (received.step > step) {
-				step = received.step;
-			}
-
-			updateWorkerState(received.workerName, WorkerState.NEW);
-
-			if (isAllWorkersAtState(WorkerState.NEW)) {
-				updateSimulationTime();
-				stopSim();
-			}
+			onWSServerlessCompleteMsg((Message_WS_Serverless_Complete) message);
 		}
 	}
 
@@ -626,6 +550,94 @@ public class Server implements MessageHandler, Runnable {
 				worker.state = state;
 				break;
 			}
+		}
+	}
+
+	private void onWSJoinMessage(Message_WS_Join msg){
+		if (isOpenForNewWorkers)
+			addWorker(msg);
+	}
+
+	private void onWSSetupCreatingVehiclesMsg(Message_WS_SetupCreatingVehicles msg){
+		numVehiclesCreatedDuringSetup += (msg).numVehicles;
+
+		double createdVehicleRatio = (double) numVehiclesCreatedDuringSetup / numVehiclesNeededAtStart;
+		if (createdVehicleRatio > 1) {
+			createdVehicleRatio = 1;
+		}
+
+		if (Settings.isVisualize) {
+			gui.updateSetupProgress(createdVehicleRatio);
+		}
+	}
+
+	private void onWSSetupDoneMsg(Message_WS_SetupDone msg){
+		updateWorkerState((msg).workerName, WorkerState.READY);
+		totalNumWwCommChannels += ((msg).numFellowWorkers);
+		if (isAllWorkersAtState(WorkerState.READY)) {
+			if (Settings.isVisualize) {
+				gui.stepToDraw = 0;
+			}
+			startSimulation();
+		}
+	}
+
+	private void onWSServerBasedShareMyTrafficWithNeighbourMsg(Message_WS_ServerBased_SharedMyTrafficWithNeighbor msg){
+		if (!isSimulating) {
+			// No need to process the message if simulation was stopped
+			return;
+		}
+		for (final WorkerMeta w : workerMetas) {
+			if (w.name.equals(msg.workerName) && (w.state == WorkerState.SHARING_STARTED)) {
+				updateWorkerState(msg.workerName, WorkerState.SHARED);
+				if (isAllWorkersAtState(WorkerState.SHARED)) {
+					askWorkersSimulateOneStep();
+				}
+				break;
+			}
+		}
+	}
+
+	private void onWSTrafficReportMsg(Message_WS_TrafficReport msg){
+		if (!isSimulating) {
+			// No need to process the message if simulation was stopped
+			return;
+		}
+		// Cache received reports
+		receivedTrafficReportCache.add(msg);
+		// Output data from the reports
+		processCachedReceivedTrafficReports();
+		// Stop if max number of steps is reached in server-based mode
+		if (Settings.isServerBased) {
+			updateWorkerState(msg.workerName, WorkerState.FINISHED_ONE_STEP);
+			if (isAllWorkersAtState(WorkerState.FINISHED_ONE_STEP)) {
+				updateSimulationTime();
+				if (step >= Settings.maxNumSteps) {
+					stopSim();
+				} else if (isSimulating) {
+					askWorkersShareTrafficDataWithFellowWorkers();
+				}
+			}
+		} else {
+			// Update time step in server-less mode
+			if (msg.step > step) {
+				step = msg.step;
+			}
+		}
+	}
+
+	private void onWSServerlessCompleteMsg(Message_WS_Serverless_Complete msg){
+		if (!isSimulating) {
+			// No need to process the message if simulation was stopped
+			return;
+		}
+		if (msg.step > step) {
+			step = msg.step;
+		}
+		updateWorkerState(msg.workerName, WorkerState.NEW);
+		if (isAllWorkersAtState(WorkerState.NEW)) {
+			updateSimulationTime();
+			stopSim();
 		}
 	}
 }
