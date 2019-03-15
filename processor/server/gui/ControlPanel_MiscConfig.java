@@ -588,7 +588,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		Settings.trafficLightTiming = LightUtil.getLightTypeFromString((String) comboBoxTrafficLight.getSelectedItem());
 		Settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString((String) comboBoxRouting.getSelectedItem());
 
-		gui.server.setupNewSim();
+		gui.processor.setupNewSim();
 		monitor.startSetupProgress();
 	}
 }

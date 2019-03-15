@@ -20,6 +20,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import common.Settings;
+import processor.SimulationProcessor;
 import processor.server.Server;
 import processor.server.gui.GUI.VehicleDetailType;
 
@@ -30,7 +31,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class ControlPanel_Realtime extends JPanel {
 	private final JButton btnPause, btnStop;
 	private final JSlider sldSimStepPause;
-	private final Server server;
+	private final SimulationProcessor processor;
 	private final JCheckBox chckbxAdditionalVehicleDetails;
 	private final JComboBox comboBoxVehicleDetails;
 	private MonitorPanel monitor;
@@ -39,8 +40,8 @@ public class ControlPanel_Realtime extends JPanel {
 	private final JLabel lblDrawTrafficAs;
 	private final ControlPanel cp;
 
-	public ControlPanel_Realtime(final Server server, ControlPanel cp) {
-		this.server = server;
+	public ControlPanel_Realtime(SimulationProcessor processor, ControlPanel cp) {
+		this.processor = processor;
 		setPreferredSize(new Dimension(445, 250));
 
 		btnPause = new JButton("PAUSE");
@@ -195,7 +196,7 @@ public class ControlPanel_Realtime extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent arg0) {
 				if (!sldSimStepPause.getValueIsAdjusting()) {
-					server.changeSpeed(sldSimStepPause.getValue());
+					processor.changeSpeed(sldSimStepPause.getValue());
 				}
 			}
 		});
@@ -208,7 +209,7 @@ public class ControlPanel_Realtime extends JPanel {
 	}
 
 	void pauseSim() {
-		server.pauseSim();
+		processor.pauseSim();
 		btnPause.setText("RESUME");
 	}
 
@@ -218,7 +219,7 @@ public class ControlPanel_Realtime extends JPanel {
 			cp.gui.stepToDraw += Settings.trafficReportStepGapInServerlessMode;
 			cp.gui.clearObjectData();//Clear received data
 		}
-		server.resumeSim();
+		processor.resumeSim();
 		btnPause.setEnabled(true);
 		btnPause.setText("PAUSE");
 		btnStop.setEnabled(true);
@@ -231,7 +232,7 @@ public class ControlPanel_Realtime extends JPanel {
 
 	void stopSim() {
 		controlPanel.isDuringSimulation = false;
-		server.stopSim();
+		processor.stopSim();
 		btnPause.setEnabled(false);
 		btnStop.setEnabled(false);
 		cp.cpMap.btnCenterMapToSelectedPlace.setEnabled(true);

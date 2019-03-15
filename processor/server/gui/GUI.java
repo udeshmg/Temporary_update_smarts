@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 
 import common.Settings;
 import osm.OSM;
+import processor.SimulationProcessor;
 import processor.communication.message.Serializable_GUI_Light;
 import processor.communication.message.Serializable_GUI_Vehicle;
 import processor.server.Server;
@@ -30,7 +31,7 @@ public class GUI extends JFrame {
 	MonitorPanel monitorPanel;
 	ControlPanel controlPanel;
 	JScrollPane controlPanelHolder;
-	Server server;
+	SimulationProcessor processor;
 	int frameWidth, frameHeight;
 	public int stepToDraw = 0;
 	int lastVisualizedStep = 0;
@@ -47,7 +48,7 @@ public class GUI extends JFrame {
 	public GUI() {
 	}
 
-	public GUI(final Server server) {
+	public GUI(SimulationProcessor processor) {
 		setTitle("SMARTS Traffic Simulator");
 		computeFrameDimension();
 		setSize(new Dimension(frameWidth, frameHeight));
@@ -55,27 +56,27 @@ public class GUI extends JFrame {
 		setLocationRelativeTo(null);
 		setResizable(false);
 		setLayout(null);
-		this.server = server;
+		this.processor = processor;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		initComponenets(server);
+		initComponenets(processor);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(final WindowEvent we) {
-				server.killConnectedWorkers();
+				processor.onClose();
 				System.exit(0);
 			}
 		});
 	}
 
 	public void changeMap() {
-		server.stopSim();
-		server.changeMap();
+		processor.stopSim();
+		processor.changeMap();
 		monitorPanel.setEnabled(false);
-		monitorPanel.changeMap(server.roadNetwork.minLon, server.roadNetwork.minLat, server.roadNetwork.maxLon,
-				server.roadNetwork.maxLat);
+		RoadNetwork roadNetwork = processor.getRoadNetwork();
+		monitorPanel.changeMap(roadNetwork.minLon, roadNetwork.minLat,roadNetwork.maxLon, roadNetwork.maxLat);
 		getReadyToSetup();
 		monitorPanel.setEnabled(true);
 	}
@@ -124,15 +125,15 @@ public class GUI extends JFrame {
 		controlPanel.prepareToSetup();
 	}
 
-	void initComponenets(final Server server) {
+	void initComponenets(SimulationProcessor processor) {
 		queryResult = new GuiStatistic();
 
-		monitorPanel = new MonitorPanel(server, this, queryResult,
+		monitorPanel = new MonitorPanel(processor, this, queryResult,
 				new Dimension(getMonitorPanelWidth(), getMonitorPanelHeightWidth()));
 		add(monitorPanel);
 
 		final Dimension rightPanelDimension = new Dimension(frameWidth - getMonitorPanelWidth(), frameHeight);
-		controlPanel = new ControlPanel(server, this, monitorPanel.displayPanelDimension.width, 0, rightPanelDimension);
+		controlPanel = new ControlPanel(processor, this, monitorPanel.displayPanelDimension.width, 0, rightPanelDimension);
 		controlPanelHolder = new JScrollPane();
 		controlPanelHolder.setViewportView(controlPanel);
 		controlPanelHolder.getVerticalScrollBar().setUnitIncrement(16);
