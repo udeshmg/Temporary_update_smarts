@@ -53,12 +53,9 @@ public class RouteLoader {
 
 	ArrayList<WorkerMeta> workers;
 
-	Server server;
-
-	public RouteLoader(final Server server, final ArrayList<WorkerMeta> workers) {
-		roadNetwork = server.roadNetwork;
+	public RouteLoader(RoadNetwork roadNetwork, final ArrayList<WorkerMeta> workers) {
+		this.roadNetwork = roadNetwork;
 		this.workers = workers;
-		this.server = server;
 	}
 
 	/**
@@ -80,10 +77,19 @@ public class RouteLoader {
 			final double repeatRate = Double.parseDouble(fields[5]);
 			final ArrayList<SerializableRouteLeg> route = getRouteFromString(fields[6]);
 			final Node routeStartNode = roadNetwork.edges.get(route.get(0).edgeIndex).startNode;
-			final WorkerMeta routeStartWorker = server.getWorkerAtRouteStart(routeStartNode);
+			final WorkerMeta routeStartWorker = getWorkerAtRouteStart(routeStartNode);
 			routeStartWorker.externalRoutes.add(new SerializableExternalVehicle(foreground, id, start_time, type,
 					driverProfile, repeatRate, route));
 		}
+	}
+
+	public WorkerMeta getWorkerAtRouteStart(final Node routeStartNode) {
+		for (final WorkerMeta worker : workers) {
+			if (worker.workarea.workCells.contains(routeStartNode.gridCell)) {
+				return worker;
+			}
+		}
+		return null;
 	}
 
 	ArrayList<SerializableRouteLeg> getRouteFromString(final String routeString) {

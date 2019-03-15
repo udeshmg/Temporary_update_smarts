@@ -222,15 +222,6 @@ public class Server implements MessageHandler, Runnable {
 		}
 	}
 
-	public WorkerMeta getWorkerAtRouteStart(final Node routeStartNode) {
-		for (final WorkerMeta worker : workerMetas) {
-			if (worker.workarea.workCells.contains(routeStartNode.gridCell)) {
-				return worker;
-			}
-		}
-		return null;
-	}
-
 	boolean isAllWorkersAtState(final WorkerState state) {
 		int count = 0;
 		for (final WorkerMeta w : workerMetas) {
@@ -391,7 +382,7 @@ public class Server implements MessageHandler, Runnable {
 		WorkloadBalancer.assignNumInternalVehiclesToWorkers(workerMetas, roadNetwork);
 
 		// Assign vehicle routes from external file to workers
-		final RouteLoader routeLoader = new RouteLoader(this, workerMetas);
+		final RouteLoader routeLoader = new RouteLoader(roadNetwork, workerMetas);
 		routeLoader.loadRoutes();
 
 		// Get number of vehicles needed
