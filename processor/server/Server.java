@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import common.Settings;
 import osm.OSM;
+import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
 import processor.communication.message.Message_SW_BlockLane;
@@ -44,7 +45,7 @@ import traffic.road.RoadUtil;
  * 
  * This class can be run as Java application.
  */
-public class Server implements MessageHandler, Runnable {
+public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public RoadNetwork roadNetwork;
 	ArrayList<WorkerMeta> workerMetas = new ArrayList<>();
 	int step = 0;//Time step in the current simulation 
@@ -433,6 +434,11 @@ public class Server implements MessageHandler, Runnable {
 			changeMap();
 		}
 		setupNewSim();
+	}
+
+	@Override
+	public RoadNetwork getRoadNetwork() {
+		return roadNetwork;
 	}
 
 	public void stopSim() {
