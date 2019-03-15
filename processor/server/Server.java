@@ -46,7 +46,7 @@ import traffic.road.RoadUtil;
  * This class can be run as Java application.
  */
 public class Server implements MessageHandler, Runnable, SimulationProcessor {
-	public RoadNetwork roadNetwork;
+	private RoadNetwork roadNetwork;
 	ArrayList<WorkerMeta> workerMetas = new ArrayList<>();
 	int step = 0;//Time step in the current simulation 
 	GUI gui;
