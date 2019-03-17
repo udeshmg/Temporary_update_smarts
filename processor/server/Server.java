@@ -48,27 +48,27 @@ import traffic.road.RoadUtil;
 public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private RoadNetwork roadNetwork;
 	ArrayList<WorkerMeta> workerMetas = new ArrayList<>();
-	int step = 0;//Time step in the current simulation 
-	GUI gui;
-	FileOutput fileOutput = new FileOutput();
+	private int step = 0;//Time step in the current simulation
+	private GUI gui;
+	private FileOutput fileOutput = new FileOutput();
 	public boolean isSimulating = false;//Whether simulation is running, i.e., it is not paused or stopped
-	int numInternalNonPubVehiclesAtAllWorkers = 0;
-	int numInternalTramsAtAllWorkers = 0;
-	int numInternalBusesAtAllWorkers = 0;
-	long timeStamp = 0;
-	double simulationWallTime = 0;//Total time length spent on simulation
+	private int numInternalNonPubVehiclesAtAllWorkers = 0;
+	private int numInternalTramsAtAllWorkers = 0;
+	private int numInternalBusesAtAllWorkers = 0;
+	private long timeStamp = 0;
+	private double simulationWallTime = 0;//Total time length spent on simulation
 	ScriptLoader scriptLoader = new ScriptLoader();
-	int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
-	ArrayList<Node> nodesToAddLight = new ArrayList<>();
-	ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
-	int numTrajectoriesReceived = 0;//Number of complete trajectories received from workers
-	int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
-	int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
+	private int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
+	private ArrayList<Node> nodesToAddLight = new ArrayList<>();
+	private ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
+	private int numTrajectoriesReceived = 0;//Number of complete trajectories received from workers
+	private int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
+	private int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
 	private ConsoleUI consoleUI;
-	boolean isOpenForNewWorkers = true;
-	ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
-	ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
-	HashMap<String, TreeMap<Double, double[]>> allTrajectories = new HashMap<String, TreeMap<Double, double[]>>();
+	private boolean isOpenForNewWorkers = true;
+	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
+	private ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
+	private HashMap<String, TreeMap<Double, double[]>> allTrajectories = new HashMap<String, TreeMap<Double, double[]>>();
 
 	public static void main(final String[] args) {
 		if (processCommandLineArguments(args)) {
