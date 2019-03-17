@@ -311,10 +311,19 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	@Override
 	public void run() {
+		initRoadNetwork();
+		initUIs();
+		// Prepare to receive connection request from workers
+		new IncomingConnectionBuilder(Settings.serverListeningPortForWorkers, this).start();
+	}
+
+	public void initRoadNetwork(){
 		// Load default road network
 		Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
 		roadNetwork = new RoadNetwork();
+	}
 
+	public void initUIs(){
 		// Start GUI or load simulation configuration without GUI
 		if (Settings.isVisualize) {
 			buildGui();
@@ -322,12 +331,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			consoleUI = new ConsoleUI(this);
 			consoleUI.acceptInitialConfigFromConsole();
 		}
-
-		// Prepare to receive connection request from workers
-		new IncomingConnectionBuilder(Settings.serverListeningPortForWorkers, this).start();
 	}
-
-
 
 	public void resumeSim() {
 		isSimulating = true;
