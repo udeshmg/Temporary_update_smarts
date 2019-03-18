@@ -105,8 +105,6 @@ public class Worker implements MessageHandler, Runnable {
 	ArrayList<Message_WW_Traffic> receivedTrafficCache = new ArrayList<>();
 	boolean isDuringServerlessSim;//Once server-less simulation begins, this will true until the simulation ends
 	boolean isPausingServerlessSim;
-	ArrayList<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
-	ArrayList<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
 	Thread singleWorkerServerlessThread = new Thread();//Used when this worker is the only worker in server-less mode
 	private int numVehicleCreatedSinceLastSetupProgressReport = 0;
 	private SimWorkerData data = new SimWorkerData();
@@ -133,7 +131,7 @@ public class Worker implements MessageHandler, Runnable {
 					}
 
 					timeNow = step / Settings.numStepsPerSecond;
-					data.simulateOneStep(me, timeNow, step, me.pspBorderEdges, me.pspNonBorderEdges,
+					data.simulateOneStep(me, timeNow, step,
 							true, true, true);
 
 					sendTrafficReportInServerlessMode();
@@ -183,7 +181,10 @@ public class Worker implements MessageHandler, Runnable {
 	 * Divide edges overlapping with the responsible area of this worker into
 	 * two sets based on their closeness to the border of the responsible area.
 	 */
-	void divideLaneSetForSim() {
+	Map<String, List<Edge>> divideLaneSetForSim() {
+		Map<String, List<Edge>> setMap = new HashMap<>();
+		List<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
+		List<Edge> pspNonBorderEdges = new ArrayList<>();
 		final HashSet<Edge> edgeSet = new HashSet<>();
 		for (final Fellow fellow : fellowWorkers) {
 			for (final Edge e : fellow.inwardEdgesAcrossBorder) {
@@ -198,6 +199,9 @@ public class Worker implements MessageHandler, Runnable {
 				pspNonBorderEdges.add(e);
 			}
 		}
+		setMap.put("Border", pspBorderEdges);
+		setMap.put("NonBorder", pspNonBorderEdges);
+		return setMap;
 	}
 
 	/**
@@ -295,7 +299,7 @@ public class Worker implements MessageHandler, Runnable {
 				} else if (!isPausingServerlessSim) {
 					step++;
 					timeNow = step / Settings.numStepsPerSecond;
-					data.simulateOneStep(this, timeNow, step, this.pspBorderEdges, this.pspNonBorderEdges,
+					data.simulateOneStep(this, timeNow, step,
 							true, true, true);
 					proceedBasedOnSyncMethod();
 				}
@@ -412,8 +416,7 @@ public class Worker implements MessageHandler, Runnable {
 		if (received.isNewEnvironment) {
 			data.initTrafficNetwork(received.roadGraph);
 			processReceivedMetadataOfWorkers(received.metadataWorkers);
-			data.initSimulation(connectedFellows);
-			divideLaneSetForSim();
+			data.initSimulation(connectedFellows, divideLaneSetForSim());
 		} else {
 			data.resetExistingNetwork();
 		}
@@ -435,12 +438,7 @@ public class Worker implements MessageHandler, Runnable {
 		}
 
 		receivedTrafficCache.clear();
-		for (final Edge edge : pspBorderEdges) {
-			edge.clearVehicles();
-		}
-		for (final Edge edge : pspNonBorderEdges) {
-			edge.clearVehicles();
-		}
+
 
 		data.resetTraffic();
 	}
@@ -569,7 +567,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	private void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
-		data.simulateOneStep(this, timeNow, step, this.pspBorderEdges, this.pspNonBorderEdges,
+		data.simulateOneStep(this, timeNow, step, 
 				msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
 		senderForServer.send(new Message_WS_TrafficReport(name, step, data.getTrafficNetwork()));
 		data.clearReportedTrafficData();
@@ -585,7 +583,7 @@ public class Worker implements MessageHandler, Runnable {
 			singleWorkerServerlessThread.start();
 		} else {
 			timeNow = step / Settings.numStepsPerSecond;
-			data.simulateOneStep(this, timeNow, step, this.pspBorderEdges, this.pspNonBorderEdges,
+			data.simulateOneStep(this, timeNow, step,
 					true, true, true);
 			proceedBasedOnSyncMethod();
 		}

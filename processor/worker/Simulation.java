@@ -33,7 +33,7 @@ public class Simulation {
 
 
 
-	ArrayList<Vehicle> moveVehicleForward(final double timeNow, final ArrayList<Edge> edges) {
+	ArrayList<Vehicle> moveVehicleForward(final double timeNow, final List<Edge> edges) {
 		final ArrayList<Vehicle> vehicles = new ArrayList<>();
 		for (final Edge edge : edges) {
 			double accumulatedVehicleSpeed = 0;
@@ -123,8 +123,8 @@ public class Simulation {
 
 
 
-	synchronized public void simulateOneStep(Worker worker, double timeNow, int step, ArrayList<Edge> pspBorderEdges,
-											 ArrayList<Edge> pspNonBorderEdges, int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
+	synchronized public void simulateOneStep(Worker worker, double timeNow, int step, List<Edge> pspBorderEdges,
+											 List<Edge> pspNonBorderEdges, int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
 											 int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
@@ -147,7 +147,7 @@ public class Simulation {
 		clearOneStepData();
 	}
 
-	void moveVehiclesAroundBorder(double timeNow, ArrayList<Edge> pspBorderEdges){
+	void moveVehiclesAroundBorder(double timeNow, List<Edge> pspBorderEdges){
 		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(timeNow, pspBorderEdges);
 		moveVehicleToNextLink(timeNow, vehiclesAroundBorder);
 	}
@@ -158,7 +158,7 @@ public class Simulation {
 		}
 	}
 
-	void moveVehiclesNotAroundBorder(double timeNow, ArrayList<Edge> pspNonBorderEdges){
+	void moveVehiclesNotAroundBorder(double timeNow, List<Edge> pspNonBorderEdges){
 		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(timeNow, pspNonBorderEdges);
 		moveVehicleToNextLink(timeNow, vehiclesNotAroundBorder);
 	}

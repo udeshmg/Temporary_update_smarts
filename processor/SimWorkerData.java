@@ -14,6 +14,8 @@ import traffic.road.RoadUtil;
 import traffic.vehicle.Vehicle;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -43,9 +45,13 @@ public class SimWorkerData {
     private int numLocalRandomPrivateVehicles = 0;
     private int numLocalRandomTrams = 0;
     private int numLocalRandomBuses = 0;
+	private List<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
+	private List<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
 
-	public void initSimulation(ArrayList<Fellow> connectedFellows){
+	public void initSimulation(ArrayList<Fellow> connectedFellows, Map<String, List<Edge>> pspEdges){
         simulation = new Simulation(trafficNetwork, connectedFellows);
+        pspBorderEdges = pspEdges.get("Border");
+        pspNonBorderEdges = pspEdges.get("NonBorder");
     }
 
     public void initTrafficNetwork(String roadGraph){
@@ -57,8 +63,7 @@ public class SimWorkerData {
         trafficNetwork = new TrafficNetwork();
     }
 
-    public void simulateOneStep(Worker worker, double timeNow, int step, ArrayList<Edge> pspBorderEdges,
-                                ArrayList<Edge> pspNonBorderEdges, boolean isNewNonPubVehiclesAllowed,
+    public void simulateOneStep(Worker worker, double timeNow, int step, boolean isNewNonPubVehiclesAllowed,
                                 boolean isNewTramsAllowed, boolean isNewBusesAllowed){
 	    simulation.simulateOneStep(worker, timeNow, step, pspBorderEdges, pspNonBorderEdges, numLocalRandomPrivateVehicles,
                 numLocalRandomTrams, numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed);
@@ -107,6 +112,12 @@ public class SimWorkerData {
     }
 
     public void resetTraffic(){
+        for (final Edge edge : pspBorderEdges) {
+            edge.clearVehicles();
+        }
+        for (final Edge edge : pspNonBorderEdges) {
+            edge.clearVehicles();
+        }
         trafficNetwork.resetTraffic();
     }
 
