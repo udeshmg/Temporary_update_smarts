@@ -148,27 +148,9 @@ public class Worker implements MessageHandler, Runnable {
 		}
 	}
 
-	Vehicle createReceivedVehicle(final SerializableVehicle serializableVehicle) {
-		final Vehicle vehicle = new Vehicle();
-		vehicle.type = VehicleType.getVehicleTypeFromName(serializableVehicle.type);
-		vehicle.length = vehicle.type.length;
-		vehicle.setRouteLegs(RouteUtil.parseReceivedRoute(serializableVehicle.routeLegs, data.getTrafficNetwork().edges));
-		vehicle.indexLegOnRoute = serializableVehicle.indexRouteLeg;
-		vehicle.lane = data.getTrafficNetwork().lanes.get(serializableVehicle.laneIndex);
-		vehicle.headPosition = serializableVehicle.headPosition;
-		vehicle.speed = serializableVehicle.speed;
-		vehicle.timeRouteStart = serializableVehicle.timeRouteStart;
-		vehicle.id = serializableVehicle.id;
-		vehicle.isExternal = serializableVehicle.isExternal;
-		vehicle.isForeground = serializableVehicle.isForeground;
-		vehicle.idLightGroupPassed = serializableVehicle.idLightGroupPassed;
-		vehicle.driverProfile = DriverProfile.valueOf(serializableVehicle.driverProfile);
-		return vehicle;
-	}
-
 	void createVehiclesFromFellow(final Message_WW_Traffic messageToProcess) {
 		for (final SerializableVehicle serializableVehicle : messageToProcess.vehiclesEnteringReceiver) {
-			final Vehicle vehicle = createReceivedVehicle(serializableVehicle);
+			final Vehicle vehicle = serializableVehicle.createVehicle(data.getTrafficNetwork());
 			data.addTransferredVehicle(vehicle);
 		}
 	}
