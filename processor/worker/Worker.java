@@ -107,18 +107,14 @@ public class Worker implements MessageHandler, Runnable {
 	private int numVehicleCreatedSinceLastSetupProgressReport = 0;
 	private SimWorkerData data = new SimWorkerData();
 
-
-
+	
 	void buildThreadForSingleWorkerServerlessSimulation() {
 		singleWorkerServerlessThread = new Thread() {
 			public void run() {
-
 				while (data.getStep() < Settings.maxNumSteps) {
-
 					if (!isDuringServerlessSim) {
 						break;
 					}
-
 					while (isPausingServerlessSim) {
 						try {
 							sleep(1);
@@ -127,16 +123,12 @@ public class Worker implements MessageHandler, Runnable {
 							e.printStackTrace();
 						}
 					}
-
 					data.simulateOneStep(me, true, true, true);
-
 					sendTrafficReportInServerlessMode();
-
 					data.setStep(data.getStep() + 1);
 				}
 				// Finish simulation
 				senderForServer.send(new Message_WS_Serverless_Complete(name, data.getStep(), data.getTrafficNetwork().getVehicleCount()));
-
 			}
 		};
 	}
@@ -219,7 +211,6 @@ public class Worker implements MessageHandler, Runnable {
 				count++;
 			}
 		}
-
 		return count == connectedFellows.size();
 
 	}
@@ -361,8 +352,8 @@ public class Worker implements MessageHandler, Runnable {
 
 		if (received.isNewEnvironment) {
 			data.initTrafficNetwork(received.roadGraph);
-			data.initSimulation(connectedFellows, divideLaneSetForSim());
 			processReceivedMetadataOfWorkers(received.metadataWorkers);
+			data.initSimulation(divideLaneSetForSim());
 		} else {
 			data.resetExistingNetwork();
 		}

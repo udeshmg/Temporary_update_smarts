@@ -17,13 +17,11 @@ import traffic.vehicle.Vehicle;
  */
 public class Simulation {
 	TrafficNetwork trafficNetwork;
-	private List<Fellow> connectedFellows;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 
-	public Simulation(final TrafficNetwork trafficNetwork, final ArrayList<Fellow> connectedFellows) {
+	public Simulation(final TrafficNetwork trafficNetwork) {
 		this.trafficNetwork = trafficNetwork;
-		this.connectedFellows = connectedFellows;
 	}
 
 	void clearOneStepData() {
@@ -71,7 +69,7 @@ public class Simulation {
 		return vehicles;
 	}
 
-	void moveVehicleToNextLink(final double timeNow, final ArrayList<Vehicle> vehiclesToCheck) {
+	void moveVehicleToNextLink(List<Fellow> connectedFellows, final double timeNow, final ArrayList<Vehicle> vehiclesToCheck) {
 		for (final Vehicle vehicle : vehiclesToCheck) {
 
 			if (!vehicle.active) {
@@ -128,9 +126,9 @@ public class Simulation {
 											 int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
-		moveVehiclesAroundBorder(timeNow, pspBorderEdges);
+		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
 		transferDataTofellow(worker);
-		moveVehiclesNotAroundBorder(timeNow, pspNonBorderEdges);
+		moveVehiclesNotAroundBorder(worker.connectedFellows, timeNow, pspNonBorderEdges);
 		removeTripFinishedVehicles();
 		trafficNetwork.changeLaneOfVehicles(timeNow);
 		trafficNetwork.updateTrafficLights();
@@ -147,9 +145,9 @@ public class Simulation {
 		clearOneStepData();
 	}
 
-	void moveVehiclesAroundBorder(double timeNow, List<Edge> pspBorderEdges){
+	void moveVehiclesAroundBorder(List<Fellow> connectedFellows, double timeNow, List<Edge> pspBorderEdges){
 		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(timeNow, pspBorderEdges);
-		moveVehicleToNextLink(timeNow, vehiclesAroundBorder);
+		moveVehicleToNextLink(connectedFellows, timeNow, vehiclesAroundBorder);
 	}
 
 	void transferDataTofellow(final Worker worker){
@@ -158,9 +156,9 @@ public class Simulation {
 		}
 	}
 
-	void moveVehiclesNotAroundBorder(double timeNow, List<Edge> pspNonBorderEdges){
+	void moveVehiclesNotAroundBorder(List<Fellow> connectedFellows, double timeNow, List<Edge> pspNonBorderEdges){
 		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(timeNow, pspNonBorderEdges);
-		moveVehicleToNextLink(timeNow, vehiclesNotAroundBorder);
+		moveVehicleToNextLink(connectedFellows, timeNow, vehiclesNotAroundBorder);
 	}
 
 	void removeTripFinishedVehicles(){

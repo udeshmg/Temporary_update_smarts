@@ -50,8 +50,8 @@ public class SimWorkerData {
     private int step = 0;
     private double timeNow;
 
-	public void initSimulation(ArrayList<Fellow> connectedFellows, Map<String, List<Edge>> pspEdges){
-        simulation = new Simulation(trafficNetwork, connectedFellows);
+	public void initSimulation(Map<String, List<Edge>> pspEdges){
+        simulation = new Simulation(trafficNetwork);
         pspBorderEdges = pspEdges.get("Border");
         pspNonBorderEdges = pspEdges.get("NonBorder");
     }
