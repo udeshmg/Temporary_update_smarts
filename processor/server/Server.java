@@ -100,18 +100,19 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		final WorkerMeta worker = new WorkerMeta(received.workerName, received.workerAddress, received.workerPort);
 		if (isAllWorkersAtState(WorkerState.NEW) && Settings.numWorkers > workerMetas.size()) {
 			workerMetas.add(worker);
-			System.out.println(workerMetas.size() + "/" + Settings.numWorkers + " workers connected.");
 			if (Settings.isVisualize) {
 				gui.updateNumConnectedWorkers(workerMetas.size());
-				if (workerMetas.size() == Settings.numWorkers) {
+			}else{
+				System.out.println(workerMetas.size() + "/" + Settings.numWorkers + " workers connected.");
+			}
+			if (workerMetas.size() == Settings.numWorkers) {
+				isOpenForNewWorkers = false;// No need for more workers
+				if (Settings.isVisualize) {
 					gui.getReadyToSetup();
-				}
-			} else {
-				if (workerMetas.size() == Settings.numWorkers) {
-					isOpenForNewWorkers = false;// No need for more workers					
+				} else {
 					consoleUI.acceptSimScriptFromConsole();// Let user input simulation script path
-				}
 
+				}
 			}
 		} else {
 			final Message_SW_KillWorker msd = new Message_SW_KillWorker(Settings.isSharedJVM);
