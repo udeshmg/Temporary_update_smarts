@@ -2,12 +2,7 @@ package processor.worker;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import common.Settings;
 import common.SysUtil;
@@ -441,8 +436,7 @@ public class Worker implements MessageHandler, Runnable {
 		}
 
 		// Reset lights
-		trafficNetwork.lightCoordinator.init(trafficNetwork.nodes, new ArrayList<SerializableInt>(),
-				new ArrayList<SerializableInt>(), workarea);
+		trafficNetwork.lightCoordinator.init(getLightNodes(), new ArrayList<SerializableInt>(), new ArrayList<SerializableInt>());
 	}
 
 	void processReceivedTraffic(final Message_WW_Traffic messageToProcess) {
@@ -546,8 +540,8 @@ public class Worker implements MessageHandler, Runnable {
 		}
 		if ((msg.indexNodesToAddLight.size() > 0)
 				|| (msg.indexNodesToRemoveLight.size() > 0)) {
-			trafficNetwork.lightCoordinator.init(trafficNetwork.nodes, msg.indexNodesToAddLight,
-					msg.indexNodesToRemoveLight, workarea);
+
+			trafficNetwork.lightCoordinator.init(getLightNodes(), msg.indexNodesToAddLight, msg.indexNodesToRemoveLight);
 		}
 		// Reset fellow state
 		for (final Fellow connectedFellow : connectedFellows) {
@@ -575,6 +569,19 @@ public class Worker implements MessageHandler, Runnable {
 		progressTimer.cancel();
 		// Let server know that setup is done
 		senderForServer.send(new Message_WS_SetupDone(name, connectedFellows.size()));
+	}
+
+	private ArrayList<Node> getLightNodes(){
+		/*
+		 * Collects the nodes with traffic lights in the current work area
+		 */
+		final ArrayList<Node> lightNodes = new ArrayList<>();
+		for (final Node node : trafficNetwork.nodes) {
+			if (workarea.workCells.contains(node.gridCell) && node.light && (node.inwardEdges.size() > 0)) {
+				lightNodes.add(node);
+			}
+		}
+		return lightNodes;
 	}
 
 	private void onSWServerBasedShareTrafficMsg(Message_SW_ServerBased_ShareTraffic msg){

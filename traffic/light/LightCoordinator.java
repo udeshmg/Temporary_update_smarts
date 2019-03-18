@@ -60,10 +60,10 @@ public class LightCoordinator {
 	 * Group nodes with traffic signals. Nodes in the same group are within
 	 * certain distance to each other.
 	 */
-	void groupAdjacentNodes(final ArrayList<Node> mapNodes, final Workarea workarea) {
+	void groupAdjacentNodes(final ArrayList<Node> lightNodes) {
 		nodeGroups.clear();
 
-		for (final Node node : mapNodes) {
+		for (final Node node : lightNodes) {
 			node.idLightNodeGroup = 0;
 		}
 
@@ -71,15 +71,7 @@ public class LightCoordinator {
 			return;
 		}
 
-		/*
-		 * Collects the nodes with traffic lights in the current work area
-		 */
-		final ArrayList<Node> lightNodes = new ArrayList<>();
-		for (final Node node : mapNodes) {
-			if (workarea.workCells.contains(node.gridCell) && node.light && (node.inwardEdges.size() > 0)) {
-				lightNodes.add(node);
-			}
-		}
+
 
 		/*
 		 * For each node with traffic light, find other nodes with lights within
@@ -156,7 +148,7 @@ public class LightCoordinator {
 	 *
 	 */
 	public void init(final ArrayList<Node> mapNodes, final ArrayList<SerializableInt> indexNodesToAddLight,
-			final ArrayList<SerializableInt> indexNodesToRemoveLight, final Workarea workarea) {
+			final ArrayList<SerializableInt> indexNodesToRemoveLight) {
 		// Add or remove lights
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
@@ -166,7 +158,7 @@ public class LightCoordinator {
 		}
 
 		// Groups adjacent nodes with traffic lights based on distance.
-		groupAdjacentNodes(mapNodes, workarea);
+		groupAdjacentNodes(mapNodes);
 		System.out.println("Grouped adjacent traffic lights.");
 
 		// Groups inward edges of the grouped nodes.
