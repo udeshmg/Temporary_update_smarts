@@ -177,15 +177,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		}
 	}
 
-	void buildGui() {
-		if (gui != null) {
-			gui.dispose();
-		}
-		final GUI newGUI = new GUI(this);
-		gui = newGUI;
-		gui.setVisible(true);
-	}
-
 	public void changeMap() {
 		Settings.listRouteSourceWindowForInternalVehicle.clear();
 		Settings.listRouteDestinationWindowForInternalVehicle.clear();
@@ -325,7 +316,12 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public void initUIs(){
 		// Start GUI or load simulation configuration without GUI
 		if (Settings.isVisualize) {
-			buildGui();
+			if (gui != null) {
+				gui.dispose();
+			}
+			final GUI newGUI = new GUI(this);
+			gui = newGUI;
+			gui.setVisible(true);
 		} else {
 			consoleUI = new ConsoleUI(this);
 			consoleUI.acceptInitialConfigFromConsole();
