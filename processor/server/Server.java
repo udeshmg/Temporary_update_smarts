@@ -1,15 +1,10 @@
 package processor.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Scanner;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import common.Settings;
-import osm.OSM;
 import processor.SimulationData;
 import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
@@ -26,17 +21,12 @@ import processor.communication.message.Message_SW_Serverless_Stop;
 import processor.communication.message.Message_SW_Setup;
 import processor.communication.message.Message_WS_Join;
 import processor.communication.message.Message_WS_TrafficReport;
-import processor.communication.message.SerializableRouteDump;
 import processor.communication.message.Message_WS_ServerBased_SharedMyTrafficWithNeighbor;
 import processor.communication.message.Message_WS_Serverless_Complete;
 import processor.communication.message.Message_WS_SetupCreatingVehicles;
 import processor.communication.message.Message_WS_SetupDone;
-import processor.communication.message.Serializable_GPS_Rectangle;
-import processor.communication.message.Serializable_GUI_Vehicle;
-import processor.server.gui.GUI;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
-import traffic.road.RoadUtil;
 
 /**
  * This class can do: 1) loading and distributing simulation configuration; 2)
