@@ -3,6 +3,7 @@ package processor.communication.message;
 import java.util.ArrayList;
 
 import common.Settings;
+import traffic.TrafficNetwork;
 import traffic.light.LightCoordinator;
 import traffic.light.LightCoordinator.LightGroup;
 import traffic.light.TrafficLightTiming;
@@ -49,6 +50,12 @@ public class Message_WS_TrafficReport {
 		this.numInternalNonPubVehicles = numInternalNonPubVehicles;
 		this.numInternalTrams = numInternalTrams;
 		this.numInternalBuses = numInternalBuses;
+	}
+
+	public Message_WS_TrafficReport(final String workerName, final int step, final TrafficNetwork trafficNetwork){
+		this(workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
+				trafficNetwork.newVehiclesSinceLastReport, step, trafficNetwork.numInternalNonPublicVehicle,
+				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus);
 	}
 
 	ArrayList<Serializable_GUI_Vehicle> getDetailOfActiveVehiclesOnRoad(final ArrayList<Vehicle> vehicles) {

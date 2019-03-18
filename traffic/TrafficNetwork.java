@@ -716,4 +716,8 @@ public class TrafficNetwork extends RoadNetwork {
 			lightCoordinator.updateLights();
 		}
 	}
+
+	public int getVehicleCount(){
+		return vehicles.size();
+	}
 }
