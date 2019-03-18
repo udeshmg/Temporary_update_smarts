@@ -250,7 +250,6 @@ public class Worker implements MessageHandler, Runnable {
 	void join() {
 		// Get IP address
 		address = SysUtil.getMyIpV4Addres();
-
 		// Find an available port
 		listeningPort = Settings.serverListeningPortForWorkers + 1
 				+ (new Random()).nextInt(65535 - Settings.serverListeningPortForWorkers);
@@ -264,16 +263,11 @@ public class Worker implements MessageHandler, Runnable {
 				continue;
 			}
 		}
-
 		connectionBuilder = new IncomingConnectionBuilder(listeningPort, this);
 		connectionBuilder.start();
-
 		senderForServer = new MessageSender(Settings.serverAddress, Settings.serverListeningPortForWorkers);
-
 		name = SysUtil.getRandomID(4);
-
 		workarea = new Workarea(name, null);
-
 		senderForServer.send(new Message_WS_Join(name, address, listeningPort));
 	}
 
@@ -424,15 +418,11 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	void resetTraffic() {
-
 		for (final Fellow fellow : fellowWorkers) {
 			fellow.vehiclesToCreateAtBorder.clear();
 			fellow.state = FellowState.SHARED;
 		}
-
 		receivedTrafficCache.clear();
-
-
 		data.resetTraffic();
 	}
 
