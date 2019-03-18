@@ -38,6 +38,19 @@ public class SimulationData {
     private RoadNetwork roadNetwork;
     private GUI gui;
     private ConsoleUI consoleUI;
+    private FileOutput fileOutput = new FileOutput();
+    private double simulationWallTime = 0;//Total time length spent on simulation
+    private int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
+    private ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
+    private HashMap<String, TreeMap<Double, double[]>> allTrajectories = new HashMap<String, TreeMap<Double, double[]>>();
+    private long timeStamp = 0;
+    private int numInternalNonPubVehiclesAtAllWorkers = 0;
+    private int numInternalTramsAtAllWorkers = 0;
+    private int numInternalBusesAtAllWorkers = 0;
+    private ArrayList<Node> nodesToAddLight = new ArrayList<>();
+    private ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
+    private int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
+    private int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
 
 
     public void showNumberOfConnectedWorkers(int number){
@@ -85,13 +98,28 @@ public class SimulationData {
         }
     }
 
-    public void updateUI(final ArrayList<Serializable_GUI_Vehicle> vehicleList,
+    public void updateFromReport(final ArrayList<Serializable_GUI_Vehicle> vehicleList,
                          final ArrayList<Serializable_GUI_Light> lightList, final String workerName, final int numWorkers,
-                         final int step){
+                         final int step, ArrayList<SerializableRouteDump> randomRoutes, int numInternalNonPubVehicles,
+                                         int numInternalTrams, int numInternalBuses){
         // Update GUI
         if (Settings.isVisualize) {
             gui.updateObjectData(vehicleList, lightList, workerName, numWorkers, step);
         }
+        // Add new vehicle position to its trajectory
+        double timeStamp = step / Settings.numStepsPerSecond;
+        for (Serializable_GUI_Vehicle vehicle : vehicleList) {
+            if (!allTrajectories.containsKey(vehicle.id)) {
+                allTrajectories.put(vehicle.id, new TreeMap<Double, double[]>());
+            }
+            allTrajectories.get(vehicle.id).put(timeStamp, new double[] { vehicle.latHead, vehicle.lonHead });
+        }
+        // Store routes of new vehicles created since last report
+        allRoutes.addAll(randomRoutes);
+        // Increment vehicle counts
+        numInternalNonPubVehiclesAtAllWorkers += numInternalNonPubVehicles;
+        numInternalTramsAtAllWorkers += numInternalTrams;
+        numInternalBusesAtAllWorkers += numInternalBuses;
     }
 
     public void startSimulationInUI(){
@@ -106,7 +134,8 @@ public class SimulationData {
         }
     }
 
-    public void updateSetupprogressInUI(int  numVehiclesCreatedDuringSetup, int numVehiclesNeededAtStart){
+    public void updateSetupprogressInUI(int  created){
+        numVehiclesCreatedDuringSetup += created;
         double createdVehicleRatio = (double) numVehiclesCreatedDuringSetup / numVehiclesNeededAtStart;
         if (createdVehicleRatio > 1) {
             createdVehicleRatio = 1;
@@ -142,5 +171,91 @@ public class SimulationData {
         }
 
         roadNetwork = new RoadNetwork();//Build road network based on new road graph
+    }
+
+    public void initFileOutput(){
+        // Initialize output
+        fileOutput.init();
+    }
+
+    public void writeOutputFiles(int step){
+        fileOutput.outputSimLog(step, simulationWallTime, totalNumWwCommChannels);
+        fileOutput.outputRoutes(allRoutes);
+        allRoutes.clear();
+        fileOutput.outputTrajectories(allTrajectories);
+        allTrajectories.clear();
+        fileOutput.close();
+    }
+
+    /**
+     * Updates wall time spent on simulation.
+     */
+    synchronized public void updateSimulationTime() {
+        simulationWallTime += (double) (System.nanoTime() - timeStamp) / 1000000000;
+    }
+
+    public void takeTimeStamp(){
+        timeStamp = System.nanoTime();
+    }
+
+    public boolean[] updateVehicleCounts(){
+        boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < Settings.numGlobalRandomPrivateVehicles;
+        boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < Settings.numGlobalRandomTrams;
+        boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < Settings.numGlobalRandomBuses;
+
+        // Clear vehicle counts from last step
+        numInternalNonPubVehiclesAtAllWorkers = 0;
+        numInternalTramsAtAllWorkers = 0;
+        numInternalBusesAtAllWorkers = 0;
+        boolean[] required = new boolean[3];
+        required[0] = isNewNonPubVehiclesAllowed;
+        required[1] = isNewTramsAllowed;
+        required[2] = isNewBusesAllowed;
+        return required;
+    }
+
+    public void setLightChangeNode(Node node){
+        node.light = !node.light;
+        nodesToAddLight.remove(node);
+        nodesToRemoveLight.remove(node);
+        if (node.light) {
+            nodesToAddLight.add(node);
+        } else {
+            nodesToRemoveLight.add(node);
+        }
+    }
+
+    public void resetVariablesForSetup(){
+        // Reset temporary variables
+        simulationWallTime = 0;
+        totalNumWwCommChannels = 0;
+        numVehiclesCreatedDuringSetup = 0;
+        numVehiclesNeededAtStart = 0;
+    }
+
+    public void reserVariablesAtStop(){
+        numInternalNonPubVehiclesAtAllWorkers = 0;
+        numInternalTramsAtAllWorkers = 0;
+        numInternalBusesAtAllWorkers = 0;
+        nodesToAddLight.clear();
+        nodesToRemoveLight.clear();
+    }
+
+    public void updateNoOfVehiclesNeededAtStart(int vehiclesInRouteLoader){
+        // Get number of vehicles needed
+        numVehiclesNeededAtStart = vehiclesInRouteLoader + Settings.numGlobalRandomPrivateVehicles
+                + Settings.numGlobalRandomTrams + Settings.numGlobalRandomBuses;
+    }
+
+    public ArrayList<Node> getNodesToAddLight() {
+        return nodesToAddLight;
+    }
+
+    public ArrayList<Node> getNodesToRemoveLight() {
+        return nodesToRemoveLight;
+    }
+
+    public void updateChannelCount(int count){
+        totalNumWwCommChannels += count;
     }
 }

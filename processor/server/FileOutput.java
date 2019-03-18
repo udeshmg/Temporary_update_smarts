@@ -22,7 +22,7 @@ public class FileOutput {
 	/**
 	 * Close output file
 	 */
-	void close() {
+	public void close() {
 		try {
 			if (fosLog != null) {
 				fosLog.close();
@@ -40,7 +40,7 @@ public class FileOutput {
 		}
 	}
 
-	void init() {
+	public void init() {
 		if (Settings.isOutputTrajectory) {
 			initTrajectoryOutputFile();
 		}
@@ -106,7 +106,7 @@ public class FileOutput {
 	/**
 	 * Output trajectory of individual vehicles
 	 */
-	void outputTrajectories(HashMap<String, TreeMap<Double, double[]>> allTrajectories) {
+	public void outputTrajectories(HashMap<String, TreeMap<Double, double[]>> allTrajectories) {
 		if (Settings.isOutputTrajectory) {
 			int trajectoryId = 0;
 			for (String vehicleId : allTrajectories.keySet()) {
@@ -137,7 +137,7 @@ public class FileOutput {
 		}
 	}
 
-	void outputRoutes(final ArrayList<SerializableRouteDump> routes) {
+	public void outputRoutes(final ArrayList<SerializableRouteDump> routes) {
 		if (Settings.isOutputInitialRoutes) {
 			try {
 				final StringBuilder sb = new StringBuilder();
@@ -165,7 +165,7 @@ public class FileOutput {
 		}
 	}
 
-	void outputSimLog(final int stepCurrent, final double simulationTimeCounter, final int totalNumFellowsOfWorker) {
+	public void outputSimLog(final int stepCurrent, final double simulationTimeCounter, final int totalNumFellowsOfWorker) {
 		final Date date = new Date();
 
 		if (Settings.isOutputSimulationLog && (fosLog != null)) {
