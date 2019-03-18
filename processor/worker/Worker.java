@@ -93,8 +93,6 @@ public class Worker implements MessageHandler, Runnable {
 
 	Worker me = this;
 	IncomingConnectionBuilder connectionBuilder;
-	int step = 0;
-	double timeNow;
 	ArrayList<Fellow> fellowWorkers = new ArrayList<>();
 	String name = "";
 	MessageSender senderForServer;
@@ -115,7 +113,7 @@ public class Worker implements MessageHandler, Runnable {
 		singleWorkerServerlessThread = new Thread() {
 			public void run() {
 
-				while (step < Settings.maxNumSteps) {
+				while (data.getStep() < Settings.maxNumSteps) {
 
 					if (!isDuringServerlessSim) {
 						break;
@@ -130,24 +128,22 @@ public class Worker implements MessageHandler, Runnable {
 						}
 					}
 
-					timeNow = step / Settings.numStepsPerSecond;
-					data.simulateOneStep(me, timeNow, step,
-							true, true, true);
+					data.simulateOneStep(me, true, true, true);
 
 					sendTrafficReportInServerlessMode();
 
-					step++;
+					data.setStep(data.getStep() + 1);
 				}
 				// Finish simulation
-				senderForServer.send(new Message_WS_Serverless_Complete(name, step, data.getTrafficNetwork().getVehicleCount()));
+				senderForServer.send(new Message_WS_Serverless_Complete(name, data.getStep(), data.getTrafficNetwork().getVehicleCount()));
 
 			}
 		};
 	}
 
 	void sendTrafficReportInServerlessMode() {
-		if ((step + 1) % Settings.trafficReportStepGapInServerlessMode == 0) {
-			senderForServer.send(new Message_WS_TrafficReport(name, step, data.getTrafficNetwork()));
+		if ((data.getStep() + 1) % Settings.trafficReportStepGapInServerlessMode == 0) {
+			senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
 			data.clearReportedTrafficData();
 		}
 	}
@@ -173,7 +169,7 @@ public class Worker implements MessageHandler, Runnable {
 	void createVehiclesFromFellow(final Message_WW_Traffic messageToProcess) {
 		for (final SerializableVehicle serializableVehicle : messageToProcess.vehiclesEnteringReceiver) {
 			final Vehicle vehicle = createReceivedVehicle(serializableVehicle);
-			data.addTransferredVehicle(vehicle, timeNow);
+			data.addTransferredVehicle(vehicle);
 		}
 	}
 
@@ -292,15 +288,13 @@ public class Worker implements MessageHandler, Runnable {
 				sendTrafficReportInServerlessMode();
 
 				// Proceed to next step or finish
-				if (step >= Settings.maxNumSteps) {
+				if (data.getStep() >= Settings.maxNumSteps) {
 					senderForServer
-							.send(new Message_WS_Serverless_Complete(name, step, data.getTrafficNetwork().getVehicleCount()));
+							.send(new Message_WS_Serverless_Complete(name, data.getStep(), data.getTrafficNetwork().getVehicleCount()));
 					resetTraffic();
 				} else if (!isPausingServerlessSim) {
-					step++;
-					timeNow = step / Settings.numStepsPerSecond;
-					data.simulateOneStep(this, timeNow, step,
-							true, true, true);
+					data.setStep(data.getStep() + 1);
+					data.simulateOneStep(this, true, true, true);
 					proceedBasedOnSyncMethod();
 				}
 			}
@@ -312,7 +306,7 @@ public class Worker implements MessageHandler, Runnable {
 
 		while (iMessage.hasNext()) {
 			final Message_WW_Traffic message = iMessage.next();
-			if (message.stepAtSender == step) {
+			if (message.stepAtSender == data.getStep()) {
 				processReceivedTraffic(message);
 				iMessage.remove();
 			}
@@ -389,8 +383,7 @@ public class Worker implements MessageHandler, Runnable {
 		Settings.numWorkers = received.numWorkers;
 		Settings.maxNumSteps = received.maxNumSteps;
 		Settings.numStepsPerSecond = received.numStepsPerSecond;
-		step = received.startStep;
-		timeNow = step / Settings.numStepsPerSecond;
+		data.setStep(received.startStep);
 		Settings.trafficReportStepGapInServerlessMode = received.workerToServerReportStepGapInServerlessMode;
 		Settings.periodOfTrafficWaitForTramAtStop = received.periodOfTrafficWaitForTramAtStop;
 		Settings.driverProfileDistribution = setDriverProfileDistribution(received.driverProfileDistribution);
@@ -415,8 +408,8 @@ public class Worker implements MessageHandler, Runnable {
 
 		if (received.isNewEnvironment) {
 			data.initTrafficNetwork(received.roadGraph);
-			processReceivedMetadataOfWorkers(received.metadataWorkers);
 			data.initSimulation(connectedFellows, divideLaneSetForSim());
+			processReceivedMetadataOfWorkers(received.metadataWorkers);
 		} else {
 			data.resetExistingNetwork();
 		}
@@ -474,7 +467,7 @@ public class Worker implements MessageHandler, Runnable {
 	 */
 	void transferVehicleDataToFellow() {
 		for (final Fellow fellowWorker : connectedFellows) {
-			fellowWorker.send(new Message_WW_Traffic(name, fellowWorker, step));
+			fellowWorker.send(new Message_WW_Traffic(name, fellowWorker, data.getStep()));
 			updateFellowState(fellowWorker.name, FellowState.SHARING_DATA_SENT);
 			fellowWorker.vehiclesToCreateAtBorder.clear();
 		}
@@ -505,7 +498,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	private void onSWSetupMessage(Message_SW_Setup msg){
 		processReceivedSimulationConfiguration(msg);
-		data.buildEnvironment(workarea.workCells, workarea.workerName, step);
+		data.buildEnvironment(workarea.workCells, workarea.workerName);
 		resetTraffic();
 		//Pause a bit so other workers can reset before starting simulation
 		try {
@@ -534,7 +527,7 @@ public class Worker implements MessageHandler, Runnable {
 		if (Settings.isVisualize) {
 			progressTimer.scheduleAtFixedRate(progressTimerTask, 500, random.nextInt(1000) + 1);
 		}
-		data.createVehicles(timeNow, msg.externalRoutes);
+		data.createVehicles(msg.externalRoutes);
 		progressTimerTask.cancel();
 		progressTimer.cancel();
 		// Let server know that setup is done
@@ -555,8 +548,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	private void onSWServerBasedShareTrafficMsg(Message_SW_ServerBased_ShareTraffic msg){
-		step = msg.currentStep;
-		timeNow = step / Settings.numStepsPerSecond;
+		data.setStep(msg.currentStep);
 		transferVehicleDataToFellow();
 		proceedBasedOnSyncMethod();
 	}
@@ -567,14 +559,13 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	private void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
-		data.simulateOneStep(this, timeNow, step, 
-				msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
-		senderForServer.send(new Message_WS_TrafficReport(name, step, data.getTrafficNetwork()));
+		data.simulateOneStep(this, msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
+		senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
 		data.clearReportedTrafficData();
 	}
 
 	private void onSWServerlessStart(Message_SW_Serverless_Start msg){
-		step = msg.startStep;
+		data.setStep(msg.startStep);
 		isDuringServerlessSim = true;
 		isPausingServerlessSim = false;
 
@@ -582,9 +573,7 @@ public class Worker implements MessageHandler, Runnable {
 			buildThreadForSingleWorkerServerlessSimulation();
 			singleWorkerServerlessThread.start();
 		} else {
-			timeNow = step / Settings.numStepsPerSecond;
-			data.simulateOneStep(this, timeNow, step,
-					true, true, true);
+			data.simulateOneStep(this, true, true, true);
 			proceedBasedOnSyncMethod();
 		}
 	}

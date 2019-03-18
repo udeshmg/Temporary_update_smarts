@@ -47,6 +47,8 @@ public class SimWorkerData {
     private int numLocalRandomBuses = 0;
 	private List<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
 	private List<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
+    private int step = 0;
+    private double timeNow;
 
 	public void initSimulation(ArrayList<Fellow> connectedFellows, Map<String, List<Edge>> pspEdges){
         simulation = new Simulation(trafficNetwork, connectedFellows);
@@ -63,7 +65,7 @@ public class SimWorkerData {
         trafficNetwork = new TrafficNetwork();
     }
 
-    public void simulateOneStep(Worker worker, double timeNow, int step, boolean isNewNonPubVehiclesAllowed,
+    public void simulateOneStep(Worker worker, boolean isNewNonPubVehiclesAllowed,
                                 boolean isNewTramsAllowed, boolean isNewBusesAllowed){
 	    simulation.simulateOneStep(worker, timeNow, step, pspBorderEdges, pspNonBorderEdges, numLocalRandomPrivateVehicles,
                 numLocalRandomTrams, numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed);
@@ -79,7 +81,7 @@ public class SimWorkerData {
         return trafficNetwork;
     }
 
-    public void createVehicles(double timeNow, ArrayList<SerializableExternalVehicle> externalRoutes){
+    public void createVehicles(ArrayList<SerializableExternalVehicle> externalRoutes){
         trafficNetwork.createExternalVehicles(externalRoutes, timeNow);
         trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
                 numLocalRandomBuses, true, true, true, timeNow);
@@ -100,7 +102,7 @@ public class SimWorkerData {
         trafficNetwork.lightCoordinator.init(lightNodes, new ArrayList<SerializableInt>(), new ArrayList<SerializableInt>());
     }
 
-    public void addTransferredVehicle(Vehicle vehicle, double timeNow){
+    public void addTransferredVehicle(Vehicle vehicle){
         trafficNetwork.addOneTransferredVehicle(vehicle, timeNow);
     }
 
@@ -130,7 +132,20 @@ public class SimWorkerData {
 	    trafficNetwork.clearReportedData();
     }
 
-    public void buildEnvironment(ArrayList<GridCell> workCells, String workerName, int step){
+    public void buildEnvironment(ArrayList<GridCell> workCells, String workerName){
         trafficNetwork.buildEnvironment(workCells, workerName, step);
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public double getTimeNow() {
+        return timeNow;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+        this.timeNow = step / Settings.numStepsPerSecond;
     }
 }
