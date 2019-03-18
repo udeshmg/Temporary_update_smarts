@@ -51,6 +51,7 @@ public class SimulationData {
     private ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
     private int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
     private int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
+    private int step = 0;//Time step in the current simulation
 
 
     public void showNumberOfConnectedWorkers(int number){
@@ -231,6 +232,7 @@ public class SimulationData {
         totalNumWwCommChannels = 0;
         numVehiclesCreatedDuringSetup = 0;
         numVehiclesNeededAtStart = 0;
+        step = 0;
     }
 
     public void reserVariablesAtStop(){
@@ -257,5 +259,13 @@ public class SimulationData {
 
     public void updateChannelCount(int count){
         totalNumWwCommChannels += count;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 }

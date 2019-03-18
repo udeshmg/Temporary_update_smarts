@@ -48,7 +48,6 @@ import traffic.road.RoadUtil;
  */
 public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	ArrayList<WorkerMeta> workerMetas = new ArrayList<>();
-	private int step = 0;//Time step in the current simulation
 	public boolean isSimulating = false;//Whether simulation is running, i.e., it is not paused or stopped
 	private boolean isOpenForNewWorkers = true;
 	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
@@ -101,7 +100,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	 */
 	void askWorkersProceedWithoutServer() {
 		data.takeTimeStamp();
-		final Message_SW_Serverless_Start message = new Message_SW_Serverless_Start(step);
+		final Message_SW_Serverless_Start message = new Message_SW_Serverless_Start(data.getStep());
 		for (final WorkerMeta worker : workerMetas) {
 			worker.send(message);
 			worker.setState(WorkerState.SERVERLESS_WORKING);
@@ -115,17 +114,17 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	void askWorkersShareTrafficDataWithFellowWorkers() {
 
 		// Increment step
-		step++;
+		data.setStep(data.getStep() + 1);
 		data.takeTimeStamp();
 
-		System.out.println("Doing step " + step);
+		System.out.println("Doing step " + data.getStep());
 
 		// Ask all workers to share data with fellow
 		for (final WorkerMeta worker : workerMetas) {
 			worker.setState(WorkerState.SHARING_STARTED);
 		}
 		for (final WorkerMeta worker : workerMetas) {
-			worker.send(new Message_SW_ServerBased_ShareTraffic(step));
+			worker.send(new Message_SW_ServerBased_ShareTraffic(data.getStep()));
 		}
 	}
 
@@ -192,7 +191,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public void pauseSim() {
 		isSimulating = false;
 		if (!Settings.isServerBased) {
-			final Message_SW_Serverless_Pause message = new Message_SW_Serverless_Pause(step);
+			final Message_SW_Serverless_Pause message = new Message_SW_Serverless_Pause(data.getStep());
 			for (final WorkerMeta worker : workerMetas) {
 				worker.send(message);
 			}
@@ -247,7 +246,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			askWorkersShareTrafficDataWithFellowWorkers();
 		} else {
 			System.out.println("Resuming server-less simulation...");
-			final Message_SW_Serverless_Resume message = new Message_SW_Serverless_Resume(step);
+			final Message_SW_Serverless_Resume message = new Message_SW_Serverless_Resume(data.getStep());
 			for (final WorkerMeta worker : workerMetas) {
 				worker.send(message);
 			}
@@ -269,7 +268,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	 */
 	public void setupNewSim() {
 		data.resetVariablesForSetup();
-		step = 0;
 		receivedTrafficReportCache.clear();
 
 		// Reset worker status
@@ -294,7 +292,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 		// Send simulation configuration to workers
 		for (final WorkerMeta worker : workerMetas) {
-			worker.send(new Message_SW_Setup(workerMetas, worker, data.getRoadNetwork().edges, step, data.getNodesToAddLight(),
+			worker.send(new Message_SW_Setup(workerMetas, worker, data.getRoadNetwork().edges, data.getStep(), data.getNodesToAddLight(),
 					data.getNodesToRemoveLight()));
 		}
 
@@ -313,7 +311,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	}
 
 	void startSimulation() {
-		if (step < Settings.maxNumSteps) {
+		if (data.getStep() < Settings.maxNumSteps) {
 			System.out.println("All workers are ready to do simulation.");
 			isSimulating = true;
 			data.startSimulationInUI();
@@ -337,11 +335,11 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		isSimulating = false;
 		data.reserVariablesAtStop();
 		processCachedReceivedTrafficReports();
-		data.writeOutputFiles(step);
+		data.writeOutputFiles(data.getStep());
 
 		// Ask workers stop in server-less mode. Note that workers may already stopped before receiving the message.
 		if (!Settings.isServerBased) {
-			final Message_SW_Serverless_Stop message = new Message_SW_Serverless_Stop(step);
+			final Message_SW_Serverless_Stop message = new Message_SW_Serverless_Stop(data.getStep());
 			for (final WorkerMeta worker : workerMetas) {
 				worker.send(message);
 				worker.setState(WorkerState.NEW);
@@ -413,7 +411,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			updateWorkerState(msg.workerName, WorkerState.FINISHED_ONE_STEP);
 			if (isAllWorkersAtState(WorkerState.FINISHED_ONE_STEP)) {
 				data.updateSimulationTime();
-				if (step >= Settings.maxNumSteps) {
+				if (data.getStep() >= Settings.maxNumSteps) {
 					stopSim();
 				} else if (isSimulating) {
 					askWorkersShareTrafficDataWithFellowWorkers();
@@ -421,8 +419,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			}
 		} else {
 			// Update time step in server-less mode
-			if (msg.step > step) {
-				step = msg.step;
+			if (msg.step > data.getStep()) {
+				data.setStep(msg.step);
 			}
 		}
 	}
@@ -432,8 +430,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			// No need to process the message if simulation was stopped
 			return;
 		}
-		if (msg.step > step) {
-			step = msg.step;
+		if (msg.step > data.getStep()) {
+			data.setStep(msg.step);
 		}
 		updateWorkerState(msg.workerName, WorkerState.NEW);
 		if (isAllWorkersAtState(WorkerState.NEW)) {
