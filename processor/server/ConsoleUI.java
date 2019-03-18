@@ -37,7 +37,7 @@ public class ConsoleUI {
         this.processor = processor;
     }
 
-    void acceptInitialConfigFromConsole() {
+    public void acceptInitialConfigFromConsole() {
         // Let user input number of workers
         System.out.println("Please specify the number of workers.");
         Settings.numWorkers = Integer.parseInt(sc.nextLine());
@@ -72,7 +72,7 @@ public class ConsoleUI {
         }
     }
 
-    void acceptSimScriptFromConsole() {
+    public void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
         Settings.inputSimulationScript = sc.nextLine();
         while (!scriptLoader.loadScriptFile()) {
@@ -96,7 +96,7 @@ public class ConsoleUI {
         }
     }
 
-    void readyToStartSim(){
+    public void readyToStartSim(){
         if (scriptLoader.isEmpty()) {
             acceptConsoleCommandAtSimEnd();
         } else {

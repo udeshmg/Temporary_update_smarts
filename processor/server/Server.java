@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import common.Settings;
 import osm.OSM;
+import processor.SimulationData;
 import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
@@ -46,10 +47,8 @@ import traffic.road.RoadUtil;
  * This class can be run as Java application.
  */
 public class Server implements MessageHandler, Runnable, SimulationProcessor {
-	private RoadNetwork roadNetwork;
 	ArrayList<WorkerMeta> workerMetas = new ArrayList<>();
 	private int step = 0;//Time step in the current simulation
-	private GUI gui;
 	private FileOutput fileOutput = new FileOutput();
 	public boolean isSimulating = false;//Whether simulation is running, i.e., it is not paused or stopped
 	private int numInternalNonPubVehiclesAtAllWorkers = 0;
@@ -60,14 +59,13 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
 	private ArrayList<Node> nodesToAddLight = new ArrayList<>();
 	private ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
-	private int numTrajectoriesReceived = 0;//Number of complete trajectories received from workers
 	private int numVehiclesCreatedDuringSetup = 0;//For updating setup progress on GUI
 	private int numVehiclesNeededAtStart = 0;//For updating setup progress on GUI
-	private ConsoleUI consoleUI;
 	private boolean isOpenForNewWorkers = true;
 	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
 	private ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
 	private HashMap<String, TreeMap<Double, double[]>> allTrajectories = new HashMap<String, TreeMap<Double, double[]>>();
+	private SimulationData data = new SimulationData();
 
 	public static void main(final String[] args) {
 		if (processCommandLineArguments(args)) {
@@ -100,19 +98,10 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		final WorkerMeta worker = new WorkerMeta(received.workerName, received.workerAddress, received.workerPort);
 		if (isAllWorkersAtState(WorkerState.NEW) && Settings.numWorkers > workerMetas.size()) {
 			workerMetas.add(worker);
-			if (Settings.isVisualize) {
-				gui.updateNumConnectedWorkers(workerMetas.size());
-			}else{
-				System.out.println(workerMetas.size() + "/" + Settings.numWorkers + " workers connected.");
-			}
+			data.showNumberOfConnectedWorkers(workerMetas.size());
 			if (workerMetas.size() == Settings.numWorkers) {
 				isOpenForNewWorkers = false;// No need for more workers
-				if (Settings.isVisualize) {
-					gui.getReadyToSetup();
-				} else {
-					consoleUI.acceptSimScriptFromConsole();// Let user input simulation script path
-
-				}
+				data.prepareForSetup();
 			}
 		} else {
 			final Message_SW_KillWorker msd = new Message_SW_KillWorker(Settings.isSharedJVM);
@@ -179,26 +168,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	}
 
 	public void changeMap() {
-		Settings.listRouteSourceWindowForInternalVehicle.clear();
-		Settings.listRouteDestinationWindowForInternalVehicle.clear();
-		Settings.listRouteSourceDestinationWindowForInternalVehicle.clear();
-		Settings.isNewEnvironment = true;
-
-		if (Settings.inputOpenStreetMapFile.length() > 0) {
-			final OSM osm = new OSM();
-			osm.processOSM(Settings.inputOpenStreetMapFile, true);
-			Settings.isBuiltinRoadGraph = false;
-			// Revert to built-in map if there was an error when converting new map
-			if (Settings.roadGraph.length() == 0) {
-				Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-				Settings.isBuiltinRoadGraph = true;
-			}
-		} else {
-			Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-			Settings.isBuiltinRoadGraph = true;
-		}
-
-		roadNetwork = new RoadNetwork();//Build road network based on new road graph
+		data.changeMap();
 	}
 
 	@Override
@@ -276,11 +246,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		final Iterator<Message_WS_TrafficReport> iMessage = receivedTrafficReportCache.iterator();
 		while (iMessage.hasNext()) {
 			final Message_WS_TrafficReport message = iMessage.next();
-			// Update GUI
-			if (Settings.isVisualize) {
-				gui.updateObjectData(message.vehicleList, message.lightList, message.workerName, workerMetas.size(),
-						message.step);
-			}
+			data.updateUI(message.vehicleList, message.lightList, message.workerName, workerMetas.size(), message.step);
+
 			// Add new vehicle position to its trajectory
 			double timeStamp = message.step / Settings.numStepsPerSecond;
 			for (Serializable_GUI_Vehicle vehicle : message.vehicleList) {
@@ -302,31 +269,10 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	@Override
 	public void run() {
-		initRoadNetwork();
-		initUIs();
+		data.initRoadNetwork();
+		data.initUIs(this);
 		// Prepare to receive connection request from workers
 		new IncomingConnectionBuilder(Settings.serverListeningPortForWorkers, this).start();
-	}
-
-	public void initRoadNetwork(){
-		// Load default road network
-		Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-		roadNetwork = new RoadNetwork();
-	}
-
-	public void initUIs(){
-		// Start GUI or load simulation configuration without GUI
-		if (Settings.isVisualize) {
-			if (gui != null) {
-				gui.dispose();
-			}
-			final GUI newGUI = new GUI(this);
-			gui = newGUI;
-			gui.setVisible(true);
-		} else {
-			consoleUI = new ConsoleUI(this);
-			consoleUI.acceptInitialConfigFromConsole();
-		}
 	}
 
 	public void resumeSim() {
@@ -368,7 +314,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		simulationWallTime = 0;
 		step = 0;
 		totalNumWwCommChannels = 0;
-		numTrajectoriesReceived = 0;
 		numVehiclesCreatedDuringSetup = 0;
 		numVehiclesNeededAtStart = 0;
 		receivedTrafficReportCache.clear();
@@ -380,15 +325,15 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 		// In a new environment (map), determine the work areas for all workers
 		if (Settings.isNewEnvironment) {
-			roadNetwork.buildGrid();
-			WorkloadBalancer.partitionGridCells(workerMetas, roadNetwork);
+			data.getRoadNetwork().buildGrid();
+			WorkloadBalancer.partitionGridCells(workerMetas, data.getRoadNetwork());
 		}
 
 		// Determine the number of internal vehicles at all workers
-		WorkloadBalancer.assignNumInternalVehiclesToWorkers(workerMetas, roadNetwork);
+		WorkloadBalancer.assignNumInternalVehiclesToWorkers(workerMetas, data.getRoadNetwork());
 
 		// Assign vehicle routes from external file to workers
-		final RouteLoader routeLoader = new RouteLoader(roadNetwork, workerMetas);
+		final RouteLoader routeLoader = new RouteLoader(data.getRoadNetwork(), workerMetas);
 		routeLoader.loadRoutes();
 
 		// Get number of vehicles needed
@@ -397,7 +342,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 		// Send simulation configuration to workers
 		for (final WorkerMeta worker : workerMetas) {
-			worker.send(new Message_SW_Setup(workerMetas, worker, roadNetwork.edges, step, nodesToAddLight,
+			worker.send(new Message_SW_Setup(workerMetas, worker, data.getRoadNetwork().edges, step, nodesToAddLight,
 					nodesToRemoveLight));
 		}
 
@@ -420,9 +365,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		if (step < Settings.maxNumSteps) {
 			System.out.println("All workers are ready to do simulation.");
 			isSimulating = true;
-			if (Settings.isVisualize) {
-				gui.startSimulation();
-			}
+			data.startSimulationInUI();
 			if (Settings.isServerBased) {
 				System.out.println("Starting server-based simulation...");
 				askWorkersShareTrafficDataWithFellowWorkers();
@@ -436,7 +379,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	@Override
 	public RoadNetwork getRoadNetwork() {
-		return roadNetwork;
+		return data.getRoadNetwork();
 	}
 
 	public void stopSim() {
@@ -464,15 +407,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		}
 
 		System.out.println("Simulation stopped.\n");
-
-		if ((Settings.isVisualize)) {
-			if (workerMetas.size() == Settings.numWorkers) {
-				gui.getReadyToSetup();
-			}
-		} else {
-			if (workerMetas.size() == Settings.numWorkers) {
-				consoleUI.readyToStartSim();
-			}
+		if (workerMetas.size() == Settings.numWorkers) {
+			data.prepareForSetupAgain();
 		}
 	}
 
@@ -499,24 +435,14 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	private void onWSSetupCreatingVehiclesMsg(Message_WS_SetupCreatingVehicles msg){
 		numVehiclesCreatedDuringSetup += (msg).numVehicles;
-
-		double createdVehicleRatio = (double) numVehiclesCreatedDuringSetup / numVehiclesNeededAtStart;
-		if (createdVehicleRatio > 1) {
-			createdVehicleRatio = 1;
-		}
-
-		if (Settings.isVisualize) {
-			gui.updateSetupProgress(createdVehicleRatio);
-		}
+		data.updateSetupprogressInUI(numVehiclesCreatedDuringSetup, numVehiclesNeededAtStart);
 	}
 
 	private void onWSSetupDoneMsg(Message_WS_SetupDone msg){
 		updateWorkerState((msg).workerName, WorkerState.READY);
 		totalNumWwCommChannels += ((msg).numFellowWorkers);
 		if (isAllWorkersAtState(WorkerState.READY)) {
-			if (Settings.isVisualize) {
-				gui.stepToDraw = 0;
-			}
+			data.resetStepInUI();
 			startSimulation();
 		}
 	}
