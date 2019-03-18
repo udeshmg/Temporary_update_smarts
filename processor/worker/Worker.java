@@ -355,32 +355,9 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	void processReceivedSimulationConfiguration(final Message_SW_Setup received) {
-
-		Settings.numWorkers = received.numWorkers;
-		Settings.maxNumSteps = received.maxNumSteps;
-		Settings.numStepsPerSecond = received.numStepsPerSecond;
+		received.setupFromMessage();
 		data.setStep(received.startStep);
-		Settings.trafficReportStepGapInServerlessMode = received.workerToServerReportStepGapInServerlessMode;
-		Settings.periodOfTrafficWaitForTramAtStop = received.periodOfTrafficWaitForTramAtStop;
-		Settings.driverProfileDistribution = setDriverProfileDistribution(received.driverProfileDistribution);
-		Settings.lookAheadDistance = received.lookAheadDistance;
-		Settings.trafficLightTiming = LightUtil.getLightTypeFromString(received.trafficLightTiming);
-		Settings.isVisualize = received.isVisualize;
 		data.resetVariables(received.numRandomPrivateVehicles, received.numRandomTrams, received.numRandomBuses);
-		Settings.isServerBased = received.isServerBased;
-		Settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString(received.routingAlgorithm);
-		Settings.isAllowPriorityVehicleUseTramTrack = received.isAllowPriorityVehicleUseTramTrack;
-		Settings.isOutputInitialRoutes = received.isOutputInternalBackgroundRoutePlan;
-		Settings.isOutputTrajectory = received.isOutputForegroundTrajectory;
-		Settings.listRouteSourceWindowForInternalVehicle = setRouteSourceDestinationWindow(
-				received.listRouteSourceWindowForInternalVehicle);
-		Settings.listRouteDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(
-				received.listRouteDestinationWindowForInternalVehicle);
-		Settings.listRouteSourceDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(
-				received.listRouteSourceDestinationWindowForInternalVehicle);
-		Settings.isAllowReroute = received.isAllowReroute;
-		Settings.isAllowTramRule = received.isAllowTramRule;
-		Settings.isDriveOnLeft = received.isDriveOnLeft;
 
 		if (received.isNewEnvironment) {
 			data.initTrafficNetwork(received.roadGraph);
@@ -412,26 +389,6 @@ public class Worker implements MessageHandler, Runnable {
 	public void run() {
 		// Join system by connecting with server
 		join();
-	}
-
-	/**
-	 * Set the percentage of drivers with different profiles, from highly
-	 * aggressive to highly polite.
-	 */
-	ArrayList<Double> setDriverProfileDistribution(final ArrayList<SerializableDouble> sList) {
-		final ArrayList<Double> list = new ArrayList<>();
-		for (final SerializableDouble sd : sList) {
-			list.add(sd.value);
-		}
-		return list;
-	}
-
-	ArrayList<double[]> setRouteSourceDestinationWindow(final ArrayList<Serializable_GPS_Rectangle> sList) {
-		final ArrayList<double[]> list = new ArrayList<>();
-		for (final Serializable_GPS_Rectangle sgr : sList) {
-			list.add(new double[] { sgr.minLon, sgr.maxLat, sgr.maxLon, sgr.minLat });
-		}
-		return list;
 	}
 
 	/**

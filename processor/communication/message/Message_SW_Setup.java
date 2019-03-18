@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import common.Settings;
 import processor.server.WorkerMeta;
+import traffic.light.LightUtil;
 import traffic.road.Edge;
 import traffic.road.Node;
+import traffic.routing.RouteUtil;
 
 /**
  * Server-to-worker message containing the simulation configuration. Worker will
@@ -133,4 +135,46 @@ public class Message_SW_Setup {
 		return list;
 	}
 
+	public void setupFromMessage(){
+		Settings.numWorkers = numWorkers;
+		Settings.maxNumSteps = maxNumSteps;
+		Settings.numStepsPerSecond = numStepsPerSecond;
+		Settings.trafficReportStepGapInServerlessMode = workerToServerReportStepGapInServerlessMode;
+		Settings.periodOfTrafficWaitForTramAtStop = periodOfTrafficWaitForTramAtStop;
+		Settings.driverProfileDistribution = setDriverProfileDistribution(driverProfileDistribution);
+		Settings.lookAheadDistance = lookAheadDistance;
+		Settings.trafficLightTiming = LightUtil.getLightTypeFromString(trafficLightTiming);
+		Settings.isVisualize = isVisualize;
+		Settings.isServerBased = isServerBased;
+		Settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString(routingAlgorithm);
+		Settings.isAllowPriorityVehicleUseTramTrack = isAllowPriorityVehicleUseTramTrack;
+		Settings.isOutputInitialRoutes = isOutputInternalBackgroundRoutePlan;
+		Settings.isOutputTrajectory = isOutputForegroundTrajectory;
+		Settings.listRouteSourceWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceWindowForInternalVehicle);
+		Settings.listRouteDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteDestinationWindowForInternalVehicle);
+		Settings.listRouteSourceDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceDestinationWindowForInternalVehicle);
+		Settings.isAllowReroute = isAllowReroute;
+		Settings.isAllowTramRule = isAllowTramRule;
+		Settings.isDriveOnLeft = isDriveOnLeft;
+	}
+
+	/**
+	 * Set the percentage of drivers with different profiles, from highly
+	 * aggressive to highly polite.
+	 */
+	ArrayList<Double> setDriverProfileDistribution(final ArrayList<SerializableDouble> sList) {
+		final ArrayList<Double> list = new ArrayList<>();
+		for (final SerializableDouble sd : sList) {
+			list.add(sd.value);
+		}
+		return list;
+	}
+
+	ArrayList<double[]> setRouteSourceDestinationWindow(final ArrayList<Serializable_GPS_Rectangle> sList) {
+		final ArrayList<double[]> list = new ArrayList<>();
+		for (final Serializable_GPS_Rectangle sgr : sList) {
+			list.add(new double[] { sgr.minLon, sgr.maxLat, sgr.maxLon, sgr.minLat });
+		}
+		return list;
+	}
 }
