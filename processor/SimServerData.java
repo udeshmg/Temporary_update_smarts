@@ -34,7 +34,7 @@ import java.util.TreeMap;
  * <p>
  * Created by tmuthugama on 3/18/2019
  */
-public class SimulationData {
+public class SimServerData {
     private RoadNetwork roadNetwork;
     private GUI gui;
     private ConsoleUI consoleUI;

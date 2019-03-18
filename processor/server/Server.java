@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import common.Settings;
-import processor.SimulationData;
+import processor.SimServerData;
 import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
@@ -41,7 +41,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public boolean isSimulating = false;//Whether simulation is running, i.e., it is not paused or stopped
 	private boolean isOpenForNewWorkers = true;
 	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
-	private SimulationData data = new SimulationData();
+	private SimServerData data = new SimServerData();
 
 	public static void main(final String[] args) {
 		if (processCommandLineArguments(args)) {
