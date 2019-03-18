@@ -1,6 +1,7 @@
 package processor.server;
 
 import common.Settings;
+import processor.SimulationProcessor;
 
 import java.util.Scanner;
 
@@ -27,11 +28,13 @@ import java.util.Scanner;
  */
 public class ConsoleUI {
 
-    private Server server;
+    //private Server server;
+    private SimulationProcessor processor;
     private Scanner sc = new Scanner(System.in);
+    private ScriptLoader scriptLoader = new ScriptLoader();
 
-    public ConsoleUI(Server server) {
-        this.server = server;
+    public ConsoleUI(SimulationProcessor processor) {
+        this.processor = processor;
     }
 
     void acceptInitialConfigFromConsole() {
@@ -42,24 +45,16 @@ public class ConsoleUI {
             System.out.println("Please specify the number of workers.");
             Settings.numWorkers = Integer.parseInt(sc.nextLine());
         }
-        // Kill all connected workers
-        server.killConnectedWorkers();
+        processor.onClose();
         // Inform user next step
         System.out.println("Please launch workers now.");
     }
 
-    void acceptSimStartCommandFromConsole() {
-        System.out.println("Ready to simulate. Start (y/n)?");
-        String choice = sc.nextLine();
-        if (choice.equals("y") || choice.equals("Y")) {
-            server.startSimulationFromLoadedScript();
-        } else if (choice.equals("n") || choice.equals("N")) {
-            System.out.println("Quit system.");
-            server.killConnectedWorkers();
-            System.exit(0);
-        } else {
-            System.out.println("Ready to simulate. Start (y/n)?");
+    void startSimulationFromLoadedScript(){
+        if (scriptLoader.retrieveOneSimulationSetup()) {
+            processor.changeMap();
         }
+        processor.setupNewSim();
     }
 
     void acceptConsoleCommandAtSimEnd() {
@@ -68,7 +63,7 @@ public class ConsoleUI {
         if (choice.equals("y") || choice.equals("Y")) {
             // Kill all connected workers
             System.out.println("Quit system.");
-            server.killConnectedWorkers();
+            processor.onClose();
             System.exit(0);
         } else if (choice.equals("n") || choice.equals("N")) {
             acceptSimScriptFromConsole();
@@ -80,12 +75,33 @@ public class ConsoleUI {
     void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
         Settings.inputSimulationScript = sc.nextLine();
-        while (!server.scriptLoader.loadScriptFile()) {
+        while (!scriptLoader.loadScriptFile()) {
             System.out.println("Please specify the simulation script path.");
             Settings.inputSimulationScript = sc.nextLine();
         }
-        if (server.workerMetas.size() == Settings.numWorkers) {
-            acceptSimStartCommandFromConsole();
+        acceptSimStartCommandFromConsole();
+    }
+
+    void acceptSimStartCommandFromConsole() {
+        System.out.println("Ready to simulate. Start (y/n)?");
+        String choice = sc.nextLine();
+        if (choice.equals("y") || choice.equals("Y")) {
+            startSimulationFromLoadedScript();
+        } else if (choice.equals("n") || choice.equals("N")) {
+            System.out.println("Quit system.");
+            processor.onClose();
+            System.exit(0);
+        } else {
+            System.out.println("Ready to simulate. Start (y/n)?");
+        }
+    }
+
+    void readyToStartSim(){
+        if (scriptLoader.isEmpty()) {
+            acceptConsoleCommandAtSimEnd();
+        } else {
+            System.out.println("Loading configuration of new simulation...");
+            startSimulationFromLoadedScript();
         }
     }
 }

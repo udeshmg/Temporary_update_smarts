@@ -57,7 +57,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private int numInternalBusesAtAllWorkers = 0;
 	private long timeStamp = 0;
 	private double simulationWallTime = 0;//Total time length spent on simulation
-	ScriptLoader scriptLoader = new ScriptLoader();
 	private int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
 	private ArrayList<Node> nodesToAddLight = new ArrayList<>();
 	private ArrayList<Node> nodesToRemoveLight = new ArrayList<>();
@@ -438,13 +437,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	}
 
-	void startSimulationFromLoadedScript() {
-		if (scriptLoader.retrieveOneSimulationSetup()) {
-			changeMap();
-		}
-		setupNewSim();
-	}
-
 	@Override
 	public RoadNetwork getRoadNetwork() {
 		return roadNetwork;
@@ -481,11 +473,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 				gui.getReadyToSetup();
 			}
 		} else {
-			if (scriptLoader.isEmpty()) {
-				consoleUI.acceptConsoleCommandAtSimEnd();
-			} else {
-				System.out.println("Loading configuration of new simulation...");
-				startSimulationFromLoadedScript();
+			if (workerMetas.size() == Settings.numWorkers) {
+				consoleUI.readyToStartSim();
 			}
 		}
 	}
