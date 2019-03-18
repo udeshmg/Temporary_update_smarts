@@ -33,7 +33,7 @@ public class Simulation {
 
 
 
-	ArrayList<Vehicle> moveVehicleForward(final double timeNow, final ArrayList<Edge> edges, Worker worker) {
+	ArrayList<Vehicle> moveVehicleForward(final double timeNow, final ArrayList<Edge> edges) {
 		final ArrayList<Vehicle> vehicles = new ArrayList<>();
 		for (final Edge edge : edges) {
 			double accumulatedVehicleSpeed = 0;
@@ -123,32 +123,33 @@ public class Simulation {
 
 
 
-	synchronized void simulateOneStep(final Worker worker, boolean isNewNonPubVehiclesAllowed,
+	synchronized public void simulateOneStep(Worker worker, double timeNow, int step, ArrayList<Edge> pspBorderEdges,
+											 ArrayList<Edge> pspNonBorderEdges, int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
+											 int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
-		moveVehiclesAroundBorder(worker);
+		moveVehiclesAroundBorder(timeNow, pspBorderEdges);
 		transferDataTofellow(worker);
-		moveVehiclesNotAroundBorder(worker);
+		moveVehiclesNotAroundBorder(timeNow, pspNonBorderEdges);
 		removeTripFinishedVehicles();
-		trafficNetwork.changeLaneOfVehicles(worker.timeNow);
+		trafficNetwork.changeLaneOfVehicles(timeNow);
 		trafficNetwork.updateTrafficLights();
 		trafficNetwork.updateTramStopTimers();
-		trafficNetwork.releaseVehicleFromParking(worker.timeNow);
+		trafficNetwork.releaseVehicleFromParking(timeNow);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
-		trafficNetwork.createInternalVehicles(worker.numLocalRandomPrivateVehicles, worker.numLocalRandomTrams,
-				worker.numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
-				worker.timeNow);
-		trafficNetwork.repeatExternalVehicles(worker.step, worker.timeNow);
+		trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+				numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+				timeNow);
+		trafficNetwork.repeatExternalVehicles(step, timeNow);
 
 		// Clear one-step data
 		clearOneStepData();
 	}
 
-	void moveVehiclesAroundBorder(final Worker worker){
-		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(worker.timeNow, worker.pspBorderEdges,
-				worker);
-		moveVehicleToNextLink(worker.timeNow, vehiclesAroundBorder);
+	void moveVehiclesAroundBorder(double timeNow, ArrayList<Edge> pspBorderEdges){
+		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(timeNow, pspBorderEdges);
+		moveVehicleToNextLink(timeNow, vehiclesAroundBorder);
 	}
 
 	void transferDataTofellow(final Worker worker){
@@ -157,10 +158,9 @@ public class Simulation {
 		}
 	}
 
-	void moveVehiclesNotAroundBorder(final Worker worker){
-		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(worker.timeNow, worker.pspNonBorderEdges,
-				worker);
-		moveVehicleToNextLink(worker.timeNow, vehiclesNotAroundBorder);
+	void moveVehiclesNotAroundBorder(double timeNow, ArrayList<Edge> pspNonBorderEdges){
+		final ArrayList<Vehicle> vehiclesNotAroundBorder = moveVehicleForward(timeNow, pspNonBorderEdges);
+		moveVehicleToNextLink(timeNow, vehiclesNotAroundBorder);
 	}
 
 	void removeTripFinishedVehicles(){
