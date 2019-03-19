@@ -26,7 +26,7 @@ import traffic.vehicle.VehicleType;
  *
  */
 public class RouteLoader {
-	class NodeIdComparator implements Comparator<NodeInfo> {
+	public class NodeIdComparator implements Comparator<NodeInfo> {
 		@Override
 		public int compare(final NodeInfo v1, final NodeInfo v2) {
 			// TODO Auto-generated method stub
@@ -56,18 +56,10 @@ public class RouteLoader {
 			worker.externalRoutes.clear();
 		}
 		for (final String vehicle : vehicles) {
-			final String[] fields = vehicle.split(Settings.delimiterItem);
-			final boolean foreground = Boolean.parseBoolean(fields[0]);
-			final String id = fields[1];
-			final double start_time = Double.parseDouble(fields[2]);
-			final String type = fields[3];
-			final String driverProfile = fields[4];
-			final double repeatRate = Double.parseDouble(fields[5]);
-			final ArrayList<SerializableRouteLeg> route = getRouteFromString(fields[6]);
-			final Node routeStartNode = roadNetwork.edges.get(route.get(0).edgeIndex).startNode;
+			SerializableExternalVehicle ev = SerializableExternalVehicle.createFromString(vehicle, roadNetwork, idMappers, nodeIdComparator);
+			final Node routeStartNode = roadNetwork.edges.get(ev.route.get(0).edgeIndex).startNode;
 			final WorkerMeta routeStartWorker = getWorkerAtRouteStart(routeStartNode);
-			routeStartWorker.externalRoutes.add(new SerializableExternalVehicle(foreground, id, start_time, type,
-					driverProfile, repeatRate, route));
+			routeStartWorker.externalRoutes.add(ev);
 		}
 	}
 
@@ -80,57 +72,17 @@ public class RouteLoader {
 		return null;
 	}
 
-	ArrayList<SerializableRouteLeg> getRouteFromString(final String routeString) {
-
-		final String[] routeLegs = routeString.split(Settings.delimiterSubItem);
-		final ArrayList<SerializableRouteLeg> route = new ArrayList<>();
-		for (int i = 0; i < (routeLegs.length - 1); i++) {
-			final String[] currentLegDetails = routeLegs[i].split("#");
-			final String[] nextLegDetails = routeLegs[i + 1].split("#");
-			final long osmIdNd1 = Long.parseLong(currentLegDetails[0]);
-			final int mapperIndexNd1 = Collections.binarySearch(idMappers, new NodeInfo(osmIdNd1, -1),
-					nodeIdComparator);
-			// Stop processing further if node cannot be found
-			if (mapperIndexNd1 < 0) {
-				System.out.println("Cannot find node: " + osmIdNd1 + ". ");
-				break;
-			}
-
-			final int nodeIndexNd1 = idMappers.get(mapperIndexNd1).getIndex();
-			final Node nd1 = roadNetwork.nodes.get(nodeIndexNd1);
-
-			// Get the edge and add it to a list
-			final long osmIdNd2 = Long.parseLong(nextLegDetails[0]);
-
-			for (final Edge e : nd1.outwardEdges) {
-				if (e.endNode.osmId == osmIdNd2) {
-					route.add(new SerializableRouteLeg(e.index, Double.parseDouble(currentLegDetails[1])));
-					break;
-				}
-			}
-		}
-
-		return route;
-	}
-
 	void loadRoutes() {
-
 		if (Settings.inputForegroundVehicleFile.length() > 0) {
 			scanXML(Settings.inputForegroundVehicleFile, true);
 		}
 		if (Settings.inputBackgroundVehicleFile.length() > 0) {
 			scanXML(Settings.inputBackgroundVehicleFile, false);
 		}
-
 		for (final Node node : roadNetwork.nodes) {
 			idMappers.add(new NodeInfo(node.osmId, node.index));
 		}
 		Collections.sort(idMappers, nodeIdComparator);
-
-		for (final WorkerMeta worker : workers) {
-			worker.externalRoutes.clear();
-		}
-
 		assignVehicleToWorker();
 	}
 
