@@ -30,19 +30,7 @@ public class RouteLoader {
 		@Override
 		public int compare(final NodeInfo v1, final NodeInfo v2) {
 			// TODO Auto-generated method stub
-			return v1.osmId > v2.osmId ? -1 : v1.osmId == v2.osmId ? 0 : 1;
-		}
-	}
-
-	class NodeInfo {
-		long osmId;
-
-		int index;
-
-		NodeInfo(final long osmId, final int index) {
-			super();
-			this.osmId = osmId;
-			this.index = index;
+			return v1.getOsmId() > v2.getOsmId() ? -1 : v1.getOsmId() == v2.getOsmId() ? 0 : 1;
 		}
 	}
 
@@ -108,7 +96,7 @@ public class RouteLoader {
 				break;
 			}
 
-			final int nodeIndexNd1 = idMappers.get(mapperIndexNd1).index;
+			final int nodeIndexNd1 = idMappers.get(mapperIndexNd1).getIndex();
 			final Node nd1 = roadNetwork.nodes.get(nodeIndexNd1);
 
 			// Get the edge and add it to a list
