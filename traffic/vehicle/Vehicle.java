@@ -59,6 +59,8 @@ public class Vehicle {
 	private boolean finished = false;
 	private boolean reachedFellow = false;
 
+	private double cityMeteringSpeed = Double.MAX_VALUE;
+
 	/**
 	 * This method tries to find a start position for a vehicle such that the
 	 * vehicle will be unlikely to collide with an existing vehicle. For
@@ -549,4 +551,13 @@ public class Vehicle {
 			}
 		}
 	}
+
+	public void setCityMeteringSpeed(double cityMeteringSpeed) {
+		this.cityMeteringSpeed = cityMeteringSpeed;
+	}
+
+	public double getCityMeteringSpeed() {
+		return cityMeteringSpeed;
+	}
+
 }
