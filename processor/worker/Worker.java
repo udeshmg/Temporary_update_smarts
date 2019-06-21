@@ -104,8 +104,8 @@ public class Worker implements MessageHandler, Runnable {
 	boolean isDuringServerlessSim;//Once server-less simulation begins, this will true until the simulation ends
 	boolean isPausingServerlessSim;
 	Thread singleWorkerServerlessThread = new Thread();//Used when this worker is the only worker in server-less mode
-	private int numVehicleCreatedSinceLastSetupProgressReport = 0;
-	private SimWorkerData data = new SimWorkerData();
+	protected int numVehicleCreatedSinceLastSetupProgressReport = 0;
+	protected SimWorkerData data = new SimWorkerData();
 
 	
 	void buildThreadForSingleWorkerServerlessSimulation() {
@@ -133,7 +133,7 @@ public class Worker implements MessageHandler, Runnable {
 		};
 	}
 
-	void sendTrafficReportInServerlessMode() {
+	public void sendTrafficReportInServerlessMode() {
 		if ((data.getStep() + 1) % Settings.trafficReportStepGapInServerlessMode == 0) {
 			senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
 			data.clearReportedTrafficData();
@@ -416,7 +416,7 @@ public class Worker implements MessageHandler, Runnable {
 		}
 	}
 
-	private void onSWSetupMessage(Message_SW_Setup msg){
+	public void onSWSetupMessage(Message_SW_Setup msg){
 		processReceivedSimulationConfiguration(msg);
 		data.buildEnvironment(workarea.workCells, workarea.workerName);
 		resetTraffic();
@@ -454,7 +454,7 @@ public class Worker implements MessageHandler, Runnable {
 		senderForServer.send(new Message_WS_SetupDone(name, connectedFellows.size()));
 	}
 
-	private ArrayList<Node> getLightNodes(){
+	protected ArrayList<Node> getLightNodes(){
 		/*
 		 * Collects the nodes with traffic lights in the current work area
 		 */
@@ -478,7 +478,7 @@ public class Worker implements MessageHandler, Runnable {
 		proceedBasedOnSyncMethod();
 	}
 
-	private void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
+	public void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
 		data.simulateOneStep(this, msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
 		senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
 		data.clearReportedTrafficData();
@@ -536,4 +536,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 
+	public SimWorkerData getData() {
+		return data;
+	}
 }
