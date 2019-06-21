@@ -65,6 +65,10 @@ public class SimWorkerData {
         trafficNetwork = new TrafficNetwork();
     }
 
+    public void setTrafficNetwork(TrafficNetwork trafficNetwork) {
+        this.trafficNetwork = trafficNetwork;
+    }
+
     public void simulateOneStep(Worker worker, boolean isNewNonPubVehiclesAllowed,
                                 boolean isNewTramsAllowed, boolean isNewBusesAllowed){
 	    simulation.simulateOneStep(worker, timeNow, step, pspBorderEdges, pspNonBorderEdges, numLocalRandomPrivateVehicles,
