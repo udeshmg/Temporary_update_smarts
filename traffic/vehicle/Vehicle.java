@@ -1,6 +1,7 @@
 package traffic.vehicle;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -560,4 +561,14 @@ public class Vehicle {
 		return cityMeteringSpeed;
 	}
 
+	public Point2D getCurrentPosition(){
+		Edge current = getCurrentEdge();
+		if(current != null){
+			double ratio = headPosition/current.length;
+			Point2D p = new Point2D.Double(current.startNode.lon + ratio * (current.endNode.lon - current.startNode.lon),
+					current.startNode.lat + ratio * (current.endNode.lat - current.startNode.lat));
+			return p;
+		}
+		return null;
+	}
 }
