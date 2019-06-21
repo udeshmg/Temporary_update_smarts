@@ -404,11 +404,8 @@ public class TrafficNetwork extends RoadNetwork {
 	 * @return
 	 */
 	ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
-		final Edge edgeStart = internalNonPublicVehicleStartEdges
-				.get(random.nextInt(internalNonPublicVehicleStartEdges.size()));
-
-		final Edge edgeEnd = internalNonPublicVehicleEndEdges
-				.get(random.nextInt(internalNonPublicVehicleEndEdges.size()));
+		final Edge edgeStart = Settings.odDistributor.getStartEdge(this, internalNonPublicVehicleStartEdges);
+		final Edge edgeEnd = Settings.odDistributor.getEndEdge(this, internalNonPublicVehicleEndEdges);
 
 		final ArrayList<RouteLeg> route = routingAlgorithm.createCompleteRoute(edgeStart, edgeEnd, type);
 

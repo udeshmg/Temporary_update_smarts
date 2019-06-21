@@ -3,7 +3,9 @@ package common;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import traffic.network.ODDistributor;
 import traffic.light.TrafficLightTiming;
+import traffic.network.RandomODDistributor;
 import traffic.routing.Routing;
 import traffic.vehicle.EmergencyStrategy;
 
@@ -119,4 +121,8 @@ public class Settings {
 	public static double trafficLightDetectionDistance = 30;//In meters. How far a vehicle can see a light.
 	public static double maxLightGroupRadius = 60;//In meters. Controls size of the area where a cluster of lights can be identified.
 
+	/**
+	 * OD Distribution
+	 */
+	public static ODDistributor odDistributor = new RandomODDistributor();
 }
