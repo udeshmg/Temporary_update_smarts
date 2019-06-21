@@ -55,6 +55,8 @@ public class IDM {
 		double v0 = vehicle.lane.edge.freeFlowSpeed;
 		if (v0 > vehicle.type.maxSpeed) {
 			v0 = vehicle.type.maxSpeed;
+		}else if(v0 > vehicle.getCityMeteringSpeed()){
+			v0 = vehicle.getCityMeteringSpeed();
 		}
 		/*
 		 * Acceleration exponent
