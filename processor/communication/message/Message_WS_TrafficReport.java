@@ -1,6 +1,7 @@
 package processor.communication.message;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import common.Settings;
 import traffic.TrafficNetwork;
@@ -24,6 +25,7 @@ public class Message_WS_TrafficReport {
 	public ArrayList<Serializable_GUI_Vehicle> vehicleList = new ArrayList<>();
 	public ArrayList<Serializable_GUI_Light> lightList = new ArrayList<>();
 	public ArrayList<SerializableRouteDump> randomRoutes = new ArrayList<>();
+	public ArrayList<Serializable_Finished_Vehicle> finishedList = new ArrayList<>();
 	public int step;
 	public int numInternalNonPubVehicles;
 	public int numInternalTrams;
@@ -34,8 +36,9 @@ public class Message_WS_TrafficReport {
 	}
 
 	public Message_WS_TrafficReport(final String workerName, final ArrayList<Vehicle> vehiclesOnRoad,
-			final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport, final int step,
-			final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses) {
+									final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport,
+									List<Vehicle> vehiclesFinished,final int step,
+									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses) {
 		this.workerName = workerName;
 		if (Settings.isVisualize || Settings.isOutputTrajectory) {
 			vehicleList = getDetailOfActiveVehiclesOnRoad(vehiclesOnRoad);
@@ -46,6 +49,7 @@ public class Message_WS_TrafficReport {
 		if (Settings.isOutputInitialRoutes) {
 			randomRoutes = getInitialRouteList(newVehiclesSinceLastReport);
 		}
+		this.finishedList = new ArrayList<>(getFinishedListFromVehicles(vehiclesFinished, step/ Settings.numStepsPerSecond));
 		this.step = step;
 		this.numInternalNonPubVehicles = numInternalNonPubVehicles;
 		this.numInternalTrams = numInternalTrams;
@@ -54,7 +58,8 @@ public class Message_WS_TrafficReport {
 
 	public Message_WS_TrafficReport(final String workerName, final int step, final TrafficNetwork trafficNetwork){
 		this(workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
-				trafficNetwork.newVehiclesSinceLastReport, step, trafficNetwork.numInternalNonPublicVehicle,
+				trafficNetwork.newVehiclesSinceLastReport, trafficNetwork.getFinishedVehicles(), step,
+				trafficNetwork.numInternalNonPublicVehicle,
 				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus);
 	}
 
@@ -135,6 +140,37 @@ public class Message_WS_TrafficReport {
 			list.add(new SerializableVehicleSpeed(speed));
 		}
 		return list;
+	}
+
+	public List<Serializable_Finished_Vehicle> getFinishedListFromVehicles(List<Vehicle> vehiclesFinished, double timeNow){
+		List<Serializable_Finished_Vehicle> finishedVehicles = new ArrayList<>();
+		for (Vehicle vehicle : vehiclesFinished) {
+			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, 1,
+					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, getRoute(vehicle.getRouteLegs()));
+			finishedVehicles.add(finishedVehicle);
+		}
+		return finishedVehicles;
+	}
+
+	public String getRoute(List<RouteLeg> routeLegs){
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		if(routeLegs.size() > 0){
+			sb.append(routeLegs.get(0).edge.startNode.index);
+			sb.append("-");
+			for (int i = 0; i < routeLegs.size(); i++) {
+				sb.append(routeLegs.get(i).edge.endNode.index);
+				if(i != routeLegs.size() -1){
+					sb.append("-");
+				}
+			}
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
+	public ArrayList<Serializable_Finished_Vehicle> getFinishedList() {
+		return finishedList;
 	}
 
 }

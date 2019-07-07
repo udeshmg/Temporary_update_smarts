@@ -1,7 +1,9 @@
-package processor;
+package processor.server;
 
-import traffic.road.Node;
-import traffic.road.RoadNetwork;
+import processor.communication.message.Serializable_Finished_Vehicle;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -22,20 +24,31 @@ import traffic.road.RoadNetwork;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 3/15/2019
+ * Created by tmuthugama on 4/10/2019
  */
-public interface SimulationProcessor {
+public class VehicleDataOutput {
 
-    RoadNetwork getRoadNetwork();
-    void stopSim();
-    void resumeSim();
-    void pauseSim();
-    void askWorkersChangeLaneBlock(int laneIndex, boolean block);
-    void setLightChangeNode(Node nodeSelected);
-    void changeMap();
-    void onClose();
-    void changeSpeed(int pauseTimeEachStep);
-    void setupNewSim();
-    void setupMultipleSim();
-    boolean loadScript();
+    private FileOutputStream fos;
+
+    public VehicleDataOutput(FileOutputStream fos){
+        this.fos = fos;
+    }
+
+    public void outputVehicleData(Serializable_Finished_Vehicle vehicle){
+        StringBuilder sb = new StringBuilder();
+        sb.append(vehicle.vehicleId+",");
+        sb.append(vehicle.trajVehicleId+",");
+        sb.append(vehicle.bestTravelTime+",");
+        sb.append(vehicle.actualTravelTime+",");
+        sb.append(vehicle.route+ System.getProperty("line.separator"));
+        outputStringToFile(fos, sb.toString());
+    }
+
+    private static void outputStringToFile(final FileOutputStream fos, String str) {
+        try {
+            fos.write(str.getBytes());
+            fos.flush();
+        } catch (final IOException e) {
+        }
+    }
 }

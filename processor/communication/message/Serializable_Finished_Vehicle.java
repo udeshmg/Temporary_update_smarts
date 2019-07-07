@@ -1,7 +1,4 @@
-package processor;
-
-import traffic.road.Node;
-import traffic.road.RoadNetwork;
+package processor.communication.message;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -22,20 +19,24 @@ import traffic.road.RoadNetwork;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 3/15/2019
+ * Created by tmuthugama on 4/10/2019
  */
-public interface SimulationProcessor {
+public class Serializable_Finished_Vehicle {
+    public String vehicleId;
+    public int trajVehicleId;
+    public double bestTravelTime;
+    public double actualTravelTime;
+    public String route;
 
-    RoadNetwork getRoadNetwork();
-    void stopSim();
-    void resumeSim();
-    void pauseSim();
-    void askWorkersChangeLaneBlock(int laneIndex, boolean block);
-    void setLightChangeNode(Node nodeSelected);
-    void changeMap();
-    void onClose();
-    void changeSpeed(int pauseTimeEachStep);
-    void setupNewSim();
-    void setupMultipleSim();
-    boolean loadScript();
+    public Serializable_Finished_Vehicle() {
+    }
+
+    public Serializable_Finished_Vehicle(String vehicleId, int trajVehicleId, double bestTravelTime, double actualTravelTime, String route) {
+        this.vehicleId = vehicleId;
+        this.trajVehicleId = trajVehicleId;
+        this.bestTravelTime = bestTravelTime;
+        this.actualTravelTime = actualTravelTime;
+        this.route = route;
+    }
+
 }

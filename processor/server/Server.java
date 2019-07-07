@@ -215,7 +215,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		while (iMessage.hasNext()) {
 			final Message_WS_TrafficReport message = iMessage.next();
 			data.updateFromReport(message.vehicleList, message.lightList, message.workerName, workerMetas.size(),
-					message.step, message.randomRoutes, message.numInternalNonPubVehicles, message.numInternalTrams, message.numInternalBuses);
+					message.step, message.randomRoutes, message.finishedList,message.numInternalNonPubVehicles, message.numInternalTrams, message.numInternalBuses);
 			// Remove processed message
 			iMessage.remove();
 		}
@@ -292,6 +292,16 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 		System.out.println("Sent simulation configuration to all workers.");
 
+	}
+
+	@Override
+	public void setupMultipleSim() {
+		data.startMultipleExperimentRunning();
+	}
+
+	@Override
+	public boolean loadScript() {
+		return data.loadScript();
 	}
 
 	public void askWorkersChangeLaneBlock(int laneIndex, boolean isBlocked) {

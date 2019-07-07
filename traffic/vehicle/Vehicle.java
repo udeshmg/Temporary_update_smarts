@@ -61,6 +61,8 @@ public class Vehicle {
 	private boolean reachedFellow = false;
 
 	private double cityMeteringSpeed = Double.MAX_VALUE;
+	private double lastSpeedChangeTime = 0;
+	private double startHeadPosition = 0;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -163,6 +165,7 @@ public class Vehicle {
 				edge.removeParkedVehicle(this);
 				this.lane = lane;
 				headPosition = pos;
+				startHeadPosition = headPosition;
 				speed = 0;
 				lane.addVehicleToLane(this);
 			}
@@ -301,6 +304,10 @@ public class Vehicle {
 			 * Move forward in the current lane
 			 */
 			headPosition += speed / Settings.numStepsPerSecond;
+
+			if(speed > 0){
+				lastSpeedChangeTime = timeNow;
+			}
 
 			/*
 			 * Reset jam start time if vehicle is not in jam
@@ -513,9 +520,9 @@ public class Vehicle {
 					// Check whether vehicle finishes trip
 					if (active && (indexLegOnRoute >= getRouteLegCount())) {
 						markAsFinished();
-						if (isForeground) {
+						//if (isForeground) {
 							timeTravel = timeNow - timeRouteStart;
-						}
+						//}
 						break;
 					}
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
@@ -561,6 +568,10 @@ public class Vehicle {
 		return cityMeteringSpeed;
 	}
 
+	public double getLastSpeedChangeTime() {
+		return lastSpeedChangeTime;
+	}
+
 	public Point2D getCurrentPosition(){
 		Edge current = getCurrentEdge();
 		if(current != null){
@@ -570,5 +581,22 @@ public class Vehicle {
 			return p;
 		}
 		return null;
+	}
+
+	public double getActualTravelTime(){
+		return timeTravel;
+	}
+
+	public double getBestTravelTime(){
+		double bestTT = 0;
+		for (int i = 0; i < routeLegs.size(); i++) {
+			Edge edge = routeLegs.get(i).edge;
+			if(i == 0){
+				bestTT += ((edge.length - startHeadPosition)/edge.freeFlowSpeed);
+			}else{
+				bestTT += (edge.length/edge.freeFlowSpeed);
+			}
+		}
+		return bestTT;
 	}
 }

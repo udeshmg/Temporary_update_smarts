@@ -2,13 +2,7 @@ package traffic;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import common.Settings;
 import processor.communication.message.SerializableExternalVehicle;
@@ -98,6 +92,7 @@ public class TrafficNetwork extends RoadNetwork {
 	HashMap<String, ArrayList<Edge>> internalBusStartEdgesInSourceWindow = new HashMap<>();
 
 	HashMap<String, ArrayList<Edge>> internalBusEndEdgesInDestinationWindow = new HashMap<>();
+	List<Vehicle> finishedVehicles = new ArrayList<>();
 
 	/**
 	 * Initialize traffic network.
@@ -110,6 +105,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 	public void clearReportedData() {
 		newVehiclesSinceLastReport.clear();
+		finishedVehicles.clear();
 	}
 
 	/**
@@ -277,7 +273,7 @@ public class TrafficNetwork extends RoadNetwork {
 		for (final SerializableExternalVehicle vehicle : externalRoutes) {
 			final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 			if (vehicle.numberRepeatPerSecond <= 0) {
-				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route), "",
+				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
 						vehicle.startTime, vehicle.id, DriverProfile.valueOf(vehicle.driverProfile));
 			} else {
 				// This is a simple way to get number of vehicles per step. The result number may be inaccurate.
@@ -295,7 +291,8 @@ public class TrafficNetwork extends RoadNetwork {
 	void createInternalNonPublicVehicles(int numLocalRandomPrivateVehicles, final double timeNow,
 			boolean isNewNonPubVehiclesAllowed) {
 		if (isNewNonPubVehiclesAllowed) {
-			final int numVehiclesNeeded = numLocalRandomPrivateVehicles - numInternalNonPublicVehicle;
+			final int numVehiclesNeeded = Settings.getTemporalDistributor().getCurrentVehicleLimit(numLocalRandomPrivateVehicles,
+					(int) (timeNow*Settings.numStepsPerSecond),Settings.maxNumSteps) - numInternalNonPublicVehicle;
 			for (int i = 0; i < numVehiclesNeeded; i++) {
 				final double typeDecider = random.nextDouble();
 				VehicleType type = null;
@@ -404,8 +401,8 @@ public class TrafficNetwork extends RoadNetwork {
 	 * @return
 	 */
 	ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
-		final Edge edgeStart = Settings.odDistributor.getStartEdge(this, internalNonPublicVehicleStartEdges);
-		final Edge edgeEnd = Settings.odDistributor.getEndEdge(this, internalNonPublicVehicleEndEdges);
+		final Edge edgeStart = Settings.getODDistributor().getStartEdge(this, internalNonPublicVehicleStartEdges);
+		final Edge edgeEnd = Settings.getODDistributor().getEndEdge(this, internalNonPublicVehicleEndEdges);
 
 		final ArrayList<RouteLeg> route = routingAlgorithm.createCompleteRoute(edgeStart, edgeEnd, type);
 
@@ -416,13 +413,19 @@ public class TrafficNetwork extends RoadNetwork {
 		}
 	}
 
-	ArrayList<RouteLeg> createOneRouteFromSerializedData(final ArrayList<SerializableRouteLeg> serializedData) {
-		final ArrayList<RouteLeg> route = new ArrayList<>(1000);
-		for (final SerializableRouteLeg sLeg : serializedData) {
-			final RouteLeg leg = new RouteLeg(edges.get(sLeg.edgeIndex), sLeg.stopover);
-			route.add(leg);
+	ArrayList<RouteLeg> createOneRouteFromSerializedData(final ArrayList<SerializableRouteLeg> serializedData, VehicleType type) {
+		if(Settings.inputOnlyODPairsOfForegroundVehicleFile){
+			SerializableRouteLeg legStart = serializedData.get(0);
+			SerializableRouteLeg legEnd = serializedData.get(serializedData.size()-1);
+			return routingAlgorithm.createCompleteRoute(edges.get(legStart.edgeIndex), edges.get(legEnd.edgeIndex), type);
+		}else {
+			final ArrayList<RouteLeg> route = new ArrayList<>(1000);
+			for (final SerializableRouteLeg sLeg : serializedData) {
+				final RouteLeg leg = new RouteLeg(edges.get(sLeg.edgeIndex), sLeg.stopover);
+				route.add(leg);
+			}
+			return route;
 		}
-		return route;
 	}
 
 	DriverProfile getRandomDriverProfile() {
@@ -622,7 +625,7 @@ public class TrafficNetwork extends RoadNetwork {
 			for (int i = 0; i < (int) numRepeatThisStep; i++) {
 				final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 				final DriverProfile profile = DriverProfile.valueOf(vehicle.driverProfile);
-				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route), "",
+				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
 						timeNow, vehicle.id + "_time_" + timeNow + "_" + i, profile);
 			}
 		}
@@ -716,5 +719,31 @@ public class TrafficNetwork extends RoadNetwork {
 
 	public int getVehicleCount(){
 		return vehicles.size();
+	}
+
+	public void finishRemoveCheck(final double timeNow){
+		for (Vehicle vehicle : vehicles) {
+			if(!vehicle.isFinished()){
+				if(vehicle.lane != null && vehicle.lane.getFrontVehicleInLane().id == vehicle.id) {
+					if(timeNow - vehicle.getLastSpeedChangeTime() > Settings.numStepsPerSecond * 300) {
+						System.out.println("Vehicle Stucked " + vehicle.id);
+					}
+				}
+			}else{
+				System.out.println("Finished Vehicle " + vehicle.id);
+			}
+		}
+	}
+
+	public void addTripFinishedVehicles(List<Vehicle> vehicles){
+		finishedVehicles.addAll(vehicles);
+	}
+
+	public List<Vehicle> getFinishedVehicles() {
+		return finishedVehicles;
+	}
+
+	public boolean isPublishTime(int step){
+		return (step % Settings.updateStepInterval) == 1;
 	}
 }

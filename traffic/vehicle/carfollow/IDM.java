@@ -46,7 +46,7 @@ public class IDM {
 		/*
 		 * Desired dynamic distance
 		 */
-		final double sS = vehicle.driverProfile.IDM_s0 + (v * vehicle.driverProfile.IDM_T)
+		final double sS = vehicle.driverProfile.IDM_s0 + (v * vehicle.driverProfile.IDM_T * Settings.safetyHeadwayMultiplier)
 				+ ((v * dV) / (2 * Math.sqrt(vehicle.driverProfile.IDM_a * vehicle.driverProfile.IDM_b)));
 		/*
 		 * Desired speed
@@ -55,9 +55,8 @@ public class IDM {
 		double v0 = vehicle.lane.edge.freeFlowSpeed;
 		if (v0 > vehicle.type.maxSpeed) {
 			v0 = vehicle.type.maxSpeed;
-		}else if(v0 > vehicle.getCityMeteringSpeed()){
-			v0 = vehicle.getCityMeteringSpeed();
 		}
+
 		/*
 		 * Acceleration exponent
 		 */
@@ -380,6 +379,13 @@ public class IDM {
 		 */
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
 
+			if ((vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge)
+
+					&& (targetEdge.lightColor == LightColor.GYR_Y)) {
+
+				return;
+
+			}
 			// Ignore other lights if vehicle already passed one of the lights
 			// in the same group
 			if (targetEdge.endNode.idLightNodeGroup == vehicle.idLightGroupPassed) {

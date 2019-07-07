@@ -5,7 +5,7 @@ package traffic.light;
  *
  */
 public enum LightColor {
-	GYR_G("G", 10, 180, 30), GYR_Y("Y", 3, 3, 3), GYR_R("R", 5, 5, 5), KEEP_RED("KR", 0, 0, 0);
+	GYR_G("G", 10, 180, 30), GYR_Y("Y", 10, 10, 10), GYR_R("R", 5, 5, 5), KEEP_RED("KR", 0, 0, 0);
 	
 	public String color;
 	public double minDynamicTime;

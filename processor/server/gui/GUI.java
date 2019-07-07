@@ -81,6 +81,23 @@ public class GUI extends JFrame {
 		monitorPanel.setEnabled(true);
 	}
 
+	public void loadMapChange(){
+		processor.changeMap();
+		monitorPanel.setEnabled(false);
+		RoadNetwork roadNetwork = processor.getRoadNetwork();
+		monitorPanel.changeMap(roadNetwork.minLon, roadNetwork.minLat,roadNetwork.maxLon, roadNetwork.maxLat);
+		getReadyToSetup();
+		monitorPanel.setEnabled(true);
+	}
+
+	public void updateGuiComps(){
+		controlPanel.cpMiscConfig.updateGuiComps();
+	}
+
+	public void runSimulationAuto(){
+		controlPanel.cpMiscConfig.getBtnSetupWorkers().doClick();
+	}
+
 	public void clearObjectData() {
 		guiVehicleList.clear();
 		guiLightList.clear();

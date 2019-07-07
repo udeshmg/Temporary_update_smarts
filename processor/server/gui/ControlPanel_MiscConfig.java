@@ -62,6 +62,11 @@ public class ControlPanel_MiscConfig extends JPanel {
 	private JRadioButton rdbtnLeftDrive;
 	private JRadioButton rdbtnRightDrive;
 
+	private JLabel lblRunMultipleSimulations;
+    private JTextField txt_runMultipleSimulations;
+    private JButton btn_changeMultipleSimulationFile;
+    private JButton btn_runMultipleSimulation;
+
 	public ControlPanel_MiscConfig(final GUI gui) {
 		this.gui = gui;
 		setPreferredSize(new Dimension(428, 641));
@@ -69,6 +74,34 @@ public class ControlPanel_MiscConfig extends JPanel {
 		// Set default directory of file chooser
 		final File workingDirectory = new File(System.getProperty("user.dir"));
 		fc.setCurrentDirectory(workingDirectory);
+
+		lblRunMultipleSimulations = new JLabel("Multiple Simulation Script File");
+		txt_runMultipleSimulations = new JTextField();
+		txt_runMultipleSimulations.setEditable(false);
+		txt_runMultipleSimulations.setColumns(10);
+		btn_changeMultipleSimulationFile = new JButton("Change");
+		btn_changeMultipleSimulationFile.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btn_changeMultipleSimulationFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				final int returnVal = fc.showOpenDialog(null);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					final File file = fc.getSelectedFile();
+					Settings.inputSimulationScript = file.getPath();
+				}
+				if (returnVal == JFileChooser.CANCEL_OPTION) {
+					Settings.inputSimulationScript = "";
+				}
+				txt_runMultipleSimulations.setText(Settings.inputSimulationScript);
+			}
+		});
+		btn_runMultipleSimulation = new JButton("Run Multiple Simulation");
+		btn_runMultipleSimulation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				gui.processor.setupMultipleSim();
+			}
+		});
 
 		btnLoadForegroundVehicles = new JButton("Change");
 		btnLoadForegroundVehicles.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -382,6 +415,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 																								.addGroup(groupLayout
 																										.createParallelGroup(
 																												Alignment.LEADING)
+																										.addComponent(lblRunMultipleSimulations)
 																										.addComponent(
 																												lblBackgroundRouteFile)
 																										.addComponent(
@@ -391,6 +425,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 																								.addGroup(groupLayout
 																										.createParallelGroup(
 																												Alignment.LEADING)
+																										.addComponent(txt_runMultipleSimulations, GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
 																										.addComponent(
 																												textField_ForegroundRouteFile,
 																												GroupLayout.DEFAULT_SIZE,
@@ -425,10 +460,12 @@ public class ControlPanel_MiscConfig extends JPanel {
 																						.addComponent(
 																								btnLoadForegroundVehicles)
 																						.addComponent(
-																								btnLoadBackgroundVehicles)))
+																								btnLoadBackgroundVehicles)
+																						.addComponent(btn_changeMultipleSimulationFile)))
 																		.addGroup(groupLayout.createSequentialGroup()
 																				.addPreferredGap(
 																						ComponentPlacement.RELATED)
+																				.addComponent(btn_runMultipleSimulation, GroupLayout.PREFERRED_SIZE, 144, GroupLayout.PREFERRED_SIZE)
 																				.addComponent(btnSetupWorkers,
 																						GroupLayout.PREFERRED_SIZE, 144,
 																						GroupLayout.PREFERRED_SIZE)))
@@ -459,6 +496,13 @@ public class ControlPanel_MiscConfig extends JPanel {
 				.addGap(67)));
 		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
+
+				.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblRunMultipleSimulations)
+						.addComponent(txt_runMultipleSimulations, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btn_changeMultipleSimulationFile))
+				.addPreferredGap(ComponentPlacement.RELATED)
+				.addComponent(btn_runMultipleSimulation)
 				.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE).addComponent(rdbtnLeftDrive)
 						.addComponent(rdbtnRightDrive))
 				.addPreferredGap(ComponentPlacement.RELATED)
@@ -590,5 +634,29 @@ public class ControlPanel_MiscConfig extends JPanel {
 
 		gui.processor.setupNewSim();
 		monitor.startSetupProgress();
+	}
+
+	void updateGuiComps(){
+		rdbtnLeftDrive.setSelected(Settings.isDriveOnLeft);
+		rdbtnRightDrive.setSelected(!Settings.isDriveOnLeft);
+		textField_ForegroundRouteFile.setText(Settings.inputForegroundVehicleFile);
+		//chckbxLoadOnlyPreviousODPairForegroundVehicles.setSelected(Settings.inputOnlyODPairsOfForegroundVehicleFile);
+		textField_BackgroundRouteFile.setText(Settings.inputBackgroundVehicleFile);
+		textField_numRandomPrivateVehicles.setText(String.valueOf(Settings.numGlobalRandomPrivateVehicles));
+		textField_numRandomBuses.setText(String.valueOf(Settings.numGlobalRandomBuses));
+		textField_numRandomTrams.setText(String.valueOf(Settings.numGlobalRandomTrams));
+		textField_TotalNumSteps.setText(String.valueOf(Settings.maxNumSteps));
+		textField_NumStepsPerSec.setText(String.valueOf(Settings.numStepsPerSecond));
+		textField_lookAheadDist.setText(String.valueOf((int)Settings.lookAheadDistance));
+		comboBoxTrafficLight.setSelectedItem(Settings.trafficLightTiming);
+		comboBoxRouting.setSelectedItem(Settings.routingAlgorithm);
+		chckbxServerbased.setSelected(Settings.isServerBased);
+		chckbxDumpInitialRoutes.setSelected(Settings.isOutputInitialRoutes);
+		chckbxOutputTrajectory.setSelected(Settings.isOutputTrajectory);
+		chckbxExternalReroute.setSelected(Settings.isAllowReroute);
+	}
+
+	public JButton getBtnSetupWorkers() {
+		return btnSetupWorkers;
 	}
 }

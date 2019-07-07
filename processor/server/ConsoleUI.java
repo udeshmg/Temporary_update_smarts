@@ -28,10 +28,8 @@ import java.util.Scanner;
  */
 public class ConsoleUI {
 
-    //private Server server;
     private SimulationProcessor processor;
     private Scanner sc = new Scanner(System.in);
-    private ScriptLoader scriptLoader = new ScriptLoader();
 
     public ConsoleUI(SimulationProcessor processor) {
         this.processor = processor;
@@ -50,14 +48,11 @@ public class ConsoleUI {
         System.out.println("Please launch workers now.");
     }
 
-    void startSimulationFromLoadedScript(){
-        if (scriptLoader.retrieveOneSimulationSetup()) {
-            processor.changeMap();
-        }
+    public void startSimulationFromLoadedScript(){
         processor.setupNewSim();
     }
 
-    void acceptConsoleCommandAtSimEnd() {
+    public void acceptConsoleCommandAtSimEnd() {
         System.out.println("Simulations are completed. Exit (y/n)?");
         String choice = sc.nextLine();
         if (choice.equals("y") || choice.equals("Y")) {
@@ -75,7 +70,7 @@ public class ConsoleUI {
     public void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
         Settings.inputSimulationScript = sc.nextLine();
-        while (!scriptLoader.loadScriptFile()) {
+        while (!processor.loadScript()) {
             System.out.println("Please specify the simulation script path.");
             Settings.inputSimulationScript = sc.nextLine();
         }
@@ -96,12 +91,4 @@ public class ConsoleUI {
         }
     }
 
-    public void readyToStartSim(){
-        if (scriptLoader.isEmpty()) {
-            acceptConsoleCommandAtSimEnd();
-        } else {
-            System.out.println("Loading configuration of new simulation...");
-            startSimulationFromLoadedScript();
-        }
-    }
 }

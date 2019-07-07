@@ -2,8 +2,10 @@ package processor.worker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import common.Settings;
+import processor.SimulationListener;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -19,9 +21,12 @@ public class Simulation {
 	TrafficNetwork trafficNetwork;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
+	SimulationListener simulationListener = null;
+	List<Vehicle> routeRequested = new ArrayList<>();
 
 	public Simulation(final TrafficNetwork trafficNetwork) {
 		this.trafficNetwork = trafficNetwork;
+		simulationListener = Settings.getSimulationListener();
 	}
 
 	void clearOneStepData() {
@@ -129,10 +134,13 @@ public class Simulation {
 		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
 		transferDataTofellow(worker);
 		moveVehiclesNotAroundBorder(worker.connectedFellows, timeNow, pspNonBorderEdges);
+		onVehicleMove(step);
 		removeTripFinishedVehicles();
+		onVehicleRemove(oneStepData_allVehiclesReachedDestination, step);
 		trafficNetwork.changeLaneOfVehicles(timeNow);
 		trafficNetwork.updateTrafficLights();
 		trafficNetwork.updateTramStopTimers();
+		onVehicleAdd(timeNow, step);
 		trafficNetwork.releaseVehicleFromParking(timeNow);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
@@ -140,7 +148,7 @@ public class Simulation {
 				numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
 				timeNow);
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
-
+		trafficNetwork.finishRemoveCheck(timeNow);
 		// Clear one-step data
 		clearOneStepData();
 	}
@@ -162,6 +170,31 @@ public class Simulation {
 	}
 
 	void removeTripFinishedVehicles(){
+		trafficNetwork.addTripFinishedVehicles(oneStepData_allVehiclesReachedDestination);
 		trafficNetwork.removeActiveVehicles(oneStepData_allVehiclesReachedDestination);
+	}
+
+	public void onVehicleAdd(double timeNow, int step){
+		if(simulationListener != null){
+			List<Vehicle> newVehicles = trafficNetwork.vehicles.stream().filter(vehicle ->
+					vehicle.active && vehicle.lane == null && vehicle.earliestTimeToLeaveParking <= timeNow && !routeRequested.contains(vehicle))
+					.collect(Collectors.toList());
+			simulationListener.onVehicleAdd(newVehicles, step, trafficNetwork);
+			routeRequested.addAll(newVehicles);
+		}
+	}
+
+	public void onVehicleMove(int step){
+		if(simulationListener != null && trafficNetwork.isPublishTime(step)){
+			List<Vehicle> allmovedVehicles = trafficNetwork.vehicles.stream().filter(vehicle -> vehicle.active)
+					.collect(Collectors.toList());
+			simulationListener.onVehicleMove(allmovedVehicles, step);
+		}
+	}
+
+	public void onVehicleRemove(List<Vehicle> vehicles, int step){
+		if(simulationListener != null){
+			simulationListener.onVehicleRemove(vehicles, step);
+		}
 	}
 }

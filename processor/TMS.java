@@ -1,7 +1,9 @@
 package processor;
 
-import traffic.road.Node;
-import traffic.road.RoadNetwork;
+import traffic.TrafficNetwork;
+import traffic.vehicle.Vehicle;
+
+import java.util.List;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -22,20 +24,49 @@ import traffic.road.RoadNetwork;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 3/15/2019
+ * Created by tmuthugama on 2/13/2019
  */
-public interface SimulationProcessor {
+public abstract class TMS implements SimulationListener{
 
-    RoadNetwork getRoadNetwork();
-    void stopSim();
-    void resumeSim();
-    void pauseSim();
-    void askWorkersChangeLaneBlock(int laneIndex, boolean block);
-    void setLightChangeNode(Node nodeSelected);
-    void changeMap();
-    void onClose();
-    void changeSpeed(int pauseTimeEachStep);
-    void setupNewSim();
-    void setupMultipleSim();
-    boolean loadScript();
+    public abstract void startTMS(TrafficNetwork trafficNetwork, int maxNoOfSteps, int noOfStepsPerSecond);
+
+    public abstract void stopTMS();
+
+    public abstract void pauseTMS();
+
+    public abstract void updateTraffic(List<Vehicle> vehicles, int step);
+
+    public abstract void getRoute(Vehicle vehicle, TrafficNetwork trafficNetwork);
+
+    @Override
+    public void onStart(TrafficNetwork trafficNetwork, int maxNoSteps, int noOfStepsPerSecond) {
+        startTMS(trafficNetwork, maxNoSteps, noOfStepsPerSecond);
+    }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onStop() {
+        stopTMS();
+    }
+
+    @Override
+    public void onVehicleAdd(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork) {
+        for (Vehicle vehicle : vehicles) {
+            getRoute(vehicle, trafficNetwork);
+        }
+    }
+
+    @Override
+    public void onVehicleMove(List<Vehicle> vehicles, int step) {
+        updateTraffic(vehicles, step);
+    }
+
+    @Override
+    public void onVehicleRemove(List<Vehicle> vehicles, int step) {
+
+    }
 }

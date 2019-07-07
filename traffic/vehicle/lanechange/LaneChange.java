@@ -9,10 +9,12 @@ import traffic.vehicle.Vehicle;
  */
 public class LaneChange {
 
-	MOBIL mobil;
+	//MOBIL mobil;
+	MOBIL_OLD mobil;
 
 	public LaneChange() {
-		mobil = new MOBIL();
+		//mobil = new MOBIL();
+		mobil = new MOBIL_OLD();
 	}
 
 	/**
@@ -20,6 +22,6 @@ public class LaneChange {
 	 *
 	 */
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
-		return mobil.decideLaneChange(input, vehicle);
+		return mobil.decideLaneChange(vehicle);
 	}
 }

@@ -158,7 +158,7 @@ public class RoadUtil {
 				} else if (eR.type.priority > e1.type.priority) {
 					conflictEdges.add(eR);
 				} else if (eR.type.priority == e1.type.priority) {
-					if (eR.name.length() > 0) {
+					/*if (eR.name.length() > 0) {
 						for (final Edge e : outwardEdgesL) {
 							if (e.name.equals(eR.name)) {
 								// Cross eR's road
@@ -166,16 +166,24 @@ public class RoadUtil {
 								break;
 							}
 						}
+					}*/
+					if (!eR.name.equals(e1.name)) {
+						// Cross eR's road
+						conflictEdges.add(eR);
 					}
 				}
 			}
 
 			for (final Edge eL : inwardEdgesL) {
 				if (e1.isRoundabout || (eL.lightColor == LightColor.GYR_R) || (eL.lightColor == LightColor.KEEP_RED)
-						|| (eL.startNode == e2.endNode)) {
+						/*|| (eL.startNode == e2.endNode)*/) {
 					continue;
 				}
 				if (eL.type.priority > e1.type.priority) {
+					conflictEdges.add(eL);
+				}else if (eL.type.priority == e1.type.priority && eL.name.equals(e1.name)
+						&& e1.lightColor == LightColor.GYR_G) {
+						// Consider vehicle from opposite direction on same road when turning right under green light
 					conflictEdges.add(eL);
 				}
 			}
@@ -190,7 +198,7 @@ public class RoadUtil {
 				} else if (eL.type.priority > e1.type.priority) {
 					conflictEdges.add(eL);
 				} else if (eL.type.priority == e1.type.priority) {
-					if (eL.name.length() > 0) {
+					/*if (eL.name.length() > 0) {
 						for (final Edge e : outwardEdgesR) {
 							if (e.name.equals(eL.name)) {
 								// Cross eL's road
@@ -198,17 +206,25 @@ public class RoadUtil {
 								break;
 							}
 						}
+					}*/
+					if(!eL.name.equals(e1.name)){
+						conflictEdges.add(eL);
 					}
 				}
 			}
 
 			for (final Edge eR : inwardEdgesR) {
 				if (e1.isRoundabout || (eR.lightColor == LightColor.GYR_R) || (eR.lightColor == LightColor.KEEP_RED)
-						|| (eR.startNode == e2.endNode)) {
+						/*|| (eR.startNode == e2.endNode)*/) {
 					continue;
 				}
 				if (eR.type.priority > e1.type.priority) {
 					conflictEdges.add(eR);
+				}else if (eR.type.priority == e1.type.priority && eR.name.equals(e1.name)
+						&& e1.lightColor == LightColor.GYR_G) {
+					// Consider vehicle from opposite direction on same road when turning left under green light
+					conflictEdges.add(eR);
+
 				}
 			}
 		}

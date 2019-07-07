@@ -18,6 +18,8 @@ public class FileOutput {
 	FileOutputStream fosLog;
 	FileOutputStream fosTrajectory;
 	FileOutputStream fosRoute;
+	FileOutputStream trjFos;
+	FileOutputStream vdFos;
 
 	/**
 	 * Close output file
@@ -33,6 +35,12 @@ public class FileOutput {
 			if (fosRoute != null) {
 				outputStringToFile(fosRoute, "</data>");
 				fosRoute.close();
+			}
+			if(trjFos != null){
+				trjFos.close();
+			}
+			if(vdFos != null){
+				vdFos.close();
 			}
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
@@ -50,18 +58,35 @@ public class FileOutput {
 		if (Settings.isOutputSimulationLog) {
 			initSimLogOutputFile();
 		}
+		initTrjOutputFile();
+		initVDOutputFile();
 	}
 
-	File getNewFile(String prefix) {
-		String fileName = prefix + SysUtil.getTimeStampString() + ".txt";
+	File getNewFile(String prefix, String extension) {
+		File downloadDir = new File(Settings.downloadDirectory);
+		if(!downloadDir.exists()){
+			System.out.println("Download directory not exist. Creating a new directory");
+			downloadDir.mkdirs();
+		}
+		String testName = Settings.testName;
+		if(testName == null){
+			testName = prefix + SysUtil.getTimeStampString();
+		}else{
+			testName = prefix + testName;
+		}
+		String fileName = Settings.downloadDirectory + "/" + testName + "." +extension;
 		File file = new File(fileName);
 		int counter = 0;
 		while (file.exists()) {
 			counter++;
-			fileName = prefix + SysUtil.getTimeStampString() + "_" + counter + ".txt";
+			fileName = Settings.downloadDirectory + "/" + testName + "_" + counter + ".txt";
 			file = new File(fileName);
 		}
 		return file;
+	}
+
+	File getNewFile(String prefix) {
+		return getNewFile(prefix ,"txt");
 	}
 
 	void initRouteOutputFile() {
@@ -97,6 +122,30 @@ public class FileOutput {
 			fosTrajectory = new FileOutputStream(file, true);
 			outputStringToFile(fosTrajectory,
 					"Trajectory ID,Vehicle ID,Time Stamp,Latitude,Longitude" + System.getProperty("line.separator"));
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	void initTrjOutputFile() {
+		try {
+			final File fileTrj = getNewFile("Trj_", "trj");
+			// Print column titles
+			trjFos = new FileOutputStream(fileTrj, true);
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	void initVDOutputFile() {
+		try {
+			final File fileTrj = getNewFile("VD_");
+			// Print column titles
+			vdFos = new FileOutputStream(fileTrj, true);
+			outputStringToFile(vdFos,
+					"VehicleID,TrjVehicleID,BestTravelTime,ActualTravelTime,Route" + System.getProperty("line.separator"));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -191,4 +240,11 @@ public class FileOutput {
 		}
 	}
 
+	public FileOutputStream getTrjFos() {
+		return trjFos;
+	}
+
+	public FileOutputStream getVdFos() {
+		return vdFos;
+	}
 }
