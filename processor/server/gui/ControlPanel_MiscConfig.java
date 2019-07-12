@@ -648,8 +648,8 @@ public class ControlPanel_MiscConfig extends JPanel {
 		textField_TotalNumSteps.setText(String.valueOf(Settings.maxNumSteps));
 		textField_NumStepsPerSec.setText(String.valueOf(Settings.numStepsPerSecond));
 		textField_lookAheadDist.setText(String.valueOf((int)Settings.lookAheadDistance));
-		comboBoxTrafficLight.setSelectedItem(Settings.trafficLightTiming);
-		comboBoxRouting.setSelectedItem(Settings.routingAlgorithm);
+		comboBoxTrafficLight.setSelectedItem(Settings.trafficLightTiming.name());
+		comboBoxRouting.setSelectedItem(Settings.routingAlgorithm.name());
 		chckbxServerbased.setSelected(Settings.isServerBased);
 		chckbxDumpInitialRoutes.setSelected(Settings.isOutputInitialRoutes);
 		chckbxOutputTrajectory.setSelected(Settings.isOutputTrajectory);
