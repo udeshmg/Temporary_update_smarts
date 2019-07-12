@@ -294,6 +294,7 @@ public class Experiment {
             }
             case "foregroundVehicleFile": {
                 setForegroundVehicleFile(value);
+                break;
             }
             case "loadOnlyODPairs": {
                 setLoadOnlyODPairs(Boolean.parseBoolean(value));
@@ -301,6 +302,7 @@ public class Experiment {
             }
             case "backgroundVehicleFile": {
                 setBackgroundVehicleFile(value);
+                break;
             }
             case "outputSimulationLog": {
                 setOutputSimulationLog(Boolean.parseBoolean(value));
@@ -314,12 +316,13 @@ public class Experiment {
                 setOutputTrajectory(Boolean.parseBoolean(value));
                 break;
             }
-            case "outputInitialRouteOfRandomVehicles": {
+            case "outputInitialRoute": {
                 setOutputInitialRoute(Boolean.parseBoolean(value));
                 break;
             }
             case "numRuns": {
                 setNumRuns(Integer.parseInt(value));
+                break;
             }
             case "lookAheadDistance": {
                 setLookAheadDistance(Double.parseDouble(value));
