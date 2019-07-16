@@ -2,10 +2,7 @@ package traffic.vehicle;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import common.Settings;
 import processor.worker.Fellow;
@@ -119,19 +116,34 @@ public class Vehicle {
 					break;
 				}
 			}
+			if(gapFront > headPosSpaceBack){
+				gaps.add(new double[] { gapFront, headPosSpaceBack });
+			}
 		} else {
 			gaps.add(new double[] { headPosSpaceFront, headPosSpaceBack });
 		}
 
-		if (gaps.size() == 0) {
+		List<double[]> validGaps = getValidGaps(gaps);
+		if (validGaps.size() == 0) {
 			return -1;
 		} else {
 			Random random = new Random();
 			// Pick a random position within a random gap
-			final double[] gap = gaps.get(random.nextInt(gaps.size()));
-			final double pos = gap[0] - (random.nextDouble() * (gap[0] - gap[1]));
+			final double[] gap = validGaps.get(random.nextInt(validGaps.size()));
+
+			final double pos = gap[1] + length + (random.nextDouble() * (gap[0] - gap[1]) * Settings.startPosOffset);
 			return pos;
 		}
+	}
+
+	public List<double[]> getValidGaps(List<double[]> gaps){
+		List<double[]> validGaps = new ArrayList<>();
+		for (double[] gap : gaps) {
+			if (gap[1] <= (Settings.startGapOffset) * length) {
+				validGaps.add(gap);
+			}
+		}
+		return validGaps;
 	}
 
 	/**
@@ -598,5 +610,18 @@ public class Vehicle {
 			}
 		}
 		return bestTT;
+	}
+
+	public double getRouteLength(){
+		double length = 0;
+		for (int i = 0; i < routeLegs.size(); i++) {
+			Edge edge = routeLegs.get(i).edge;
+			if(i == 0){
+				length += (edge.length - startHeadPosition);
+			}else{
+				length += edge.length;
+			}
+		}
+		return length;
 	}
 }

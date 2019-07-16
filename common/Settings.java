@@ -143,6 +143,8 @@ public class Settings {
 	public static boolean inputOnlyODPairsOfForegroundVehicleFile = false;
 	public static int updateStepInterval = 300;
 	public static String simulationListener = "";
+	public static double startGapOffset = 0.0;
+	public static double startPosOffset = 0.0;
 
 	public static ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);
