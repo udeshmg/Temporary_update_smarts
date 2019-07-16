@@ -145,7 +145,7 @@ public class FileOutput {
 			// Print column titles
 			vdFos = new FileOutputStream(fileTrj, true);
 			outputStringToFile(vdFos,
-					"VehicleID,TrjVehicleID,BestTravelTime,ActualTravelTime,Route" + System.getProperty("line.separator"));
+					"VehicleID,TrjVehicleID,BestTravelTime,ActualTravelTime,RouteLength,Route" + System.getProperty("line.separator"));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

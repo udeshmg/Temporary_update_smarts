@@ -146,7 +146,7 @@ public class Message_WS_TrafficReport {
 		List<Serializable_Finished_Vehicle> finishedVehicles = new ArrayList<>();
 		for (Vehicle vehicle : vehiclesFinished) {
 			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, 1,
-					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, getRoute(vehicle.getRouteLegs()));
+					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), getRoute(vehicle.getRouteLegs()));
 			finishedVehicles.add(finishedVehicle);
 		}
 		return finishedVehicles;

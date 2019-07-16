@@ -40,6 +40,7 @@ public class VehicleDataOutput {
         sb.append(vehicle.trajVehicleId+",");
         sb.append(vehicle.bestTravelTime+",");
         sb.append(vehicle.actualTravelTime+",");
+        sb.append(vehicle.routeLength+",");
         sb.append(vehicle.route+ System.getProperty("line.separator"));
         outputStringToFile(fos, sb.toString());
     }

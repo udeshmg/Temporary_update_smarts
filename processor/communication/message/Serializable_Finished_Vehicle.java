@@ -26,16 +26,18 @@ public class Serializable_Finished_Vehicle {
     public int trajVehicleId;
     public double bestTravelTime;
     public double actualTravelTime;
+    public double routeLength;
     public String route;
 
     public Serializable_Finished_Vehicle() {
     }
 
-    public Serializable_Finished_Vehicle(String vehicleId, int trajVehicleId, double bestTravelTime, double actualTravelTime, String route) {
+    public Serializable_Finished_Vehicle(String vehicleId, int trajVehicleId, double bestTravelTime, double actualTravelTime, double routeLength, String route) {
         this.vehicleId = vehicleId;
         this.trajVehicleId = trajVehicleId;
         this.bestTravelTime = bestTravelTime;
         this.actualTravelTime = actualTravelTime;
+        this.routeLength = routeLength;
         this.route = route;
     }
 
