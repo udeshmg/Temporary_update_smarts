@@ -114,7 +114,7 @@ public class TrjOutput {
         }
     }
 
-    private static void outputStringToFile(final FileOutputStream fos, byte[] str) {
+    private void outputStringToFile(final FileOutputStream fos, byte[] str) {
         try {
             fos.write(str);
             fos.flush();
@@ -122,7 +122,7 @@ public class TrjOutput {
         }
     }
 
-    private static byte[] getFormatBytes(char endianness, float version){
+    private byte[] getFormatBytes(char endianness, float version){
         ByteBuffer byteBuffer = ByteBuffer.allocate(6);
         byteBuffer.put(getByteBytes((byte) 0));
         byteBuffer.put(getByteBytes((byte) endianness));
@@ -130,7 +130,7 @@ public class TrjOutput {
         return byteBuffer.array();
     }
 
-    private static byte[] getDimensionBytes(int unit, float scale, int minX, int minY, int maxX, int maxY){
+    private byte[] getDimensionBytes(int unit, float scale, int minX, int minY, int maxX, int maxY){
         ByteBuffer byteBuffer = ByteBuffer.allocate(22);
         byteBuffer.put(getByteBytes((byte) 1));
         byteBuffer.put(getByteBytes((byte) unit));
@@ -142,14 +142,14 @@ public class TrjOutput {
         return byteBuffer.array();
     }
 
-    private static byte[] getTimeStepBytes(float timestep){
+    private byte[] getTimeStepBytes(float timestep){
         ByteBuffer byteBuffer = ByteBuffer.allocate(5);
         byteBuffer.put(getByteBytes((byte) 2));
         byteBuffer.put(getFloatBytes(timestep));
         return byteBuffer.array();
     }
 
-    private static byte[] getVehicleBytes(int vehicleId, int linkId, int laneId,
+    private byte[] getVehicleBytes(int vehicleId, int linkId, int laneId,
                                    float frontX, float frontY, float rearX, float rearY,
                                    float length, float width, float speed, float acceleration){
         ByteBuffer byteBuffer = ByteBuffer.allocate(42);
@@ -169,19 +169,19 @@ public class TrjOutput {
     }
 
 
-    private static byte[] getByteBytes(byte a){
+    private byte[] getByteBytes(byte a){
         ByteBuffer bytebuf = ByteBuffer.allocate(1).order(ByteOrder.LITTLE_ENDIAN);
         bytebuf.put(a);
         return bytebuf.array();
     }
 
-    private static byte[] getIntBytes(int a){
+    private byte[] getIntBytes(int a){
         ByteBuffer bytebuf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
         bytebuf.putInt(a);
         return bytebuf.array();
     }
 
-    private static byte[] getFloatBytes(float a){
+    private byte[] getFloatBytes(float a){
         ByteBuffer bytebuf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
         bytebuf.putFloat(a);
         return bytebuf.array();

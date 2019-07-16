@@ -44,7 +44,7 @@ public class VehicleDataOutput {
         outputStringToFile(fos, sb.toString());
     }
 
-    private static void outputStringToFile(final FileOutputStream fos, String str) {
+    private void outputStringToFile(final FileOutputStream fos, String str) {
         try {
             fos.write(str.getBytes());
             fos.flush();
