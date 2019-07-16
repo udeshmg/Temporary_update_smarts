@@ -40,7 +40,6 @@ public class TrjOutput {
     private int maxY;
     private FileOutputStream fos;
     private Map<String, Integer> vehicleIds;
-    private Map<Integer, Map<String, List<Serializable_GUI_Vehicle>>> trajStamps;
     private int vehicleIndex = 0;
     private int noOfWorkers;
     private int noStepsPerSecond;
@@ -58,7 +57,6 @@ public class TrjOutput {
         this.maxX = (int) Math.ceil(width/metresPerUnit) + 25;
         this.maxY = (int) Math.ceil(height/metresPerUnit) + 25;
         this.vehicleIds = new HashMap<>();
-        this.trajStamps = new HashMap<>();
     }
 
     public void outputMapData(){
@@ -74,25 +72,8 @@ public class TrjOutput {
         return vehicleIds.get(vehicleId);
     }
 
-    public void outputTrajData(int step, String worker, List<Serializable_GUI_Vehicle> gui_vehicles){
-        if(!trajStamps.containsKey(step)){
-            trajStamps.put(step, new HashMap<>());
-        }
-        Map<String, List<Serializable_GUI_Vehicle>> stepRecord = trajStamps.get(step);
-        stepRecord.put(worker, gui_vehicles);
-        while(step > lastFinishedStep && step <= maxSteps){
-            int curStep = lastFinishedStep + 1;
-            stepRecord = trajStamps.get(curStep);
-            if(stepRecord != null && stepRecord.size() == noOfWorkers){
-                List<Serializable_GUI_Vehicle> vehicles = new ArrayList<>();
-                for (String s : stepRecord.keySet()) {
-                    vehicles.addAll(stepRecord.get(s));
-                }
-                outputTimeStepData(curStep, vehicles);
-                trajStamps.remove(stepRecord);
-                lastFinishedStep = curStep;
-            }
-        }
+    public void outputTrajData(int step, List<Serializable_GUI_Vehicle> gui_vehicles){
+        outputTimeStepData(step, gui_vehicles);
     }
 
     public void outputTimeStepData(int timestep, List<Serializable_GUI_Vehicle> vehicles){
