@@ -89,7 +89,7 @@ public class Dijkstra extends Routing {
 		}
 	}
 
-	public void computePathsFromTo(final Edge startEdge, final Edge endEdge, final VehicleType type) {
+	public void computePathsFromTo(final Node sourceNode, final Node destinationNode, final VehicleType type) {
 		// Reset
 		for (final DijkstraVertex v : vertices) {
 			v.minDistance = Double.POSITIVE_INFINITY;
@@ -97,8 +97,8 @@ public class Dijkstra extends Routing {
 			v.state = DijkstraVertexState.None;
 		}
 
-		final Node sourceNode = startEdge.startNode;
-		final Node destinationNode = endEdge.endNode;
+//		final Node sourceNode = startEdge.startNode;
+//		final Node destinationNode = endEdge.endNode;
 
 		final DijkstraVertex source = vertices.get(sourceNode.index);
 		source.minDistance = 0;
@@ -141,18 +141,19 @@ public class Dijkstra extends Routing {
 	}
 
 	public ArrayList<RouteLeg> createCompleteRoute(final Edge startEdge, final Edge endEdge, final VehicleType type) {
-
-		computePathsFromTo(startEdge, endEdge, type);
+		//StartEdge should be fixed to add vehicle . Otherwise it creates incorrect routes
+		computePathsFromTo(startEdge.endNode, endEdge.endNode, type);
 		final List<DijkstraVertex> path = getPathTo(endEdge.endNode);
 		if (path.size() < 2) {
 			return null;
 		}
 		final ArrayList<RouteLeg> legsOnRoute = new ArrayList<>();
+		legsOnRoute.add(new RouteLeg(startEdge, 0));
 		for (int i = 1; i < path.size(); i++) {
 			final Edge edge = getEdgeFromVertices(path.get(i - 1), path.get(i));
 			legsOnRoute.add(new RouteLeg(edge, 0));
 		}
-		RouteUtil.removeRepeatSections(legsOnRoute);
+//		RouteUtil.removeRepeatSections(legsOnRoute);
 		return legsOnRoute;
 	}
 

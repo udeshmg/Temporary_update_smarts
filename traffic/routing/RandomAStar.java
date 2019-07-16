@@ -103,10 +103,8 @@ public class RandomAStar extends Routing {
 		}
 	}
 
-	public void computePathsFromTo(final Edge startEdge, final Edge endEdge, final VehicleType type) {
+	public void computePathsFromTo(Node sourceNode, Node destinationNode, final VehicleType type) {
 		// Reset
-		final Node sourceNode = startEdge.startNode;
-		final Node destinationNode = endEdge.endNode;
 		final double metersPerLongitude = RoadUtil
 				.getMetersPerLongitudeDegree((sourceNode.lon + destinationNode.lon) / 2);
 		for (final DijkstraVertex v : vertices) {
@@ -167,12 +165,13 @@ public class RandomAStar extends Routing {
 	}
 
 	public ArrayList<RouteLeg> createCompleteRoute(final Edge startEdge, final Edge endEdge, final VehicleType type) {
-		computePathsFromTo(startEdge, endEdge, type);
+		computePathsFromTo(startEdge.endNode, endEdge.endNode, type);
 		final List<DijkstraVertex> path = getPathTo(endEdge.endNode);
 		if (path.size() < 2) {
 			return null;
 		}
 		final ArrayList<RouteLeg> legsOnRoute = new ArrayList<>(1000);
+		legsOnRoute.add(new RouteLeg(startEdge, 0));
 		for (int i = 1; i < path.size(); i++) {
 			final Edge edge = getEdgeFromVertices(path.get(i - 1), path.get(i));
 			legsOnRoute.add(new RouteLeg(edge, 0));
