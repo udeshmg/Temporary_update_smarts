@@ -129,11 +129,13 @@ public class SimServerData {
         }
         // Add new vehicle position to its trajectory
         double timeStamp = step / Settings.numStepsPerSecond;
-        for (Serializable_GUI_Vehicle vehicle : vehicleList) {
-            if (!allTrajectories.containsKey(vehicle.id)) {
-                allTrajectories.put(vehicle.id, new TreeMap<Double, double[]>());
+        if (Settings.isOutputTrajectory) {
+            for (Serializable_GUI_Vehicle vehicle : vehicleList) {
+                if (!allTrajectories.containsKey(vehicle.id)) {
+                    allTrajectories.put(vehicle.id, new TreeMap<Double, double[]>());
+                }
+                allTrajectories.get(vehicle.id).put(timeStamp, new double[]{vehicle.latHead, vehicle.lonHead});
             }
-            allTrajectories.get(vehicle.id).put(timeStamp, new double[]{vehicle.latHead, vehicle.lonHead});
         }
         for (Serializable_Finished_Vehicle finishedVehicle : finished) {
             finishedVehicle.trajVehicleId = trjOutput.getTrjVehicleId(finishedVehicle.vehicleId);
@@ -141,7 +143,9 @@ public class SimServerData {
         }
         trjOutput.outputTrajData(step, workerName, vehicleList);
         // Store routes of new vehicles created since last report
-        allRoutes.addAll(randomRoutes);
+        if (Settings.isOutputInitialRoutes) {
+            allRoutes.addAll(randomRoutes);
+        }
         // Increment vehicle counts
         numInternalNonPubVehiclesAtAllWorkers += numInternalNonPubVehicles;
         numInternalTramsAtAllWorkers += numInternalTrams;
@@ -262,6 +266,8 @@ public class SimServerData {
         numVehiclesCreatedDuringSetup = 0;
         numVehiclesNeededAtStart = 0;
         step = 0;
+        allRoutes.clear();
+        allTrajectories.clear();
     }
 
     public void reserVariablesAtStop() {
