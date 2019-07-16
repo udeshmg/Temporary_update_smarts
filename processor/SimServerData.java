@@ -137,7 +137,7 @@ public class SimServerData {
             finishedVehicle.trajVehicleId = trjOutput.getTrjVehicleId(finishedVehicle.vehicleId);
             vdOutput.outputVehicleData(finishedVehicle);
         }
-        trjOutput.outputTrajData(step, workerName, vehicleList);
+        trjOutput.outputTrajData(step, vehicleList);
         // Store routes of new vehicles created since last report
         if (Settings.isOutputInitialRoutes) {
             allRoutes.addAll(randomRoutes);
