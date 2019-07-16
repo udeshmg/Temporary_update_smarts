@@ -101,17 +101,13 @@ public class SimServerData {
         updateExperimentIndices();
         if ((Settings.isVisualize)) {
             gui.getReadyToSetup();
-            if (experiments.size() == experimentIndex) {
-                resetVariablesEndOfExperiment();
-            }else{
+            if (experiments != null && experiments.size() != experimentIndex) {
                 System.out.println("Loading configuration of new simulation...");
                 runAutomatedSim();
             }
         } else {
-            if (experiments.size() == experimentIndex) {
-                resetVariablesEndOfExperiment();
-                consoleUI.acceptConsoleCommandAtSimEnd();
-            }else{
+            consoleUI.acceptConsoleCommandAtSimEnd();
+            if (experiments != null && experiments.size() != experimentIndex) {
                 System.out.println("Loading configuration of new simulation...");
                 startSimulationFromLoadedScript();
             }
@@ -368,12 +364,18 @@ public class SimServerData {
     }
 
     public void updateExperimentIndices() {
-        int runsNeed = experiments.get(experimentIndex).getNumRuns();
-        if (runIndex == runsNeed) {
-            runIndex = 1;
-            experimentIndex++;
-        } else {
-            runIndex++;
+        if(experiments != null) {
+            if (experiments.size() == experimentIndex) {
+                resetVariablesEndOfExperiment();
+            }else {
+                int runsNeed = experiments.get(experimentIndex).getNumRuns();
+                if (runIndex == runsNeed) {
+                    runIndex = 1;
+                    experimentIndex++;
+                } else {
+                    runIndex++;
+                }
+            }
         }
     }
 
