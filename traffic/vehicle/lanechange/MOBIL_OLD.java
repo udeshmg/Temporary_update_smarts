@@ -128,10 +128,10 @@ public class MOBIL_OLD {
             // Encourage change for making a turn
             if (Settings.isDriveOnLeft && vehicle.edgeBeforeTurnLeft != null
                     && vehicle.lane.laneNumber >= currentEdge.numLeftLanes) {
-                incentive = 5;
+                incentive = 50;
             } else if (!Settings.isDriveOnLeft && vehicle.edgeBeforeTurnRight != null
                     && vehicle.lane.laneNumber >= currentEdge.numRightLanes) {
-                incentive = 5;
+                incentive = 50;
             }
             // Encourage change for giving way to priority vehicle based on emergency strategy
             if (vehicle.lane.edge.isEdgeOnPathOfPriorityVehicle() && (vehicle.type != VehicleType.PRIORITY)
@@ -143,10 +143,10 @@ public class MOBIL_OLD {
             // Encourage change for making a turn
             if (Settings.isDriveOnLeft && vehicle.edgeBeforeTurnRight != null
                     && (vehicle.lane.laneNumber < (currentEdge.getLaneCount() - currentEdge.numRightLanes))) {
-                incentive = 5;
+                incentive = 50;
             } else if (!Settings.isDriveOnLeft && vehicle.edgeBeforeTurnLeft != null
                     && (vehicle.lane.laneNumber < (currentEdge.getLaneCount() - currentEdge.numLeftLanes))) {
-                incentive = 5;
+                incentive = 50;
             }
         }
 
