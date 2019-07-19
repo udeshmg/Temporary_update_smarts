@@ -16,6 +16,7 @@ import java.util.Comparator;
 public class SerializableExternalVehicle {
 	public boolean foreground;
 	public String id;
+	public int vid;
 	public double startTime;
 	public String vehicleType;
 	public String driverProfile;
@@ -26,12 +27,13 @@ public class SerializableExternalVehicle {
 
 	}
 
-	public SerializableExternalVehicle(final boolean foreground, final String id, final double startTime,
+	public SerializableExternalVehicle(final boolean foreground, final String id, int vid, final double startTime,
 			final String vehicleType, final String driverProfile, final double repeatRate,
 			final ArrayList<SerializableRouteLeg> route) {
 		super();
 		this.foreground = foreground;
 		this.id = id;
+		this.vid = vid;
 		this.startTime = startTime;
 		this.vehicleType = vehicleType;
 		this.driverProfile = driverProfile;
@@ -43,12 +45,13 @@ public class SerializableExternalVehicle {
 		final String[] fields = vehicle.split(Settings.delimiterItem);
 		final boolean foreground = Boolean.parseBoolean(fields[0]);
 		final String id = fields[1];
-		final double start_time = Double.parseDouble(fields[2]);
-		final String type = fields[3];
-		final String driverProfile = fields[4];
-		final double repeatRate = Double.parseDouble(fields[5]);
-		final ArrayList<SerializableRouteLeg> route = getRouteFromString(fields[6], roadNetwork, idMappers, nodeIdComparator);
-		return new SerializableExternalVehicle(foreground, id, start_time, type,
+		final int vid = Integer.parseInt(fields[2]);
+		final double start_time = Double.parseDouble(fields[3]);
+		final String type = fields[4];
+		final String driverProfile = fields[5];
+		final double repeatRate = Double.parseDouble(fields[6]);
+		final ArrayList<SerializableRouteLeg> route = getRouteFromString(fields[7], roadNetwork, idMappers, nodeIdComparator);
+		return new SerializableExternalVehicle(foreground, id, vid, start_time, type,
 				driverProfile, repeatRate, route);
 	}
 

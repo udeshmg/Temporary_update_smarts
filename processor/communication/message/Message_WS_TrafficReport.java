@@ -83,6 +83,7 @@ public class Message_WS_TrafficReport {
 				sVehicle.length = v.type.length;
 				sVehicle.numLinksToGo = v.getRouteLegCount() - 1 - v.indexLegOnRoute;
 				sVehicle.id = v.id;
+				sVehicle.vid = v.vid;
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
 				sVehicle.edgeIndex = v.lane.edge.index;
@@ -127,7 +128,7 @@ public class Message_WS_TrafficReport {
 						routeLeg.stopover);
 				routeDumpPoints.add(point);
 			}
-			list.add(new SerializableRouteDump(vehicle.id, vehicle.type.name(), vehicle.timeRouteStart, routeDumpPoints,
+			list.add(new SerializableRouteDump(vehicle.id, vehicle.vid, vehicle.type.name(), vehicle.timeRouteStart, routeDumpPoints,
 					vehicle.driverProfile.name()));
 		}
 
@@ -145,7 +146,9 @@ public class Message_WS_TrafficReport {
 	public List<Serializable_Finished_Vehicle> getFinishedListFromVehicles(List<Vehicle> vehiclesFinished, double timeNow){
 		List<Serializable_Finished_Vehicle> finishedVehicles = new ArrayList<>();
 		for (Vehicle vehicle : vehiclesFinished) {
-			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, 1,
+			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, vehicle.vid,
+					vehicle.getRouteLeg(0).edge.startNode.index,
+					vehicle.getRouteLeg(vehicle.getRouteLegCount()-1).edge.endNode.index,
 					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), getRoute(vehicle.getRouteLegs()));
 			finishedVehicles.add(finishedVehicle);
 		}

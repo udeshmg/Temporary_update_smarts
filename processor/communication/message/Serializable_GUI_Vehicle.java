@@ -11,6 +11,7 @@ public class Serializable_GUI_Vehicle {
 	public double length;
 	public int numLinksToGo;
 	public String id;
+	public int vid;
 	public String worker;
 	public String driverProfile;
 	public int edgeIndex;

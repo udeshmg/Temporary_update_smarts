@@ -39,7 +39,6 @@ public class TrjOutput {
     private int maxX;
     private int maxY;
     private FileOutputStream fos;
-    private Map<String, Integer> vehicleIds;
     private int vehicleIndex = 0;
     private int noOfWorkers;
     private int noStepsPerSecond;
@@ -56,20 +55,11 @@ public class TrjOutput {
         this.minLat = minLat;
         this.maxX = (int) Math.ceil(width/metresPerUnit) + 25;
         this.maxY = (int) Math.ceil(height/metresPerUnit) + 25;
-        this.vehicleIds = new HashMap<>();
     }
 
     public void outputMapData(){
         outputStringToFile(fos, getFormatBytes('L', 1.04f));
         outputStringToFile(fos, getDimensionBytes(1, metresPerUnit, 0, 0, maxX, maxY));
-    }
-
-    private int getVehicleId(String vehicleId){
-        if(!vehicleIds.containsKey(vehicleId)){
-            vehicleIds.put(vehicleId, vehicleIndex);
-            vehicleIndex++;
-        }
-        return vehicleIds.get(vehicleId);
     }
 
     public void outputTrajData(int step, List<Serializable_GUI_Vehicle> gui_vehicles){
@@ -79,7 +69,7 @@ public class TrjOutput {
     public void outputTimeStepData(int timestep, List<Serializable_GUI_Vehicle> vehicles){
         outputStringToFile(fos, getTimeStepBytes((float) timestep/(float) noStepsPerSecond));
         for (Serializable_GUI_Vehicle vehicle : vehicles) {
-            int vehicleId = getVehicleId(vehicle.id);
+            int vehicleId = vehicle.vid;
             int linkId = vehicle.edgeIndex;
             int laneId = vehicle.laneIndex;
             float frontX = (float) RoadUtil.getDistInMeters(minLat, minLon,minLat,  vehicle.lonHead)/metresPerUnit;
@@ -168,7 +158,4 @@ public class TrjOutput {
         return bytebuf.array();
     }
 
-    public int getTrjVehicleId(String vehicleId){
-        return vehicleIds.get(vehicleId);
-    }
 }

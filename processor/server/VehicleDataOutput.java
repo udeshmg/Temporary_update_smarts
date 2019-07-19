@@ -36,8 +36,10 @@ public class VehicleDataOutput {
 
     public void outputVehicleData(Serializable_Finished_Vehicle vehicle){
         StringBuilder sb = new StringBuilder();
-        sb.append(vehicle.vehicleId+",");
-        sb.append(vehicle.trajVehicleId+",");
+        sb.append(vehicle.id+",");
+        sb.append(vehicle.vid+",");
+        sb.append(vehicle.source+",");
+        sb.append(vehicle.destination+",");
         sb.append(vehicle.bestTravelTime+",");
         sb.append(vehicle.actualTravelTime+",");
         sb.append(vehicle.routeLength+",");

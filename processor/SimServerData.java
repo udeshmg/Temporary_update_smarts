@@ -134,7 +134,6 @@ public class SimServerData {
             }
         }
         for (Serializable_Finished_Vehicle finishedVehicle : finished) {
-            finishedVehicle.trajVehicleId = trjOutput.getTrjVehicleId(finishedVehicle.vehicleId);
             vdOutput.outputVehicleData(finishedVehicle);
         }
         trjOutput.outputTrajData(step, vehicleList);

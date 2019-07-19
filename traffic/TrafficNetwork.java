@@ -114,7 +114,7 @@ public class TrafficNetwork extends RoadNetwork {
 	 */
 	void addNewVehicle(final VehicleType type, final boolean isExternal, final boolean foreground,
 			final ArrayList<RouteLeg> routeLegs, final String idPrefix, final double timeRouteStart,
-			final String externalId, final DriverProfile dP) {
+			final String externalId, final int vid, final DriverProfile dP) {
 		// Do not proceed if the route is empty
 		if (routeLegs.size() < 1) {
 			return;
@@ -152,6 +152,7 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 			// Assign vehicle ID
 			vehicle.id = idPrefix + Long.toString(numInternalVehicleAllTime);
+			vehicle.vid = numInternalVehicleAllTime;
 			// Add vehicle to system
 			vehicles.add(vehicle);
 
@@ -159,6 +160,7 @@ public class TrafficNetwork extends RoadNetwork {
 		} else {
 			// Add external vehicle to system
 			vehicle.id = externalId;
+			vehicle.vid = vid;
 			vehicles.add(vehicle);
 			vehicle.park(true, timeRouteStart);
 		}
@@ -274,7 +276,7 @@ public class TrafficNetwork extends RoadNetwork {
 			final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 			if (vehicle.numberRepeatPerSecond <= 0) {
 				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
-						vehicle.startTime, vehicle.id, DriverProfile.valueOf(vehicle.driverProfile));
+						vehicle.startTime, vehicle.id, vehicle.vid, DriverProfile.valueOf(vehicle.driverProfile));
 			} else {
 				// This is a simple way to get number of vehicles per step. The result number may be inaccurate.
 				final double numRepeatPerStep = vehicle.numberRepeatPerSecond / Settings.numStepsPerSecond;
@@ -305,7 +307,7 @@ public class TrafficNetwork extends RoadNetwork {
 				}
 				ArrayList<RouteLeg> route = createOneRandomInternalRoute(type);
 				if (route != null) {
-					addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "",
+					addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", -1,
 							getRandomDriverProfile());
 				}
 			}
@@ -391,7 +393,7 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 		}
 		if (route != null) {
-			addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", getRandomDriverProfile());
+			addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", -1, getRandomDriverProfile());
 		}
 	}
 
@@ -626,7 +628,7 @@ public class TrafficNetwork extends RoadNetwork {
 				final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 				final DriverProfile profile = DriverProfile.valueOf(vehicle.driverProfile);
 				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
-						timeNow, vehicle.id + "_time_" + timeNow + "_" + i, profile);
+						timeNow, vehicle.id + "_time_" + timeNow + "_" + i, vehicle.vid,  profile);
 			}
 		}
 	}

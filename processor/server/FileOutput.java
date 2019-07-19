@@ -145,7 +145,7 @@ public class FileOutput {
 			// Print column titles
 			vdFos = new FileOutputStream(fileTrj, true);
 			outputStringToFile(vdFos,
-					"VehicleID,TrjVehicleID,BestTravelTime,ActualTravelTime,RouteLength,Route" + System.getProperty("line.separator"));
+					"ID,VID,Source,Destination,BestTravelTime,ActualTravelTime,RouteLength,Route" + System.getProperty("line.separator"));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -192,7 +192,7 @@ public class FileOutput {
 				final StringBuilder sb = new StringBuilder();
 				for (final SerializableRouteDump route : routes) {
 					sb.append("<vehicle ");
-					sb.append("id=\"" + route.vehicleId + "\" type=\"" + route.type + "\" start_time=\""
+					sb.append("id=\"" + route.vehicleId + "\" vid=\"" + route.vid +"\" type=\"" + route.type + "\" start_time=\""
 							+ route.startTime + "\" driverProfile=\"" + route.driverProfile + "\">"
 							+ System.getProperty("line.separator"));
 					for (final SerializableRouteDumpPoint point : route.routeDumpPoints) {

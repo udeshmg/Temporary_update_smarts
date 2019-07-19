@@ -121,6 +121,8 @@ public class RouteLoader {
 						sbOneV.append(String.valueOf(foreground) + Settings.delimiterItem);
 						// Vehicle ID
 						sbOneV.append(attributes.getValue("id") + Settings.delimiterItem);
+						// Vehicle VID
+						sbOneV.append(attributes.getValue("vid") + Settings.delimiterItem);
 						// Vehicle start time (earliest time the vehicle could be released from parking)
 						String start_time = attributes.getValue("start_time");
 						if (start_time == null) {

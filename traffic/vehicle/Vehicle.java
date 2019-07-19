@@ -19,6 +19,7 @@ import traffic.vehicle.lanechange.MOBILInput;
 
 public class Vehicle {
 	public String id = "";
+	public int vid = -1;
 	private List<RouteLeg> routeLegs = new ArrayList<>(1000);
 	public VehicleType type = null;
 	public double headPosition = 0;

@@ -22,8 +22,10 @@ package processor.communication.message;
  * Created by tmuthugama on 4/10/2019
  */
 public class Serializable_Finished_Vehicle {
-    public String vehicleId;
-    public int trajVehicleId;
+    public String id;
+    public int vid;
+    public int source;
+    public int destination;
     public double bestTravelTime;
     public double actualTravelTime;
     public double routeLength;
@@ -32,9 +34,11 @@ public class Serializable_Finished_Vehicle {
     public Serializable_Finished_Vehicle() {
     }
 
-    public Serializable_Finished_Vehicle(String vehicleId, int trajVehicleId, double bestTravelTime, double actualTravelTime, double routeLength, String route) {
-        this.vehicleId = vehicleId;
-        this.trajVehicleId = trajVehicleId;
+    public Serializable_Finished_Vehicle(String id, int vid, int source, int destination, double bestTravelTime, double actualTravelTime, double routeLength, String route) {
+        this.id = id;
+        this.vid = vid;
+        this.source = source;
+        this.destination = destination;
         this.bestTravelTime = bestTravelTime;
         this.actualTravelTime = actualTravelTime;
         this.routeLength = routeLength;
