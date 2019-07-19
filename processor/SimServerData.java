@@ -342,6 +342,9 @@ public class SimServerData {
         Settings.isAllowReroute = experiment.isAllowReroute();
         Settings.downloadDirectory = experiment.getDownLoadDirectory();
         Settings.testName = experiment.getTestName();
+        Settings.odDistributor = experiment.getOdDistributor();
+        Settings.temporalDistributor = experiment.getTemporalDistributor();
+        Settings.simulationListener = experiment.getSimulationListener();
 
         return isNewMap;
     }
