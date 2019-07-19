@@ -144,6 +144,9 @@ public class SimWorkerData {
 
     public void buildEnvironment(ArrayList<GridCell> workCells, String workerName){
         trafficNetwork.buildEnvironment(workCells, workerName, step);
+        if(Settings.getSimulationListener() != null) {
+            Settings.getSimulationListener().onStart(trafficNetwork, Settings.maxNumSteps, (int) Settings.numStepsPerSecond);
+        }
     }
 
     public int getStep() {
