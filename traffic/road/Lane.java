@@ -51,7 +51,7 @@ public class Lane {
 	 * GPS coordinates of start/end points
 	 *
 	 */
-	public double latStart, lonStart, latEnd, lonEnd, latLength, lonLength;
+	public double latStart, lonStart, latEnd, lonEnd;
 	public VehiclePositionComparator vehiclePositionComparator = new VehiclePositionComparator();
 
 	public Lane(final Edge edge) {

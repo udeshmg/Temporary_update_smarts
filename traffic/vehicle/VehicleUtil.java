@@ -18,10 +18,13 @@ public class VehicleUtil {
 		final double headToEdgeRatio = v.headPosition / v.lane.edge.length;
 		final double tailToEdgeRatio = (v.headPosition - v.length) / v.lane.edge.length;
 
-		final double headLon = v.lane.lonStart + (headToEdgeRatio * v.lane.lonLength);
-		final double headLat = v.lane.latStart + (headToEdgeRatio * v.lane.latLength);
-		final double tailLon = v.lane.lonStart + (tailToEdgeRatio * v.lane.lonLength);
-		final double tailLat = v.lane.latStart + (tailToEdgeRatio * v.lane.latLength);
+		final double lonLength = v.lane.lonEnd - v.lane.lonStart;
+		final double latLength = v.lane.latEnd - v.lane.latStart;
+
+		final double headLon = v.lane.lonStart + (headToEdgeRatio * lonLength);
+		final double headLat = v.lane.latStart + (headToEdgeRatio * latLength);
+		final double tailLon = v.lane.lonStart + (tailToEdgeRatio * lonLength);
+		final double tailLat = v.lane.latStart + (tailToEdgeRatio * latLength);
 
 		final double[] coords = { headLon, headLat, tailLon, tailLat };
 		return coords;

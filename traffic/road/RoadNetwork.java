@@ -585,8 +585,6 @@ public class RoadNetwork {
 			lane.latStart = gpsPoints[1];
 			lane.lonEnd = gpsPoints[2];
 			lane.latEnd = gpsPoints[3];
-			lane.lonLength = lane.lonEnd - lane.lonStart;
-			lane.latLength = lane.latEnd - lane.latStart;
 		}
 
 		/*
