@@ -2,6 +2,7 @@ package common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import processor.SimulationListener;
 import traffic.network.ODDistributor;
@@ -99,10 +100,14 @@ public class Settings {
 	 * Routing
 	 */
 	public static Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA;//Routing algorithm
-	public static double minLengthOfRouteStartEndEdge = 10;//In meters. This may affect whether there is enough space to insert vehicle.
-	public static ArrayList<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
-	public static ArrayList<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
-	public static ArrayList<double[]> listRouteSourceDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start or end
+	public static double minLengthOfRouteStartEndEdge = 20;//In meters. This may affect whether there is enough space to insert vehicle.
+	public static List<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
+	public static List<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
+	public static List<double[]> listRouteSourceDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start or end
+
+	public static List<double[]> guiSourceWindowsForInternalVehicle = new ArrayList<>();//List of windows where random routes start
+	public static List<double[]> guiDestinationWindowsForInternalVehicle = new ArrayList<>();//List of windows where random routes end
+	public static List<double[]> guiSourceDestinationWindowsForInternalVehicle = new ArrayList<>();//List of windows where random routes start or end
 	public static boolean isAllowPriorityVehicleUseTramTrack = true;//Whether priority vehicles can use tram edge
 
 	/*

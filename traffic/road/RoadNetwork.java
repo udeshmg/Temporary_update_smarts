@@ -2,10 +2,7 @@ package traffic.road;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import common.Settings;
 
@@ -596,7 +593,7 @@ public class RoadNetwork {
 
 	}
 
-	public boolean isNodeInsideRectangle(final Node node, final ArrayList<double[]> listRect) {
+	public boolean isNodeInsideRectangle(final Node node, final List<double[]> listRect) {
 		for (final double[] rect : listRect) {
 			if ((node.lon >= rect[0]) && (node.lon <= rect[2]) && (node.lat >= rect[3]) && (node.lat <= rect[1])) {
 				return true;

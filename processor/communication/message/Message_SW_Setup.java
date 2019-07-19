@@ -1,6 +1,7 @@
 package processor.communication.message;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import common.Settings;
 import processor.server.WorkerMeta;
@@ -127,7 +128,7 @@ public class Message_SW_Setup {
 		return list;
 	}
 
-	ArrayList<Serializable_GPS_Rectangle> getListRouteWindow(final ArrayList<double[]> windows) {
+	ArrayList<Serializable_GPS_Rectangle> getListRouteWindow(final List<double[]> windows) {
 		final ArrayList<Serializable_GPS_Rectangle> list = new ArrayList<>();
 		for (final double[] window : windows) {
 			list.add(new Serializable_GPS_Rectangle(window[0], window[1], window[2], window[3]));

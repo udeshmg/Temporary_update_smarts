@@ -21,10 +21,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -1051,17 +1048,17 @@ public class MonitorPanel extends JPanel {
 	}
 
 	public double[] getSourceDestinationWindowAtPoint(final double lat, final double lon) {
-		double[] windowFound = getWindowAtPoint(Settings.listRouteSourceWindowForInternalVehicle, lon, lat);
+		double[] windowFound = getWindowAtPoint(Settings.guiSourceWindowsForInternalVehicle, lon, lat);
 		if (windowFound == null) {
-			windowFound = getWindowAtPoint(Settings.listRouteDestinationWindowForInternalVehicle, lon, lat);
+			windowFound = getWindowAtPoint(Settings.guiDestinationWindowsForInternalVehicle, lon, lat);
 		}
 		if (windowFound == null) {
-			windowFound = getWindowAtPoint(Settings.listRouteSourceDestinationWindowForInternalVehicle, lon, lat);
+			windowFound = getWindowAtPoint(Settings.guiSourceDestinationWindowsForInternalVehicle, lon, lat);
 		}
 		return windowFound;
 	}
 
-	double[] getWindowAtPoint(final ArrayList<double[]> windowList, final double lon, final double lat) {
+	double[] getWindowAtPoint(final List<double[]> windowList, final double lon, final double lat) {
 		double topLeftLon, topLeftLat, btmRightLon, btmRightLat;
 		for (final double[] window : windowList) {
 			topLeftLon = window[0];
@@ -1340,15 +1337,15 @@ public class MonitorPanel extends JPanel {
 		g2d.setColor(Color.magenta);
 		final float dash[] = { 4.0f };
 		g2d.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
-		for (final double[] window : Settings.listRouteSourceWindowForInternalVehicle) {
+		for (final double[] window : Settings.guiSourceWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("S", convertLonToX(window[0]) - 20, convertLatToY(window[1]) + 20);
 		}
-		for (final double[] window : Settings.listRouteDestinationWindowForInternalVehicle) {
+		for (final double[] window : Settings.guiDestinationWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("D", convertLonToX(window[0]) - 20, convertLatToY(window[1]) + 20);
 		}
-		for (final double[] window : Settings.listRouteSourceDestinationWindowForInternalVehicle) {
+		for (final double[] window : Settings.guiSourceDestinationWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("S/D", convertLonToX(window[0]) - 40, convertLatToY(window[1]) + 20);
 		}
@@ -1535,12 +1532,12 @@ public class MonitorPanel extends JPanel {
 	}
 
 	void removeSourceDestinationWindow(final double[] windowToRemove) {
-		removeWindow(Settings.listRouteSourceWindowForInternalVehicle, windowToRemove);
-		removeWindow(Settings.listRouteDestinationWindowForInternalVehicle, windowToRemove);
-		removeWindow(Settings.listRouteSourceDestinationWindowForInternalVehicle, windowToRemove);
+		removeWindow(Settings.guiSourceWindowsForInternalVehicle, windowToRemove);
+		removeWindow(Settings.guiDestinationWindowsForInternalVehicle, windowToRemove);
+		removeWindow(Settings.guiSourceDestinationWindowsForInternalVehicle, windowToRemove);
 	}
 
-	void removeWindow(final ArrayList<double[]> windowList, final double[] windowToRemove) {
+	void removeWindow(final List<double[]> windowList, final double[] windowToRemove) {
 		for (int i = 0; i < windowList.size(); i++) {
 			boolean isMatch = true;
 			for (int j = 0; j < 4; j++) {
@@ -1672,15 +1669,15 @@ public class MonitorPanel extends JPanel {
 				final ActionListener menuListener = new ActionListener() {
 					public void actionPerformed(final ActionEvent event) {
 						if (event.getActionCommand().equalsIgnoreCase("Set as source")) {
-							Settings.listRouteSourceWindowForInternalVehicle.add(getCoordOfQueryWindow());
+							Settings.guiSourceWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Set as destination")) {
-							Settings.listRouteDestinationWindowForInternalVehicle.add(getCoordOfQueryWindow());
+							Settings.guiDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Set as source and destination")) {
-							Settings.listRouteSourceDestinationWindowForInternalVehicle.add(getCoordOfQueryWindow());
+							Settings.guiSourceDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Download road network")) {

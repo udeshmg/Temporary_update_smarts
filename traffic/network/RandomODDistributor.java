@@ -1,8 +1,11 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.RoadNetwork;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,5 +41,20 @@ public class RandomODDistributor extends ODDistributor{
     @Override
     public Edge getEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleEndEdges) {
         return possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
+    }
+
+    @Override
+    public List<double[]> getSourceWidows(RoadNetwork network) {
+        return Settings.guiSourceWindowsForInternalVehicle;
+    }
+
+    @Override
+    public List<double[]> getDestinationWidows(RoadNetwork network) {
+        return Settings.guiDestinationWindowsForInternalVehicle;
+    }
+
+    @Override
+    public List<double[]> getSourceDestinationWidows(RoadNetwork network) {
+        return Settings.guiSourceDestinationWindowsForInternalVehicle;
     }
 }

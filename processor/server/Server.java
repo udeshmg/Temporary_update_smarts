@@ -25,6 +25,7 @@ import processor.communication.message.Message_WS_ServerBased_SharedMyTrafficWit
 import processor.communication.message.Message_WS_Serverless_Complete;
 import processor.communication.message.Message_WS_SetupCreatingVehicles;
 import processor.communication.message.Message_WS_SetupDone;
+import traffic.network.ODDistributor;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
 
@@ -270,6 +271,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			data.getRoadNetwork().buildGrid();
 			WorkloadBalancer.partitionGridCells(workerMetas, data.getRoadNetwork());
 		}
+		assignODWindows();
 
 		// Determine the number of internal vehicles at all workers
 		WorkloadBalancer.assignNumInternalVehiclesToWorkers(workerMetas, data.getRoadNetwork());
@@ -292,6 +294,13 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 		System.out.println("Sent simulation configuration to all workers.");
 
+	}
+
+	private void assignODWindows(){
+		ODDistributor odDistributor = Settings.getODDistributor();
+		Settings.listRouteSourceWindowForInternalVehicle = odDistributor.getSourceWidows(getRoadNetwork());
+		Settings.listRouteDestinationWindowForInternalVehicle = odDistributor.getDestinationWidows(getRoadNetwork());
+		Settings.listRouteSourceDestinationWindowForInternalVehicle = odDistributor.getSourceDestinationWidows(getRoadNetwork());
 	}
 
 	@Override
