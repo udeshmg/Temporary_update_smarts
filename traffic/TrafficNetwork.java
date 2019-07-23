@@ -707,9 +707,15 @@ public class TrafficNetwork extends RoadNetwork {
 	 *
 	 */
 	public void releaseVehicleFromParking(final double timeNow) {
-		for (int i = 0; i < vehicles.size(); i++) {
-			final Vehicle vehicle = vehicles.get(i);
-			vehicle.startFromParking(timeNow);
+		for (Edge edge : edges) {
+			Vehicle next = edge.getVehicleToGetIntoTheLane();
+			if(next == null) {
+				next = edge.getNextParkedVehicle(timeNow);
+			}
+			edge.setNextVehicleToGetIntoTheLane(next);
+			if(next != null){
+				next.startFromParking();
+			}
 		}
 	}
 

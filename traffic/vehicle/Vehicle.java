@@ -9,6 +9,7 @@ import processor.worker.Fellow;
 import processor.worker.Simulation;
 import traffic.road.Edge;
 import traffic.road.Lane;
+import traffic.road.Node;
 import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
@@ -72,7 +73,7 @@ public class Vehicle {
 	public double getStartPositionInLane0() {
 		Edge currentEdge = routeLegs.get(indexLegOnRoute).edge;
 
-		double headPosSpaceFront = currentEdge.length;
+		double headPosSpaceFront = currentEdge.length - currentEdge.getEndIntersectionSize();
 
 		if (indexLegOnRoute + 1 < routeLegs.size()) {
 			RouteLeg legToCheck = routeLegs.get(indexLegOnRoute + 1);
@@ -87,19 +88,10 @@ public class Vehicle {
 			}
 		}
 
-		double headPosSpaceBack = 0;
+		double headPosSpaceBack = getNonCollidingHeadPosSpaceBack(currentEdge) + length;
 
-		if (indexLegOnRoute > 0) {
-			RouteLeg legToCheck = routeLegs.get(indexLegOnRoute - 1);
-			Lane laneToCheck = legToCheck.edge.getFirstLane();
-			if (laneToCheck.getVehicleCount() > 0) {
-				Vehicle vehicleToCheck = laneToCheck.getFrontVehicleInLane();
-				double headPosOfFirstVehicleOnPreviousLeg = -(laneToCheck.edge.length - vehicleToCheck.headPosition);
-				if (headPosSpaceBack - length < headPosOfFirstVehicleOnPreviousLeg) {
-					headPosSpaceBack = headPosOfFirstVehicleOnPreviousLeg + length;
-				}
-			}
-		}
+		headPosSpaceFront = headPosSpaceFront - driverProfile.IDM_s0;
+		headPosSpaceBack = headPosSpaceBack + driverProfile.IDM_s0;
 
 		if (headPosSpaceFront <= headPosSpaceBack)
 			return -1;
@@ -109,10 +101,12 @@ public class Vehicle {
 
 			double gapFront = headPosSpaceFront;
 			for (Vehicle vehicleToCheck : currentEdge.getFirstLane().getVehicles()) {
-				if (gapFront - length > vehicleToCheck.headPosition) {
-					gaps.add(new double[] { gapFront, vehicleToCheck.headPosition + length });
+				double safePosFromLaneVehicle = vehicleToCheck.headPosition +
+						vehicleToCheck.getUnsafeDistanceForVehiclesFromParking() + driverProfile.IDM_s0;
+				if (gapFront - length > safePosFromLaneVehicle) {
+					gaps.add(new double[] { gapFront, safePosFromLaneVehicle + length });
 				}
-				gapFront = vehicleToCheck.headPosition - vehicleToCheck.length;
+				gapFront = vehicleToCheck.headPosition - (vehicleToCheck.length + driverProfile.IDM_s0);
 				if (gapFront < headPosSpaceBack) {
 					break;
 				}
@@ -123,8 +117,9 @@ public class Vehicle {
 		} else {
 			gaps.add(new double[] { headPosSpaceFront, headPosSpaceBack });
 		}
-
-		List<double[]> validGaps = getValidGaps(gaps);
+		double minGapBack = currentEdge.getStartIntersectionSize() + driverProfile.IDM_s0 + length;
+		double minGapFront = currentEdge.getEndIntersectionSize() + driverProfile.IDM_s0;
+		List<double[]> validGaps = getValidGaps(gaps, currentEdge.length, minGapBack, minGapFront);
 		if (validGaps.size() == 0) {
 			return -1;
 		} else {
@@ -132,15 +127,41 @@ public class Vehicle {
 			// Pick a random position within a random gap
 			final double[] gap = validGaps.get(random.nextInt(validGaps.size()));
 
-			final double pos = gap[1] + length + (random.nextDouble() * (gap[0] - gap[1]) * Settings.startPosOffset);
+			final double pos = gap[1] + (random.nextDouble() * (gap[0] - gap[1]) * Settings.startPosOffset);
 			return pos;
 		}
 	}
 
-	public List<double[]> getValidGaps(List<double[]> gaps){
+	public double getNonCollidingHeadPosSpaceBack(Edge current){
+		Node incomingJunc = current.startNode;
+		List<Edge> inEdges = incomingJunc.inwardEdges;
+		double maxHeadPos = current.getStartIntersectionSize();
+		for (Edge inEdge : inEdges) {
+			Lane lane = inEdge.getLane(0);
+			Vehicle first = lane.getFrontVehicleInLane();
+			if(first != null) {
+				Edge next = first.getNextEdge();
+				if (next != null && next.index == current.index) {
+					double remainingDist = getUnsafeDistanceForVehiclesFromParking() - (inEdge.length - first.headPosition);
+					if (maxHeadPos < remainingDist) {
+						maxHeadPos = remainingDist;
+					}
+				}
+			}
+		}
+		return maxHeadPos;
+	}
+
+	public double getUnsafeDistanceForVehiclesFromParking(){
+		return speed * driverProfile.IDM_T;
+	}
+
+
+	public List<double[]> getValidGaps(List<double[]> gaps, double laneLength, double minGapBack, double minGapFront){
+		double effectiveLength = laneLength - minGapBack - minGapFront;
 		List<double[]> validGaps = new ArrayList<>();
 		for (double[] gap : gaps) {
-			if (gap[1] <= (Settings.startGapOffset) * length) {
+			if (gap[1] <= (minGapBack) + (Settings.startGapOffset) * effectiveLength) {
 				validGaps.add(gap);
 			}
 		}
@@ -168,21 +189,23 @@ public class Vehicle {
 	/**
 	 * Moves vehicle from parking area onto roads.
 	 */
-	public void startFromParking(double timeNow) {
-		if (active && (lane == null) && (timeNow >= earliestTimeToLeaveParking)) {
-			final RouteLeg leg = routeLegs.get(indexLegOnRoute);
-			final Edge edge = leg.edge;
-			final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
-			final double pos = getStartPositionInLane0();
-			if (pos >= 0) {
-				edge.removeParkedVehicle(this);
-				this.lane = lane;
-				headPosition = pos;
-				startHeadPosition = headPosition;
-				speed = 0;
-				lane.addVehicleToLane(this);
-			}
+	public void startFromParking() {
+		final RouteLeg leg = routeLegs.get(indexLegOnRoute);
+		final Edge edge = leg.edge;
+		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
+		final double pos = getStartPositionInLane0();
+		if (pos >= 0) {
+			this.lane = lane;
+			headPosition = pos;
+			startHeadPosition = headPosition;
+			speed = 0;
+			lane.addVehicleToLane(this);
+			edge.setNextVehicleToGetIntoTheLane(null);
 		}
+	}
+
+	public boolean isStartFromParking(double timeNow){
+		return active && (lane == null) && (timeNow >= earliestTimeToLeaveParking);
 	}
 
 	public void changeLane(final double timeNow){

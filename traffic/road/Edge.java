@@ -1,8 +1,6 @@
 package traffic.road;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import common.Settings;
 import traffic.light.LightColor;
@@ -73,7 +71,8 @@ public class Edge {
 	/**
 	 * Collection of vehicles that are parked along this edge.
 	 */
-	private ArrayList<Vehicle> parkedVehicles = new ArrayList<>(100);
+	private PriorityQueue<Vehicle> parkedVehicles = new PriorityQueue<>(getParkedVehicleComparator());
+	private Vehicle vehicleToGetIntoTheLane = null;
 	/**
 	 * List of tram routes passing this edge.
 	 */
@@ -294,13 +293,39 @@ public class Edge {
 		parkedVehicles.add(v);
 	}
 
-	public void removeParkedVehicle(Vehicle v){
-		parkedVehicles.remove(v);
-	}
-
 	public void clearParkedVehicles(){
 		parkedVehicles.clear();
 	}
+
+	public Comparator<Vehicle> getParkedVehicleComparator(){
+		return new Comparator<Vehicle>() {
+			@Override
+			public int compare(Vehicle v1, Vehicle v2) {
+				if(v1.earliestTimeToLeaveParking < v2.earliestTimeToLeaveParking){
+					return -1;
+				}else if(v1.earliestTimeToLeaveParking > v2.earliestTimeToLeaveParking){
+					return 1;
+				}
+				return 0;
+			}
+		};
+	}
+
+	public Vehicle getNextParkedVehicle(double timeNow){
+		Vehicle v =  parkedVehicles.peek();
+		if(v != null && v.isStartFromParking(timeNow)){
+			return parkedVehicles.poll();
+		}
+		return null;
+	}
+
+    public Vehicle getVehicleToGetIntoTheLane() {
+        return vehicleToGetIntoTheLane;
+    }
+
+    public void setNextVehicleToGetIntoTheLane(Vehicle vehicle){
+	    vehicleToGetIntoTheLane = vehicle;
+    }
 
 	public double getStartIntersectionSize(){
 		return startNode.getIntersectionSize(endNode);
