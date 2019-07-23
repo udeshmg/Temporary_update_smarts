@@ -1,15 +1,6 @@
 package processor.server.gui;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -22,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -288,6 +280,7 @@ public class MonitorPanel extends JPanel {
 	ArrayList<Serializable_GUI_Vehicle> vehicleObjects = new ArrayList<>();
 	ArrayList<Serializable_GUI_Light> lightObjects = new ArrayList<>();
 	ArrayList<EdgeObject> edgeObjects = new ArrayList<>(300000);
+	List<DrawingObject.NodeObject> nodeObjects = new ArrayList<>();
 	ArrayList<TramStopObject> tramStopObjects = new ArrayList<>(3000);
 	Point2D.Double queryWindowTopLeft = null, queryWindowBottomRight = null;
 	boolean isReceivingData = false;
@@ -826,29 +819,23 @@ public class MonitorPanel extends JPanel {
 	 */
 	void drawRoadEdgeOnImage(final Graphics2D g2d, final Rectangle actualDrawingArea, final EdgeObject roadEdge,
 			final EdgeEndMarkerType endMarkerType) {
-		/*
-		 * Calculate final positions
-		 */
-		final int startX = (convertLonToX(roadEdge.startNodeLon));
-		final int startY = (convertLatToY(roadEdge.startNodeLat));
-		final int endX = (convertLonToX(roadEdge.endNodeLon));
-		final int endY = (convertLatToY(roadEdge.endNodeLat));
+		for (DrawingObject.LaneObject lane : roadEdge.lanes) {
 
-		/*
-		 * Draw a line representing the edge if it intersects the area shown in
-		 * the actual panel
-		 */
-		if (actualDrawingArea.intersectsLine(startX, startY, endX, endY)) {
-			g2d.drawLine(startX, startY, endX, endY);
-		}
+			/*
+			 * Calculate final positions
+			 */
+			final int startX = (convertLonToX(lane.lonStart));
+			final int startY = (convertLatToY(lane.latStart));
+			final int endX = (convertLonToX(lane.lonEnd));
+			final int endY = (convertLatToY(lane.latEnd));
 
-		/*
-		 * Draw a dot at the start node.
-		 */
-		if (endMarkerType == EdgeEndMarkerType.start) {
-			g2d.fill(new Rectangle2D.Double(startX - 5, startY - 5, 10, 10));
-		} else if (endMarkerType == EdgeEndMarkerType.end) {
-			g2d.fill(new Rectangle2D.Double(endX - 5, endY - 5, 10, 10));
+			/*
+			 * Draw a line representing the edge if it intersects the area shown in
+			 * the actual panel
+			 */
+			if (actualDrawingArea.intersectsLine(startX, startY, endX, endY)) {
+				g2d.drawLine(startX, startY, endX, endY);
+			}
 		}
 	}
 
@@ -874,6 +861,20 @@ public class MonitorPanel extends JPanel {
 				g2d.drawOval(x, y, 1, 1);
 			}
 		}
+	}
+
+	/**
+	 * Draw one tram stop on buffered image.
+	 */
+	void drawNodeOnImage(final Graphics2D g2d, final Rectangle actualDrawingArea,
+							 final DrawingObject.NodeObject nodeObject) {
+		Polygon polygon = new Polygon();
+		for (Point2D point2D : nodeObject.polygon) {
+			int x = convertLonToX(point2D.getX());
+			int y = convertLatToY(point2D.getY());
+			polygon.addPoint(x,y);
+		}
+		g2d.drawPolygon(polygon);
 	}
 
 	/**
@@ -987,7 +988,7 @@ public class MonitorPanel extends JPanel {
 						edgeAtPoint.index, false);
 				roadEdgeAtMousePoint = null;
 			} else {
-				final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edgeAtPoint.index, 0, "", 0, null);
+				final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edgeAtPoint.index, 0, "", 0, null, null);
 				roadEdgeAtMousePoint = edgeObjects
 						.get(Collections.binarySearch(edgeObjects, dummyEdge, new EdgeObjectComparator()));
 				roadIntersectionAtMousePoint = null;
@@ -1030,8 +1031,8 @@ public class MonitorPanel extends JPanel {
 		return convertXToLon(0.5 * displayPanelDimension.width);
 	}
 
-	double getMetersPerPixel(final double latitude, final int zoom) {
-		return (Math.cos((latitude * Math.PI) / 180) * 2 * Math.PI * 6371000) / (256 * (Math.pow(2, zoom)));
+	double getMetersPerPixel() {
+		return (Math.cos((maxLat * Math.PI) / 180) * 2 * Math.PI * 6371000) / (256 * (Math.pow(2, currentZoom)));
 	}
 
 	Edge getSelectedRoadEdge() {
@@ -1082,10 +1083,11 @@ public class MonitorPanel extends JPanel {
 	/**
 	 * Import the information of each edge from a string
 	 *
-	 * @param edgePositions
+	 *
 	 */
 	void importRoadEdges(final RoadNetwork roadNetwork, final double minLon, final double minLat, final double maxLon,
 			final double maxLat) {
+		nodeObjects.clear();
 		edgeObjects.clear();
 		lightObjects.clear();
 		tramStopObjects.clear();
@@ -1111,9 +1113,14 @@ public class MonitorPanel extends JPanel {
 			note += "Idx " + edge.index + ", ";
 			note += (int) (edge.freeFlowSpeed * 3.6) + "kmh";
 
+			List<DrawingObject.LaneObject> laneObjs = new ArrayList<>();
+			for (Lane lane : edge.getLanes()) {
+				DrawingObject.LaneObject laneObject = new DrawingObject.LaneObject(lane.latStart, lane.lonStart, lane.latEnd, lane.lonEnd);
+				laneObjs.add(laneObject);
+			}
 			// Create simplified edge object
 			final EdgeObject e = new EdgeObject(startNodeX, startNodeY, endNodeX, endNodeY, edge.index, numLanes, note,
-					edge.length, edge.type);
+					edge.length, edge.type, laneObjs);
 			edgeObjects.add(e);
 
 			if (edge.endNode.tramStop) {
@@ -1128,6 +1135,8 @@ public class MonitorPanel extends JPanel {
 		 * can be edited by user.
 		 */
 		for (final Node node : roadNetwork.nodes) {
+			DrawingObject.NodeObject nodeObject = new DrawingObject.NodeObject(node.lon, node.lat, node.getIntersectionPolygon());
+			nodeObjects.add(nodeObject);
 			if (node.light) {
 				final Serializable_GUI_Light lightObject = new Serializable_GUI_Light(node.lon, node.lat, "G");
 				lightObjects.add(lightObject);
@@ -1414,13 +1423,20 @@ public class MonitorPanel extends JPanel {
 				BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2d = roadNetworkImage.createGraphics();
 		g2d.setColor(new Color(224, 224, 235, 255));
+		int laneWidthPixel = (int) Math.round((Settings.laneWidthInMeters/getMetersPerPixel())*0.95);
 		final Rectangle actualDrawingArea = new Rectangle(displayPanelDimension.width, displayPanelDimension.height);
-		g2d.setStroke(new BasicStroke((int) Math.pow(currentZoom / 7, currentZoom / 5), BasicStroke.CAP_ROUND,
+		g2d.setStroke(new BasicStroke(laneWidthPixel, BasicStroke.CAP_ROUND,
 				BasicStroke.JOIN_ROUND));
 		for (final EdgeObject e : edgeObjects) {
 			drawRoadEdgeOnImage(g2d, actualDrawingArea, e, EdgeEndMarkerType.none);
 		}
-
+		g2d.setStroke(new BasicStroke((float) Math.ceil(0.1/getMetersPerPixel())));
+		g2d.setColor(Color.black);
+		for (DrawingObject.NodeObject nodeObject : nodeObjects) {
+			drawNodeOnImage(g2d, actualDrawingArea, nodeObject);
+		}
+		g2d.setStroke(new BasicStroke(laneWidthPixel, BasicStroke.CAP_ROUND,
+				BasicStroke.JOIN_ROUND));
 		g2d.setColor(Color.BLUE);
 		for (final TramStopObject t : tramStopObjects) {
 			drawTramStopOnImage(g2d, actualDrawingArea, t);
