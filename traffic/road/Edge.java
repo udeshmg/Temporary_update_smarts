@@ -301,4 +301,12 @@ public class Edge {
 	public void clearParkedVehicles(){
 		parkedVehicles.clear();
 	}
+
+	public double getStartIntersectionSize(){
+		return startNode.getIntersectionSize(endNode);
+	}
+
+	public double getEndIntersectionSize(){
+		return endNode.getIntersectionSize(startNode);
+	}
 }
