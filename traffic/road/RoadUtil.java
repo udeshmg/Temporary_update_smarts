@@ -1,6 +1,8 @@
 package traffic.road;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -320,6 +322,70 @@ public class RoadUtil {
 		return points;
 	}
 
+	/**
+	 * Calculate GPS coordinates of the start point and the end point of a lane.
+	 */
+	public static Line2D getPavementGPS(final Lane lane) {
+		final Edge edge = lane.edge;
+		final double[] points = new double[4];
+		double rotateDegree = 90;
+		if (!Settings.isDriveOnLeft) {
+			rotateDegree = -90;
+		}
+		double pavementLaneNumber;
+		if(lane.laneNumber == 0) {
+			pavementLaneNumber = lane.laneNumber - 0.75;
+		}else{
+			pavementLaneNumber = lane.laneNumber + 0.75;
+		}
+
+		// GPS of start point of lane
+		double extendedEdgeStartToEdgeRatio = 1;
+		if (edge.isOnTwoWayRoad()) {
+			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.getLaneCount() - pavementLaneNumber))
+					* Settings.laneWidthInMeters) / edge.length;
+		} else {
+			extendedEdgeStartToEdgeRatio = ((-0.5 + ((lane.edge.getLaneCount() / 2.0) - pavementLaneNumber))
+					* Settings.laneWidthInMeters) / edge.length;
+		}
+		final double lonExtendedEdgeStart = edge.startNode.lon
+				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeStartToEdgeRatio);
+		final double latExtendedEdgeStart = (edge.startNode.lat
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeStartToEdgeRatio)) * Settings.lonVsLat;
+		final double[] ptStart = { lonExtendedEdgeStart, latExtendedEdgeStart };
+		AffineTransform.getRotateInstance(Math.toRadians(rotateDegree), edge.startNode.lon,
+				edge.startNode.lat * Settings.lonVsLat).transform(ptStart, 0, ptStart, 0, 1);
+		ptStart[1] = ptStart[1] / Settings.lonVsLat;
+		points[0] = ptStart[0];
+		points[1] = ptStart[1];
+
+		// GPS of end point of lane
+		double extendedEdgeEndToEdgeRatio = 1;
+		if (edge.isOnTwoWayRoad()) {
+			extendedEdgeEndToEdgeRatio = 1
+					+ (((-0.5 + (lane.edge.getLaneCount() - pavementLaneNumber)) * Settings.laneWidthInMeters)
+					/ edge.length);
+		} else {
+			extendedEdgeEndToEdgeRatio = 1
+					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - pavementLaneNumber)) * Settings.laneWidthInMeters)
+					/ edge.length);
+		}
+
+		final Double lonExtendedEdgeEnd = edge.startNode.lon
+				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeEndToEdgeRatio);
+		final double latExtendedEdgeEnd = (edge.startNode.lat
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeEndToEdgeRatio)) * Settings.lonVsLat;
+		final double[] ptEnd = { lonExtendedEdgeEnd, latExtendedEdgeEnd };
+		AffineTransform
+				.getRotateInstance(Math.toRadians(rotateDegree), edge.endNode.lon, edge.endNode.lat * Settings.lonVsLat)
+				.transform(ptEnd, 0, ptEnd, 0, 1);
+		ptEnd[1] = ptEnd[1] / Settings.lonVsLat;
+		points[2] = ptEnd[0];
+		points[3] = ptEnd[1];
+		Line2D l = new Line2D.Double(new Point2D.Double(points[0], points[1]), new Point2D.Double(points[2], points[3]));
+		return l;
+	}
+
 	public static double getLatitudeDegreePerMeter(final double latitude) {
 		final double dist = getDistInMeters(latitude - 0.0005, 0, latitude + 0.0005, 0);
 		return 0.001 / dist;
@@ -384,5 +450,79 @@ public class RoadUtil {
 		Collections.sort(connectedNodes, nodeAngleComparator);
 
 		return connectedNodes;
+	}
+
+	public static Point2D getIntersectionPoint(Line2D l1, Line2D l2){
+		double m1 = (l1.getY2() - l1.getY1())/(l1.getX2() - l1.getX1());
+		double c1 = (l1.getY1()*l1.getX2() - l1.getY2()*l1.getX1())/(l1.getX2()-l1.getX1());
+		double m2 = (l2.getY2() - l2.getY1())/(l2.getX2() - l2.getX1());
+		double c2 = (l2.getY1()*l2.getX2() - l2.getY2()*l2.getX1())/(l2.getX2()-l2.getX1());
+
+		if(m1 != m2){
+			if(Double.isInfinite(m1) && Double.isInfinite(m2)){
+				return null;
+			}else if(Double.isInfinite(m1)){
+				double x = l1.getX1();
+				return new Point2D.Double(x, m2*x + c2);
+			}else if(Double.isInfinite(m2)){
+				double x = l2.getX1();
+				return new Point2D.Double(x, m1*x + c1);
+			}else {
+				double x = (c2 - c1) / (m1 - m2);
+				return new Point2D.Double(x, m1*x + c1);
+			}
+		}
+		return null;
+	}
+
+	public static double getPerpendicularDistanceToLine(Line2D l, Point2D p){
+		double a = l.getY2() - l.getY1();
+		double b = l.getX1() - l.getX2();
+		double c = (l.getY1() * l.getX2()) - (l.getX1() * l.getY2());
+		return Math.abs(a * p.getX() + b * p.getY() + c) / Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
+	}
+
+	public static Line2D getLine(double gradient, double x1, double y1){
+		return new Line2D.Double(new Point2D.Double(x1,y1), new Point2D.Double(0,y1-gradient*x1));
+	}
+
+	public static Line2D getPerpLine(Line2D line, double x1, double y1){
+		double m1 = (line.getY2() - line.getY1())/(line.getX2()-line.getX1());
+		double m2 = (-1.0)/m1;
+		double x;
+		double y;
+		if(Double.isInfinite(m2)){
+			x = x1;
+			y = y1+1;
+		}else{
+			x = line.getX1();
+			y = y1 + m2 * (x-x1);
+		}
+		return new Line2D.Double(new Point2D.Double(x1,y1), new Point2D.Double(x,y));
+	}
+
+	public static double getClockwiseBearing(Point2D co1, Point2D co2){
+		double arcTan = Math.atan2(co2.getY() - co1.getY(), co2.getX() - co1.getX());
+		double bearing = ((5 *Math.PI / 2) - arcTan)/(2 * Math.PI);
+		int intPart = (int)bearing;
+		return (bearing - intPart) * 2 * Math.PI;
+	}
+
+	public static double getAntiClockwiseBearing(Point2D co1, Point2D co2){
+		double arcTan = Math.atan2(co2.getY() - co1.getY(), co2.getX() - co1.getX());
+		double bearing = ( arcTan + (3 * Math.PI / 2))/(2 * Math.PI);
+		int intPart = (int) bearing;
+		return (bearing - intPart) * 2 * Math.PI;
+	}
+
+	public static double getBackBearing(double bearing){
+		if(bearing >= Math.PI *2){
+			bearing -= Math.PI *2;
+		}
+		if(bearing >= Math.PI){
+			return bearing - Math.PI;
+		}else{
+			return bearing + Math.PI;
+		}
 	}
 }
