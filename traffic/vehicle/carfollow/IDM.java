@@ -378,6 +378,9 @@ public class IDM {
 		 * Checks traffic light at the end of the target lane's edge.
 		 */
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+		    if(vehicle.headPosition > targetEdge.length - targetEdge.getEndIntersectionSize()){
+		        return;
+            }
 
 			if ((vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge)
 
@@ -418,7 +421,8 @@ public class IDM {
 					slowdownObj.headPosition = examinedDist + targetEdge.length;
 				}
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
-				slowdownObj.length = 0;
+				slowdownObj.length = targetEdge.getEndIntersectionSize() - vehicle.driverProfile.IDM_s0;
+				//vehicle keeps the gap of IDM_S0 but here vehicles should go to the stop line
 			}
 		}
 	}
