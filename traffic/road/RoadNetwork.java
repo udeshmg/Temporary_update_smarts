@@ -59,6 +59,7 @@ public class RoadNetwork {
 		buildGrid();
 		setIndexes();
 		addLightAndNameToTramEdges();
+		findIntersectionPolygons();
 	}
 
 	/**
@@ -623,6 +624,12 @@ public class RoadNetwork {
 		 */
 		for (int i = 0; i < lanes.size(); i++) {
 			lanes.get(i).index = i;
+		}
+	}
+
+	public void findIntersectionPolygons(){
+		for (Node node : nodes) {
+			node.findIntersectionPolygon();
 		}
 	}
 
