@@ -1835,12 +1835,9 @@ public class MonitorPanel extends JPanel {
 	}
 
 	void updateMapAreaDimension() {
-		RoadNetwork roadNetwork = processor.getRoadNetwork();
-		final double mapWidthInMeters = RoadUtil.getDistInMeters(roadNetwork.maxLat, roadNetwork.minLon,
-				roadNetwork.maxLat, roadNetwork.maxLon);
-		final double mapHeightInMeters = RoadUtil.getDistInMeters(roadNetwork.minLat, roadNetwork.minLon,
-				roadNetwork.maxLat, roadNetwork.minLon);
-		final double metersPerPixel = getMetersPerPixel(roadNetwork.maxLat, currentZoom);
+		final double mapWidthInMeters = RoadUtil.getDistInMeters(maxLat, minLon, maxLat, maxLon);
+		final double mapHeightInMeters = RoadUtil.getDistInMeters(minLat, minLon, maxLat, minLon);
+		final double metersPerPixel = getMetersPerPixel();
 		mapAreaWidthInPixelsOld = mapAreaWidthInPixels;
 		mapAreaWidthInPixels = mapWidthInMeters / metersPerPixel;
 		mapAreaHeightInPixels = mapHeightInMeters / metersPerPixel;
