@@ -625,4 +625,12 @@ public class Vehicle {
 		}
 		return length;
 	}
+
+	public Edge getNextEdge(){
+		if(indexLegOnRoute < routeLegs.size() - 1) {
+			return routeLegs.get(indexLegOnRoute + 1).edge;
+		}else{
+			return null;
+		}
+	}
 }
