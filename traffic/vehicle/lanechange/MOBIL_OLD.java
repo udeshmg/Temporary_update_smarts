@@ -200,6 +200,13 @@ public class MOBIL_OLD {
         if (vehicle.type == VehicleType.TRAM) {
             return false;
         }
+        Lane lane = vehicle.lane;
+        Edge edge = lane.edge;
+        if((vehicle.headPosition >= edge.length - edge.getEndIntersectionSize())
+            || (vehicle.headPosition <= edge.getStartIntersectionSize() + vehicle.length)){
+            //Do not change lanes within an intersection
+            return false;
+        }
 
         Lane targetLane = null;
         if (Settings.isDriveOnLeft) {
