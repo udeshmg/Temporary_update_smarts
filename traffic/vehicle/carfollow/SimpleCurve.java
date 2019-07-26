@@ -174,9 +174,9 @@ public class SimpleCurve {
     }
 
     private double getTotalTheta(Line2D l1, Line2D l2){
-        double diff = RoadUtil.getAngleDiff(l1, l2);
-        if(diff > Math.PI){
-            diff -= Math.PI;
+        double diff = RoadUtil.getSmallestDiff(l1, l2, Math.PI/180);
+        if(diff == 0 && isUTurn){
+            diff = Math.PI;
         }
         return diff;
     }
@@ -202,33 +202,37 @@ public class SimpleCurve {
         double actualHead = totalHeadPos * lengthRatio;
         double vehicleLenTheta = getVehicleLengthEquivalentAngle(length);
         double maxL = getThetaEquivalentLength(THETA);
+        Point2D[] points = null;
 
         if(actualHead <= sGap){
-            return VehicleUtil.calculateCoordinates(actualHead, length, lane);
+            points =  VehicleUtil.calculateCoordinates(actualHead, length, lane);
         }else if ( actualHead <= (sGap + R * THETA)){
             double h_THETA = getHeadPositionTheta(actualHead);
             if(h_THETA < vehicleLenTheta){
-
                 double str = straightPartInMixed(length, R, h_THETA);
-                return new Point2D[]{getMappedPosition(h_THETA), RoadUtil.getDividingPoint(sLaneMeetPoint, curveStartPoint, (sR - sGap + str), - (str))};
+                points = new Point2D[]{getMappedPosition(h_THETA),RoadUtil.getDividingPoint(sLaneMeetPoint, curveStartPoint, (sR - sGap + str), - (str))};
             }else{
                 double tailTheta = h_THETA - vehicleLenTheta;
-                return new Point2D[]{getMappedPosition(h_THETA), getMappedPosition(tailTheta)};
+                points = new Point2D[]{getMappedPosition(h_THETA), getMappedPosition(tailTheta)};
             }
         }else{
             double afterCurveLen = actualHead - (sGap + R * THETA);
             if(afterCurveLen < length) {
                 double alpha = alphaPartInMixed(length, R, afterCurveLen);
-                return new Point2D[]{RoadUtil.getDividingPoint(eLaneMeetPoint, curveEndPoint, (eR - eGap + afterCurveLen), - (afterCurveLen)),
+                points = new Point2D[]{RoadUtil.getDividingPoint(eLaneMeetPoint, curveEndPoint, (eR - eGap + afterCurveLen), - (afterCurveLen)),
                         getMappedPosition(THETA - alpha)};
             }else{
-                return VehicleUtil.calculateCoordinates(actualHead, length, lane);
+                points =  VehicleUtil.calculateCoordinates(actualHead, length, lane);
             }
         }
+        if(RoadUtil.getDistInMeters(points[0].getY(), points[0].getX(), points[1].getY(), points[1].getX())> length*(1.1) && length < 10){
+            System.out.println("HAS ERROR");
+        }
+        return points;
     }
 
     private double straightPartInMixed(double l, double r, double theta){
-        return Math.sqrt(Math.pow(l,2) - Math.pow(r*(1-Math.cos(theta)), 2))- r*Math.sin(theta);
+        return Math.sqrt(Math.pow(l,2) - Math.pow(r * (1-Math.cos(theta)), 2))- r * Math.sin(theta);
     }
 
     private double alphaPartInMixed(double l, double r, double x){
@@ -266,7 +270,7 @@ public class SimpleCurve {
             return false;
         }
         if(startEdge.startNode.index == endEdge.endNode.index){
-            return false; //U Turn
+            return true; //U Turn
         }
         Lane startLane = startEdge.getLane(startLaneIndex);
         Lane endLane = endEdge.getLane(endLaneIndex);

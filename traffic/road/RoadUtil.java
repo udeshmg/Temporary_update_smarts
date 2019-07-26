@@ -494,6 +494,21 @@ public class RoadUtil {
 		}
 	}
 
+	public static double getSmallestDiff(Line2D l1, Line2D l2, double delta){
+		double diff =  getAngleDiff(l1, l2);
+		if (diff < delta) {
+			return 0;
+		}else if( diff > Math.PI - delta && diff < Math.PI + delta){
+			return 0;
+		}else if( diff > 2 * Math.PI - delta){
+			return 0;
+		}else if(diff > Math.PI){
+			return diff - Math.PI;
+		}else{
+			return diff;
+		}
+	}
+
 	public static double getClockwiseBearing(Point2D co1, Point2D co2){
 		double arcTan = Math.atan2(co2.getY() - co1.getY(), co2.getX() - co1.getX());
 		double bearing = ((5 *Math.PI / 2) - arcTan)/(2 * Math.PI);
