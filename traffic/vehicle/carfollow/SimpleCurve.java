@@ -203,6 +203,7 @@ public class SimpleCurve {
         double lengthRatio = (sGap + R * THETA + endSeg)/(sIntSize + eIntSize + endSeg);
         double actualHead = totalHeadPos * lengthRatio;
         double vehicleLenTheta = getVehicleLengthEquivalentAngle(length);
+        double maxL = getThetaEquivalentLength(THETA);
 
         if(actualHead <= sGap){
             return VehicleUtil.calculateCoordinates(actualHead, length, lane);
@@ -252,6 +253,10 @@ public class SimpleCurve {
 
     private double getVehicleLengthEquivalentAngle(double length){
         return 2* Math.asin(length/(2*R));
+    }
+
+    private double getThetaEquivalentLength(double THETA){
+        return 2 * R * Math.sin(THETA/2);
     }
 
 
