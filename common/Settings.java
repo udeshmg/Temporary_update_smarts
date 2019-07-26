@@ -78,7 +78,8 @@ public class Settings {
 	public static double lonVsLat = 1.26574588;//Longitude-latitude ratio in terms of Euclidean distance per degree. This is re-computed when loading map.
 	public static int numLanesPerEdge = 0;//A positive value means all edges have the same number of lanes. '0' means the number is read from OSM data or set based on edge type.
 	public static String roadGraph = "";//Road graph data in a string. 
-	public static double laneWidthInMeters = 3.0;
+	public static double laneWidthInMeters = 3.25;
+	public static double pavementLineRatio = 1.0;
 
 	/*
 	 * Map data

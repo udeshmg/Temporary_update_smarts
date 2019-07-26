@@ -334,9 +334,9 @@ public class RoadUtil {
 		}
 		double pavementLaneNumber;
 		if(lane.laneNumber == 0) {
-			pavementLaneNumber = lane.laneNumber - 0.75;
+			pavementLaneNumber = lane.laneNumber - Settings.pavementLineRatio;
 		}else{
-			pavementLaneNumber = lane.laneNumber + 0.75;
+			pavementLaneNumber = lane.laneNumber + Settings.pavementLineRatio;
 		}
 
 		// GPS of start point of lane
