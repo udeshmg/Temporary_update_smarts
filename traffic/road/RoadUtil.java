@@ -452,6 +452,12 @@ public class RoadUtil {
 		return connectedNodes;
 	}
 
+	//TODO Need to consider Geo coordinate system, These are valid only for small distances
+
+	public static Point2D getDividingPoint(Point2D p1, Point2D p2, double l, double m){
+		return new Point2D.Double((p1.getX()*m + p2.getX()*l)/(l+m), (p1.getY()*m+p2.getY()*l)/(l+m));
+	}
+
 	public static Point2D getIntersectionPoint(Line2D l1, Line2D l2){
 		double m1 = (l1.getY2() - l1.getY1())/(l1.getX2() - l1.getX1());
 		double c1 = (l1.getY1()*l1.getX2() - l1.getY2()*l1.getX1())/(l1.getX2()-l1.getX1());
@@ -475,30 +481,17 @@ public class RoadUtil {
 		return null;
 	}
 
-	public static double getPerpendicularDistanceToLine(Line2D l, Point2D p){
-		double a = l.getY2() - l.getY1();
-		double b = l.getX1() - l.getX2();
-		double c = (l.getY1() * l.getX2()) - (l.getX1() * l.getY2());
-		return Math.abs(a * p.getX() + b * p.getY() + c) / Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
-	}
-
-	public static Line2D getLine(double gradient, double x1, double y1){
-		return new Line2D.Double(new Point2D.Double(x1,y1), new Point2D.Double(0,y1-gradient*x1));
-	}
-
-	public static Line2D getPerpLine(Line2D line, double x1, double y1){
-		double m1 = (line.getY2() - line.getY1())/(line.getX2()-line.getX1());
-		double m2 = (-1.0)/m1;
-		double x;
-		double y;
-		if(Double.isInfinite(m2)){
-			x = x1;
-			y = y1+1;
+	public static boolean isParalell(Line2D l1, Line2D l2, double delta){
+		double diff =  getAngleDiff(l1, l2);
+		if (diff < delta) {
+			return true;
+		}else if( diff > Math.PI - delta && diff < Math.PI + delta){
+			return true;
+		}else if( diff > 2 * Math.PI - delta){
+			return true;
 		}else{
-			x = line.getX1();
-			y = y1 + m2 * (x-x1);
+			return false;
 		}
-		return new Line2D.Double(new Point2D.Double(x1,y1), new Point2D.Double(x,y));
 	}
 
 	public static double getClockwiseBearing(Point2D co1, Point2D co2){
@@ -506,6 +499,12 @@ public class RoadUtil {
 		double bearing = ((5 *Math.PI / 2) - arcTan)/(2 * Math.PI);
 		int intPart = (int)bearing;
 		return (bearing - intPart) * 2 * Math.PI;
+	}
+
+	public static double getAngleDiff(Line2D l1, Line2D l2){
+		double arcTan1 = Math.atan2(l1.getY2() - l1.getY1(), l1.getX2() - l1.getX1());
+		double arcTan2 = Math.atan2(l2.getY2() - l2.getY1(), l2.getX2() - l2.getX1());
+		return Math.abs(arcTan1 - arcTan2);
 	}
 
 	public static double getAntiClockwiseBearing(Point2D co1, Point2D co2){
