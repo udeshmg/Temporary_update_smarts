@@ -2,8 +2,13 @@ package traffic.vehicle;
 
 import common.Settings;
 import traffic.road.Edge;
+import traffic.road.Lane;
 import traffic.road.Node;
 import traffic.road.RoadType;
+import traffic.vehicle.carfollow.SimpleCurve;
+
+import javax.xml.crypto.dsig.SignatureMethod;
+import java.awt.geom.Point2D;
 
 /**
  * This class finds impeding objects based on various factors, e.g., traffic
@@ -15,20 +20,57 @@ public class VehicleUtil {
 	 * Compute the GPS coordinates of the head and end of a given vehicle
 	 */
 	public static double[] calculateCoordinates(final Vehicle v) {
-		final double headToEdgeRatio = v.headPosition / v.lane.edge.length;
-		final double tailToEdgeRatio = (v.headPosition - v.length) / v.lane.edge.length;
+        SimpleCurve curve = getIntersectionCurve(v);
+//        SimpleCurve curve = null;
+	    if(curve != null){
+	        Point2D[] points = curve.getMappedPositions(v.headPosition, v.length, v.lane);
+            final double[] coords = {points[0].getX(), points[0].getY(), points[1].getX(), points[1].getY()};
+            return coords;
+        }else {
+            final double headToEdgeRatio = v.headPosition / v.lane.edge.length;
+            final double tailToEdgeRatio = (v.headPosition - v.length) / v.lane.edge.length;
 
-		final double lonLength = v.lane.lonEnd - v.lane.lonStart;
-		final double latLength = v.lane.latEnd - v.lane.latStart;
+            final double lonLength = v.lane.lonEnd - v.lane.lonStart;
+            final double latLength = v.lane.latEnd - v.lane.latStart;
 
-		final double headLon = v.lane.lonStart + (headToEdgeRatio * lonLength);
-		final double headLat = v.lane.latStart + (headToEdgeRatio * latLength);
-		final double tailLon = v.lane.lonStart + (tailToEdgeRatio * lonLength);
-		final double tailLat = v.lane.latStart + (tailToEdgeRatio * latLength);
+            final double headLon = v.lane.lonStart + (headToEdgeRatio * lonLength);
+            final double headLat = v.lane.latStart + (headToEdgeRatio * latLength);
+            final double tailLon = v.lane.lonStart + (tailToEdgeRatio * lonLength);
+            final double tailLat = v.lane.latStart + (tailToEdgeRatio * latLength);
 
-		final double[] coords = { headLon, headLat, tailLon, tailLat };
-		return coords;
+            final double[] coords = {headLon, headLat, tailLon, tailLat};
+            return coords;
+        }
 	}
+
+	public static SimpleCurve getIntersectionCurve(Vehicle v){
+        Edge edge = v.lane.edge;
+        Node junc = null;
+        if(v.headPosition > edge.length - edge.endNode.getIntersectionSize(edge.startNode)){
+            junc = edge.endNode;
+        }else if(v.headPosition <= edge.startNode.getIntersectionSize(edge.endNode) + v.length){
+            junc = edge.startNode;
+        }
+        if(junc != null){
+            return junc.getCurve(v);
+        }
+        return null;
+    }
+
+    public static Point2D[] calculateCoordinates(double headPos, double length, Lane lane) {
+        final double headToEdgeRatio = headPos / lane.edge.length;
+        final double tailToEdgeRatio = (headPos - length) / lane.edge.length;
+
+        final double lonLength = lane.lonEnd - lane.lonStart;
+        final double latLength = lane.latEnd - lane.latStart;
+
+        final double headLon = lane.lonStart + (headToEdgeRatio * lonLength);
+        final double headLat = lane.latStart + (headToEdgeRatio * latLength);
+        final double tailLon = lane.lonStart + (tailToEdgeRatio * lonLength);
+        final double tailLat = lane.latStart + (tailToEdgeRatio * latLength);
+
+        return new Point2D[]{new Point2D.Double(headLon, headLat), new Point2D.Double(tailLon, tailLat)};
+    }
 
 
 

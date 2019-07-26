@@ -64,6 +64,7 @@ public class Vehicle {
 	private double lastSpeedChangeTime = 0;
 	private double startHeadPosition = 0;
 	private SlowdownFactor recentSlowDownFactor = null;
+	private IntersectionDecision decision = null;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -356,7 +357,24 @@ public class Vehicle {
 
 			// Check whether road is explicitly blocked on vehicle's route
 			updateRoadBlockInfo();
+			takeIntersectionDecision();
 		}
+	}
+
+	public void takeIntersectionDecision(){
+		Edge current = lane.edge;
+		if(hasNextEdge()) {
+			if (headPosition > current.length - current.endNode.getIntersectionSize(current.startNode)) {
+				Lane next = getLaneInNextEdge(getNextEdge());
+				decision = new IntersectionDecision(lane, next);
+			}else if(headPosition > current.startNode.getIntersectionSize(current.endNode) + length){
+				decision = null;
+			}
+		}
+	}
+
+	public IntersectionDecision getDecision() {
+		return decision;
 	}
 
 	public void blockAtTramStop(){
@@ -566,12 +584,8 @@ public class Vehicle {
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;
-					Lane newLane = null;
-					if (nextEdge.getLaneCount() <= lane.laneNumber) {
-						newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
-					} else {
-						newLane = nextEdge.getLane(lane.laneNumber);
-					}
+					Lane newLane = decision.getEndLane();
+
 					updateLane(newLane);
 					// Remember the cluster of traffic lights
 					if (nextEdge.startNode.idLightNodeGroup != 0) {
@@ -595,6 +609,20 @@ public class Vehicle {
 				// Set priority lanes
 				setPriorityLanes(true);
 			}
+		}
+	}
+
+	public Lane getLaneInNextEdge(Edge nextEdge){
+		if(nextEdge.endNode == lane.edge.startNode){
+			return nextEdge.getLane(0);
+		}else {
+			Lane newLane = null;
+			if (nextEdge.getLaneCount() <= lane.laneNumber) {
+				newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
+			} else {
+				newLane = nextEdge.getLane(lane.laneNumber);
+			}
+			return newLane;
 		}
 	}
 
@@ -652,17 +680,48 @@ public class Vehicle {
 	}
 
 	public Edge getNextEdge(){
-		if(indexLegOnRoute < routeLegs.size() - 1) {
+		if(hasNextEdge()) {
 			return routeLegs.get(indexLegOnRoute + 1).edge;
 		}else{
 			return null;
 		}
 	}
+
+	public boolean hasNextEdge(){
+		return indexLegOnRoute < routeLegs.size() - 1;
+	}
+
+	public Edge getPreviousEdge(){
+		if(indexLegOnRoute > 0) {
+			return routeLegs.get(indexLegOnRoute - 1).edge;
+		}else{
+			return null;
+		}
+	}
+
 	public String getRecentSlowDownFactor() {
 		return String.valueOf(recentSlowDownFactor);
 	}
 
 	public void setRecentSlowDownFactor(SlowdownFactor recentSlowDownFactor) {
 		this.recentSlowDownFactor = recentSlowDownFactor;
+	}
+
+	public class IntersectionDecision{
+		private Lane startLane;
+		private Lane endLane;
+
+		public IntersectionDecision(Lane startLane, Lane endLane) {
+			this.startLane = startLane;
+			this.endLane = endLane;
+		}
+
+		public Lane getStartLane() {
+			return startLane;
+		}
+
+		public Lane getEndLane() {
+			return endLane;
+		}
 	}
 }

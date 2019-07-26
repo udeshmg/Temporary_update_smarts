@@ -1,5 +1,6 @@
 package traffic.road;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -142,6 +143,10 @@ public class Lane {
 		}
 		return frontVehicle;
 	}
+
+	public Line2D getLaneLine(){
+	    return new Line2D.Double(lonStart, latStart, lonEnd, latEnd);
+    }
 
 	/**
 	 * Comparator of vehicles based on their positions in a lane. The vehicle

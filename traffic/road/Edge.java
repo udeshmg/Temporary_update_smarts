@@ -1,5 +1,6 @@
 package traffic.road;
 
+import java.awt.geom.Point2D;
 import java.util.*;
 
 import common.Settings;
@@ -333,5 +334,13 @@ public class Edge {
 
 	public double getEndIntersectionSize(){
 		return endNode.getIntersectionSize(startNode);
+	}
+
+	public Point2D getStartPoint(){
+		return new Point2D.Double(startNode.lon, startNode.lat);
+	}
+
+	public Point2D getEndPoint(){
+		return new Point2D.Double(endNode.lon, endNode.lat);
 	}
 }

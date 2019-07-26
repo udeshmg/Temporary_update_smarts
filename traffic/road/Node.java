@@ -1,5 +1,8 @@
 package traffic.road;
 
+import traffic.vehicle.Vehicle;
+import traffic.vehicle.carfollow.SimpleCurve;
+
 import javax.sound.sampled.Line;
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -75,6 +78,7 @@ public class Node {
 	private Map<Node, Double> stopLineDists = new HashMap<>();
 	private Map<Node, Line2D> leftPavement = new HashMap<>();
 	private Map<Node, Line2D> rightPavement = new HashMap<>();
+	private Map<String, SimpleCurve> curveMap = new HashMap<>();
 
 	public Node(final long osmId, final String name, final double lat, final double lon, final boolean light,
 			final boolean tram_stop, final boolean bus_stop) {
@@ -256,5 +260,25 @@ public class Node {
 
 	public Line2D getStopLine(Node n) {
 		return stopLines.get(n);
+	}
+
+	public SimpleCurve getCurve(Vehicle v){
+		Vehicle.IntersectionDecision decision = v.getDecision();
+		if(decision != null){
+			Lane curL = decision.getStartLane();
+			Lane nextL = decision.getEndLane();
+			String curveKey = getCurveKey(curL.edge, nextL.edge, curL, nextL);
+			if(SimpleCurve.hasCurve(curL.edge, nextL.edge, curL.laneNumber, nextL.laneNumber)) {
+				if (!curveMap.containsKey(curveKey)) {
+					curveMap.put(curveKey, new SimpleCurve(curL, nextL));
+				}
+				return curveMap.get(curveKey);
+			}
+		}
+		return null;
+	}
+
+	private String getCurveKey(Edge cur, Edge next, Lane curL, Lane nextL){
+		return cur.index+"-"+next.index+"-"+curL.laneNumber+"-"+nextL.laneNumber;
 	}
 }
