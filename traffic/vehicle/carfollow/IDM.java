@@ -420,16 +420,10 @@ public class IDM {
 
 			if (stopAtLight) {
 				slowdownObj.speed = 0;
-				// The position may be put further out from edge end to avoid car stop before
-				// entering an edge.
-				if (targetEdge.length <= vehicle.driverProfile.IDM_s0) {
-					slowdownObj.headPosition = (examinedDist + targetEdge.length + vehicle.driverProfile.IDM_s0)
-							- 0.00001;
-				} else {
-					slowdownObj.headPosition = examinedDist + targetEdge.length;
-				}
+				//TODO put a fix where edge lengths are shorter
+				slowdownObj.headPosition = examinedDist + targetEdge.length - (targetEdge.getEndIntersectionSize() - vehicle.driverProfile.IDM_s0);
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
-				slowdownObj.length = targetEdge.getEndIntersectionSize() - vehicle.driverProfile.IDM_s0;
+				slowdownObj.length = 0;
 				//vehicle keeps the gap of IDM_S0 but here vehicles should go to the stop line
 				slowdownObj.factor = SlowdownFactor.LIGHT;
 			}
