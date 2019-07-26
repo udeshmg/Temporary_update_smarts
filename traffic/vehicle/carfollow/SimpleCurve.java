@@ -174,8 +174,6 @@ public class SimpleCurve {
     }
 
     private double getTotalTheta(Line2D l1, Line2D l2){
-//        double startBearing = RoadUtil.getClockwiseBearing(l1.getP1(), l1.getP2());
-//        double endBearing = RoadUtil.getClockwiseBearing(l2.getP1(), l2.getP2());
         double diff = RoadUtil.getAngleDiff(l1, l2);
         if(diff > Math.PI){
             diff -= Math.PI;
@@ -210,6 +208,7 @@ public class SimpleCurve {
         }else if ( actualHead <= (sGap + R * THETA)){
             double h_THETA = getHeadPositionTheta(actualHead);
             if(h_THETA < vehicleLenTheta){
+
                 double str = straightPartInMixed(length, R, h_THETA);
                 return new Point2D[]{getMappedPosition(h_THETA), RoadUtil.getDividingPoint(sLaneMeetPoint, curveStartPoint, (sR - sGap + str), - (str))};
             }else{
@@ -236,8 +235,10 @@ public class SimpleCurve {
         double x_2 = Math.pow(x,2);
         double l_2 = Math.pow(l,2);
         double r_2 = Math.pow(r,2);
-        return Math.asin((l_2 - x_2 - 2 * r_2)/(2 * r * Math.sqrt( x_2 + r_2 )))
-                + Math.asin(r/Math.sqrt( x_2 + r_2 ));
+        double x_2_r_2 = Math.sqrt( x_2 + r_2 );
+        double alpha = Math.asin((l_2 - x_2 - 2 * r_2)/(2 * r * x_2_r_2));
+        double beta = Math.asin(r/x_2_r_2);
+        return alpha + beta;
     }
 
     public Point2D getMappedPosition(double theta){
