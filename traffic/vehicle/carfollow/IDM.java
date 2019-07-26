@@ -528,8 +528,9 @@ public class IDM {
 				}
 			}
 			if (isNeedToBlock) {
-				slowdownObj.headPosition = (examinedDist + edgeBeingChecked.length + vehicle.driverProfile.IDM_s0)
-						- 0.00001;
+//				slowdownObj.headPosition = (examinedDist + edgeBeingChecked.length + vehicle.driverProfile.IDM_s0)
+//						- 0.00001;
+				slowdownObj.headPosition = examinedDist + edgeBeingChecked.length/2; //TODO this should be properly implemented, may not work for realworld networks
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.speed = 0;
 				slowdownObj.length = 0;
