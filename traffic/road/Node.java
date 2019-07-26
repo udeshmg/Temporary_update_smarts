@@ -73,6 +73,8 @@ public class Node {
 	private List<Point2D> intersectionPolygon = new ArrayList<>();
 	private Map<Node, Line2D> stopLines = new HashMap<>();
 	private Map<Node, Double> stopLineDists = new HashMap<>();
+	private Map<Node, Line2D> leftPavement = new HashMap<>();
+	private Map<Node, Line2D> rightPavement = new HashMap<>();
 
 	public Node(final long osmId, final String name, final double lat, final double lon, final boolean light,
 			final boolean tram_stop, final boolean bus_stop) {
@@ -182,33 +184,39 @@ public class Node {
 	}
 
 	public Line2D getLeftPavement(Node node){
-		Edge inwardEdge = getInwardEdge(node);
-		Edge outwardEdge = getOutwardEdge(node);
-		Line2D pavement = null;
-		Line2D directionCorrected = null;
-		if(inwardEdge != null){
-			pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(0));
-			directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
-		}else{
-			pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(outwardEdge.getLaneCount() - 1));
-			directionCorrected = pavement;
+		if(!leftPavement.containsKey(node)) {
+			Edge inwardEdge = getInwardEdge(node);
+			Edge outwardEdge = getOutwardEdge(node);
+			Line2D pavement = null;
+			Line2D directionCorrected = null;
+			if (inwardEdge != null) {
+				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(0));
+				directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
+			} else {
+				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(outwardEdge.getLaneCount() - 1));
+				directionCorrected = pavement;
+			}
+			leftPavement.put(node, directionCorrected);
 		}
-		return directionCorrected;
+		return leftPavement.get(node);
 	}
 
 	public Line2D getRightPavement(Node node){
-		Edge inwardEdge = getInwardEdge(node);
-		Edge outwardEdge = getOutwardEdge(node);
-		Line2D pavement = null;
-		Line2D directionCorrected = null;
-		if(outwardEdge != null){
-			pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(0));
-			directionCorrected = pavement;
-		}else{
-			pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(inwardEdge.getLaneCount() - 1));
-			directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
+		if(!rightPavement.containsKey(node)) {
+			Edge inwardEdge = getInwardEdge(node);
+			Edge outwardEdge = getOutwardEdge(node);
+			Line2D pavement = null;
+			Line2D directionCorrected = null;
+			if (outwardEdge != null) {
+				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(0));
+				directionCorrected = pavement;
+			} else {
+				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(inwardEdge.getLaneCount() - 1));
+				directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
+			}
+			rightPavement.put(node, directionCorrected);
 		}
-		return directionCorrected;
+		return rightPavement.get(node);
 	}
 
 	public Point2D getValidCorner(Line2D pavement1, Line2D pavement2){
