@@ -93,17 +93,9 @@ public class SimpleCurve {
         this.curveCenterPoint = getCurveCenterPoint();
         this.R = RoadUtil.getDistInMeters(curveStartPoint.getY(), curveStartPoint.getX(), curveCenterPoint.getY(), curveCenterPoint.getX());
         this.THETA = getTotalTheta(new Line2D.Double(curveCenterPoint, curveEndPoint), new Line2D.Double(curveCenterPoint, curveStartPoint));
-        calculateCurve();
     }
 
 
-    private void calculateCurve(){
-        double c1 = RoadUtil.getDistInMeters(curveStartPoint.getY(), curveStartPoint.getX(), laneMeetPoint.getY(), laneMeetPoint.getX());
-        double c2 = RoadUtil.getDistInMeters(curveStartPoint.getY(), curveStartPoint.getX(), curveCenterPoint.getY(), curveCenterPoint.getX());
-        double c3 = RoadUtil.getDistInMeters(laneMeetPoint.getY(), laneMeetPoint.getX(), curveEndPoint.getY(), curveEndPoint.getX());
-        double c4 = RoadUtil.getDistInMeters(curveCenterPoint.getY(), curveCenterPoint.getX(), curveEndPoint.getY(), curveEndPoint.getX());
-        System.out.println("lengths");
-    }
 
     private double getBigRadius(){
         if(!isUTurn){
