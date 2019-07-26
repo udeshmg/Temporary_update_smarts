@@ -364,7 +364,7 @@ public class Vehicle {
 	public void takeIntersectionDecision(){
 		Edge current = lane.edge;
 		if(hasNextEdge()) {
-			if (headPosition > current.length - current.endNode.getIntersectionSize(current.startNode)) {
+			if (headPosition >= current.length - current.endNode.getIntersectionSize(current.startNode)) {
 				Lane next = getLaneInNextEdge(getNextEdge());
 				decision = new IntersectionDecision(lane, next);
 			}else if(headPosition > current.startNode.getIntersectionSize(current.endNode) + length){
