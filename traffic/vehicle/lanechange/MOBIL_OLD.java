@@ -123,6 +123,7 @@ public class MOBIL_OLD {
 
         double incentive = 0;
         final Edge currentEdge = vehicle.getRouteLeg(vehicle.indexLegOnRoute).edge;
+        final Edge nextEdge = vehicle.getNextEdge();
 
         if (direction == LaneChangeDirection.TOWARDS_ROADSIDE) {
             // Encourage change for making a turn
@@ -146,6 +147,11 @@ public class MOBIL_OLD {
                 incentive = 50;
             } else if (!Settings.isDriveOnLeft && vehicle.edgeBeforeTurnLeft != null
                     && (vehicle.lane.laneNumber < (currentEdge.getLaneCount() - currentEdge.numLeftLanes))) {
+                incentive = 50;
+            }else if ((nextEdge != null)
+                    && (nextEdge.endNode.index == currentEdge.startNode.index)
+                    && (vehicle.lane.laneNumber < currentEdge.getLaneCount() - 1)){
+                //U Turn scenario
                 incentive = 50;
             }
         }
