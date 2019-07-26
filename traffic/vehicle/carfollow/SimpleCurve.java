@@ -46,8 +46,8 @@ public class SimpleCurve {
 
     private Point2D sLaneStop;
     private Point2D eLaneStop;
-    private Point2D stopLineMeetPoint;
-    private Point2D laneMeetPoint;
+    private Point2D sLaneMeetPoint;
+    private Point2D eLaneMeetPoint;
     private double sR;
     private double eR;
     private double bigR;
@@ -79,8 +79,8 @@ public class SimpleCurve {
 
         this.sLaneStop = RoadUtil.getDividingPoint(sLaneLine.getP1(), sLaneLine.getP2(), sEdge.length - sIntSize, sIntSize);
         this.eLaneStop = RoadUtil.getDividingPoint(eLaneLine.getP1(), eLaneLine.getP2(), eIntSize, eEdge.length - eIntSize);
-        this.stopLineMeetPoint = getStopLineMeetPoint();
-        this.laneMeetPoint = getLaneMeetPoint();
+        this.sLaneMeetPoint = getStartLaneMeetPoint();
+        this.eLaneMeetPoint = getEndLaneMeetPoint();
         this.sR = getSR();
         this.eR = getER();
         this.bigR = getBigRadius();
@@ -107,7 +107,7 @@ public class SimpleCurve {
 
     private double getSR(){
         if(!isUTurn){
-            return RoadUtil.getDistInMeters(laneMeetPoint.getY(), laneMeetPoint.getX(), sLaneStop.getY(), sLaneStop.getX());
+            return RoadUtil.getDistInMeters(sLaneMeetPoint.getY(), sLaneMeetPoint.getX(), sLaneStop.getY(), sLaneStop.getX());
         }else{
             return RoadUtil.getDistInMeters(sLaneLine.getY2(), sLaneLine.getX2(), sLaneStop.getY(), sLaneStop.getX());
         }
@@ -115,7 +115,7 @@ public class SimpleCurve {
 
     private double getER(){
         if(!isUTurn){
-            return RoadUtil.getDistInMeters(laneMeetPoint.getY(), laneMeetPoint.getX(), eLaneStop.getY(), eLaneStop.getX());
+            return RoadUtil.getDistInMeters(eLaneMeetPoint.getY(), eLaneMeetPoint.getX(), eLaneStop.getY(), eLaneStop.getX());
         }else{
             return RoadUtil.getDistInMeters(eLaneLine.getY1(), eLaneLine.getX1(), eLaneStop.getY(), eLaneStop.getX());
         }
@@ -130,11 +130,19 @@ public class SimpleCurve {
     }
 
 
-    private Point2D getLaneMeetPoint(){
+    private Point2D getStartLaneMeetPoint(){
         if(!isUTurn) {
             return RoadUtil.getIntersectionPoint(sLaneLine, eLaneLine);
         }else{
             return sLaneLine.getP2();
+        }
+    }
+
+    private Point2D getEndLaneMeetPoint(){
+        if(!isUTurn) {
+            return sLaneMeetPoint;
+        }else{
+            return eLaneLine.getP1();
         }
     }
 
@@ -202,7 +210,7 @@ public class SimpleCurve {
             double h_THETA = getHeadPositionTheta(actualHead);
             if(h_THETA < vehicleLenTheta){
                 double str = straightPartInMixed(length, R, h_THETA);
-                return new Point2D[]{getMappedPosition(h_THETA), RoadUtil.getDividingPoint(laneMeetPoint, curveStartPoint, (sR - sGap + str), - (str))};
+                return new Point2D[]{getMappedPosition(h_THETA), RoadUtil.getDividingPoint(sLaneMeetPoint, curveStartPoint, (sR - sGap + str), - (str))};
             }else{
                 double tailTheta = h_THETA - vehicleLenTheta;
                 return new Point2D[]{getMappedPosition(h_THETA), getMappedPosition(tailTheta)};
@@ -211,8 +219,7 @@ public class SimpleCurve {
             double afterCurveLen = actualHead - (sGap + R * THETA);
             if(afterCurveLen < length) {
                 double alpha = alphaPartInMixed(length, R, afterCurveLen);
-                //alpha = vehicleLenTheta;
-                return new Point2D[]{RoadUtil.getDividingPoint(laneMeetPoint, curveEndPoint, (R + afterCurveLen), - (afterCurveLen)),
+                return new Point2D[]{RoadUtil.getDividingPoint(eLaneMeetPoint, curveEndPoint, (eR - eGap + afterCurveLen), - (afterCurveLen)),
                         getMappedPosition(THETA - alpha)};
             }else{
                 return VehicleUtil.calculateCoordinates(actualHead, length, lane);
@@ -236,7 +243,7 @@ public class SimpleCurve {
         double COS_THETA = Math.cos(theta);
         double SIN_THETA = Math.sin(theta);
         Point2D p1 = RoadUtil.getDividingPoint(curveStartPoint, curveCenterPoint, R * (1 - COS_THETA), R * COS_THETA);
-        Point2D p2 = RoadUtil.getDividingPoint(curveStartPoint, laneMeetPoint, R * SIN_THETA, sR - R * SIN_THETA);
+        Point2D p2 = RoadUtil.getDividingPoint(curveStartPoint, sLaneMeetPoint, R * SIN_THETA, sR - R * SIN_THETA);
 
         double x = p1.getX() + p2.getX() - curveStartPoint.getX();
         double y = p1.getY() + p2.getY() - curveStartPoint.getY();
