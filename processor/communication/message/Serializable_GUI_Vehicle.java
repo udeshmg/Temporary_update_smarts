@@ -9,11 +9,13 @@ public class Serializable_GUI_Vehicle {
 	public double lonTail;
 	public double latTail;
 	public double length;
+	public double width;
 	public int numLinksToGo;
 	public String id;
 	public int vid;
 	public String worker;
 	public String driverProfile;
+	public String slowDownFactor;
 	public int edgeIndex;
 	public int laneIndex;
 	public double originalEdgeMaxSpeed;

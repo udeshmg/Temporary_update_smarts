@@ -882,6 +882,8 @@ public class MonitorPanel extends JPanel {
 	 */
 	void drawVehicleOnImage(final Rectangle actualDrawingArea, final Graphics2D g2d,
 			final Serializable_GUI_Vehicle vehicle, final VehicleObjectType drawType) {
+		g2d.setStroke(new BasicStroke((int) (vehicle.width/getMetersPerPixel()), BasicStroke.CAP_BUTT,
+				BasicStroke.CAP_BUTT));
 		final int headX = convertLonToX(vehicle.lonHead);
 		final int headY = convertLatToY(vehicle.latHead);
 		final int tailX = convertLonToX(vehicle.lonTail);
@@ -922,12 +924,7 @@ public class MonitorPanel extends JPanel {
 		 * Draw the object if it is in the area shown in the actual panel
 		 */
 		if (actualDrawingArea.contains(new Point(headX, headY))) {
-			if (currentZoom > 18) {
-				g2d.drawLine(headX, headY, tailX, tailY);
-				g2d.fillRect(tailX - 6, tailY - 6, 12, 12);
-			} else {
-				g2d.fillRect(tailX - 3, tailY - 3, 6, 6);
-			}
+			g2d.drawLine(headX, headY, tailX, tailY);
 
 			/*
 			 * Display vehicle details.
@@ -942,7 +939,7 @@ public class MonitorPanel extends JPanel {
 					detail = String.valueOf(vehicle.numLinksToGo);
 					break;
 				case ID_Worker:
-					detail = vehicle.id + "@" + vehicle.worker;
+					detail = vehicle.vid + "@" + vehicle.worker;
 					break;
 				case Driver_Profile:
 					detail = vehicle.driverProfile;
@@ -950,7 +947,7 @@ public class MonitorPanel extends JPanel {
 				}
 
 				g2d.setColor(Color.black);
-				g2d.drawString(" " + detail, headX, headY - 10);
+				g2d.drawString(" " + detail, headX, headY);
 			}
 
 			/*
@@ -1282,8 +1279,6 @@ public class MonitorPanel extends JPanel {
 			/*
 			 * Draw vehicles
 			 */
-			g2d.setStroke(new BasicStroke((int) (Math.pow(currentZoom / 8, currentZoom / 7)), BasicStroke.CAP_BUTT,
-					BasicStroke.CAP_BUTT));
 			for (final Serializable_GUI_Vehicle vehicle : vehicleObjects) {
 				drawVehicleOnImage(actualDrawingArea, g2d, vehicle, VehicleObjectType.normal);
 			}

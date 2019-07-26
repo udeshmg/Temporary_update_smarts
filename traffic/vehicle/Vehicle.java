@@ -14,6 +14,7 @@ import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
 import traffic.vehicle.carfollow.CarFollow;
+import traffic.vehicle.carfollow.SlowdownFactor;
 import traffic.vehicle.lanechange.LaneChange;
 import traffic.vehicle.lanechange.LaneChangeDirection;
 import traffic.vehicle.lanechange.MOBILInput;
@@ -62,6 +63,7 @@ public class Vehicle {
 	private double cityMeteringSpeed = Double.MAX_VALUE;
 	private double lastSpeedChangeTime = 0;
 	private double startHeadPosition = 0;
+	private SlowdownFactor recentSlowDownFactor = null;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -655,5 +657,12 @@ public class Vehicle {
 		}else{
 			return null;
 		}
+	}
+	public String getRecentSlowDownFactor() {
+		return String.valueOf(recentSlowDownFactor);
+	}
+
+	public void setRecentSlowDownFactor(SlowdownFactor recentSlowDownFactor) {
+		this.recentSlowDownFactor = recentSlowDownFactor;
 	}
 }

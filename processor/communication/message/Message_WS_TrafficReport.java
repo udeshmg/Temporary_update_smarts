@@ -81,11 +81,13 @@ public class Message_WS_TrafficReport {
 				sVehicle.lonTail = coordinates[2];
 				sVehicle.latTail = coordinates[3];
 				sVehicle.length = v.type.length;
+				sVehicle.width = v.type.width;
 				sVehicle.numLinksToGo = v.getRouteLegCount() - 1 - v.indexLegOnRoute;
 				sVehicle.id = v.id;
 				sVehicle.vid = v.vid;
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
+				sVehicle.slowDownFactor = v.getRecentSlowDownFactor();
 				sVehicle.edgeIndex = v.lane.edge.index;
 				sVehicle.laneIndex = v.lane.index;
 				sVehicle.originalEdgeMaxSpeed = v.lane.edge.freeFlowSpeed;

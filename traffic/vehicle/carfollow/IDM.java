@@ -93,6 +93,7 @@ public class IDM {
 		if (acc1 > acc2) {
 			vehicle.distToImpedingObject = impedingObject.headPosition - impedingObject.length - vehicle.headPosition;
 			vehicle.spdOfImpedingObject = impedingObject.speed;
+			vehicle.setRecentSlowDownFactor(impedingObject.factor);
 			return acc2;
 		} else {
 			return acc1;
@@ -121,7 +122,6 @@ public class IDM {
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
 				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane,
 						SlowdownFactor.PRIORITY_VEHICLE));
-
 		return lowestAcceleration;
 	}
 
@@ -182,6 +182,7 @@ public class IDM {
 					impedingObj.headPosition = vehicle.headPosition + 10000;
 					impedingObj.type = VehicleType.VIRTUAL_STATIC;
 					impedingObj.length = 0;
+					impedingObj.factor = SlowdownFactor.FRONT;
 					break;
 				}
 			}
@@ -193,6 +194,7 @@ public class IDM {
 			impedingObj.headPosition = vehicle.headPosition + 10000;
 			impedingObj.type = VehicleType.VIRTUAL_STATIC;
 			impedingObj.length = 0;
+			impedingObj.factor = SlowdownFactor.FRONT;
 		}
 
 	}
@@ -261,6 +263,7 @@ public class IDM {
 				slowdownObj.headPosition = (examinedDist + targetEdge.length + vehicle.driverProfile.IDM_s0) - 0.00001;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.CONFLICT;
 			}
 		}
 	}
@@ -288,6 +291,7 @@ public class IDM {
 			slowdownObj.headPosition = examinedDist + frontVehicle.headPosition;
 			slowdownObj.type = frontVehicle.type;
 			slowdownObj.length = frontVehicle.length;
+			slowdownObj.factor = SlowdownFactor.FRONT;
 			// Do not cross the intersection that is immediately behind the front vehicle if the front vehicle is too slow and is too close to the intersection
 			if (RoadUtil.hasIntersectionAtEdgeStart(frontVehicle.lane.edge)
 					&& (vehicle.lane.edge != frontVehicle.lane.edge)
@@ -300,6 +304,7 @@ public class IDM {
 				slowdownObj.headPosition = examinedDist - 0.00001;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.FRONT;
 			}
 		} else if (laneBeingChecked.endPositionOfLatestVehicleLeftThisWorker < laneBeingChecked.edge.length) {
 			// A front vehicle may be running on a different worker. Therefore we check vehicle position sent from other workers.
@@ -307,6 +312,7 @@ public class IDM {
 			slowdownObj.headPosition = examinedDist + laneBeingChecked.endPositionOfLatestVehicleLeftThisWorker;
 			slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 			slowdownObj.length = 0;
+			slowdownObj.factor = SlowdownFactor.FRONT;
 		}
 
 	}
@@ -334,6 +340,7 @@ public class IDM {
 				slowdownObj.length = 0;
 				slowdownObj.speed = 0;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
+				slowdownObj.factor = SlowdownFactor.PRIORITY_VEHICLE;
 			}
 		}
 
@@ -361,6 +368,7 @@ public class IDM {
 						- 0.00001;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.LANEBLOCK;
 			}
 		}
 	}
@@ -423,6 +431,7 @@ public class IDM {
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = targetEdge.getEndIntersectionSize() - vehicle.driverProfile.IDM_s0;
 				//vehicle keeps the gap of IDM_S0 but here vehicles should go to the stop line
+				slowdownObj.factor = SlowdownFactor.LIGHT;
 			}
 		}
 	}
@@ -449,6 +458,7 @@ public class IDM {
 			slowdownObj.headPosition = (examinedDist + targetEdge.length + vehicle.driverProfile.IDM_s0) - 0.00001;
 			slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 			slowdownObj.length = 0;
+			slowdownObj.factor = SlowdownFactor.TRAM;
 			return;
 		}
 
@@ -460,6 +470,7 @@ public class IDM {
 						+ vehicle.driverProfile.IDM_s0) - 0.00001;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.TRAM;
 				return;
 			}
 
@@ -471,6 +482,7 @@ public class IDM {
 							+ vehicle.driverProfile.IDM_s0) - 0.00001;
 					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 					slowdownObj.length = 0;
+					slowdownObj.factor = SlowdownFactor.TRAM;
 					return;
 				}
 			}
@@ -521,12 +533,14 @@ public class IDM {
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.speed = 0;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.TURN;
 			} else {
 				slowdownObj.headPosition = examinedDist + edgeBeingChecked.length
 						+ (VehicleType.VIRTUAL_SLOW.maxSpeed * 3);//The virtual object is a few seconds ahead
 				slowdownObj.type = VehicleType.VIRTUAL_SLOW;
 				slowdownObj.speed = VehicleType.VIRTUAL_SLOW.maxSpeed;
 				slowdownObj.length = 0;
+				slowdownObj.factor = SlowdownFactor.TURN;
 			}
 		}
 	}

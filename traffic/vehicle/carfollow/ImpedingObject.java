@@ -31,6 +31,7 @@ public class ImpedingObject {
     public double headPosition = 0;
     public double speed = 0;
     public double length = 0;
+    public SlowdownFactor factor = null;
 
     public ImpedingObject(){
 
