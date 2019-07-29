@@ -228,7 +228,7 @@ public class IDM {
 					if (lane.getVehicleCount() > 0) {
 						final Vehicle firstV = lane.getFrontVehicleInLane();
 						if (firstV.speed > 0) {
-							final double arrivalTime = (e.length - firstV.headPosition) / firstV.speed;
+							final double arrivalTime = (e.length - e.getEndIntersectionSize() - firstV.headPosition) / firstV.speed;
 							if (arrivalTime < earliestTime) {
 								earliestTime = arrivalTime;
 							}
@@ -260,14 +260,20 @@ public class IDM {
 			 * intersection is too close, this vehicle must stop at the
 			 * intersection to prevent collision.
 			 */
+			double pos = (examinedDist + targetEdge.length - targetEdge.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0);
+			if(pos < vehicle.headPosition) {
+				return;
+			}
 			if ((!vehicle.lane.isPriority && (earliestTime < Settings.minTimeSafeToCrossIntersection))
 					|| isGiveWayToPriorityVehicle) {
 				slowdownObj.speed = 0;
-				slowdownObj.headPosition = (examinedDist + targetEdge.length + vehicle.driverProfile.IDM_s0) - 0.00001;
+				//slowdownObj.headPosition = (examinedDist + targetEdge.length - targetEdge.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0) - 0.00001;
+				slowdownObj.headPosition = pos;
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.length = 0;
 				slowdownObj.factor = SlowdownFactor.CONFLICT;
 			}
+
 		}
 	}
 
@@ -299,8 +305,7 @@ public class IDM {
 			if (RoadUtil.hasIntersectionAtEdgeStart(frontVehicle.lane.edge)
 					&& (vehicle.lane.edge != frontVehicle.lane.edge)
 					&& (slowdownObj.speed < Settings.intersectionSpeedThresholdOfFront)
-					&& (frontVehicle.headPosition - frontVehicle.length <= vehicle.driverProfile.IDM_s0
-					+ vehicle.length)//The current vehicle cannot stop between the intersection and the front vehicle due to limited space
+					&& (frontVehicle.headPosition - frontVehicle.length <= vehicle.driverProfile.IDM_s0 + vehicle.length)//The current vehicle cannot stop between the intersection and the front vehicle due to limited space
 					&& (frontVehicle.headPosition - frontVehicle.length >= 0)//Only consider the situation where front vehicle has passed the intersection in whole
 					&& (VehicleUtil.getBrakingDistance(vehicle) <= (examinedDist - vehicle.headPosition))) {
 				slowdownObj.speed = 0;
