@@ -139,35 +139,37 @@ public class IDM {
 	 *            Indicate the lane where impeding object is searched. If the
 	 *            search expands to multiple edges, only the lanes with the same
 	 *            lane number are considered
-	 * @param impedingObj
+	 * @param impObj
 	 *            The virtual vehicle object that stores the properties of the
 	 *            impeding object
 	 * @param factor
 	 *            Type of the impeding object, e.g., traffic lights
 	 */
 	public void updateImpedingObject(final Vehicle vehicle, int indexLegOnRouteBeingChecked, final int laneNumber,
-									 final ImpedingObject impedingObj, final SlowdownFactor factor) {
+									 final ImpedingObject impObj, final SlowdownFactor factor) {
 		double examinedDist = 0;
-		impedingObj.headPosition = -1; // Initialize front vehicle's position.
-		while ((impedingObj.headPosition < 0) && (indexLegOnRouteBeingChecked <= (vehicle.getRouteLegCount() - 1))) {
+		impObj.headPosition = -1; // Initialize front vehicle's position.
+		while ((impObj.headPosition < 0) && (indexLegOnRouteBeingChecked <= (vehicle.getRouteLegCount() - 1))) {
 			if (factor == SlowdownFactor.FRONT) {
-				updateImpedingObject_Front(vehicle, examinedDist, indexLegOnRouteBeingChecked, laneNumber, impedingObj);
+				updateImpedingObject_Front(vehicle, examinedDist, indexLegOnRouteBeingChecked, laneNumber, impObj);
 			} else if (factor == SlowdownFactor.TRAM) {
 				updateImpedingObject_Tram(vehicle, examinedDist,
-						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impedingObj);
+						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impObj);
 			} else if (factor == SlowdownFactor.LIGHT) {
 				updateImpedingObject_Light(vehicle, examinedDist,
-						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impedingObj);
+						vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked), impObj);
 			} else if (factor == SlowdownFactor.CONFLICT) {
-				updateImpedingObject_Conflict(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
+				updateImpedingObject_Conflict(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			} else if (factor == SlowdownFactor.LANEBLOCK) {
-				updateImpedingObject_LaneBlock(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
+				updateImpedingObject_LaneBlock(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			} else if (factor == SlowdownFactor.TURN) {
-				updateImpedingObject_Turn(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
+				updateImpedingObject_Turn(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			} else if (factor == SlowdownFactor.PRIORITY_VEHICLE) {
-				updateImpedingObject_PriorityVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impedingObj);
+				updateImpedingObject_PriorityVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
+			} else if (factor == SlowdownFactor.WAITING_VEHICLE) {
+				updateImpedingObject_WaitingVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			}
-			if (impedingObj.headPosition < 0) {
+			if (impObj.headPosition < 0) {
 				examinedDist += vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length;
 				// Proceeds to the next leg on route if look-ahead distance is
 				// not exhausted
@@ -178,23 +180,23 @@ public class IDM {
 					// If no impeding object is found within look-ahead
 					// distance, returns a virtual one that moves fast at long
 					// distance
-					impedingObj.speed = 100;
-					impedingObj.headPosition = vehicle.headPosition + 10000;
-					impedingObj.type = VehicleType.VIRTUAL_STATIC;
-					impedingObj.length = 0;
-					impedingObj.factor = SlowdownFactor.FRONT;
+					impObj.speed = 100;
+					impObj.headPosition = vehicle.headPosition + 10000;
+					impObj.type = VehicleType.VIRTUAL_STATIC;
+					impObj.length = 0;
+					impObj.factor = SlowdownFactor.FRONT;
 					break;
 				}
 			}
 		}
 
 		// Make sure there is a virtual impeding object
-		if (impedingObj.headPosition < 0) {
-			impedingObj.speed = 100;
-			impedingObj.headPosition = vehicle.headPosition + 10000;
-			impedingObj.type = VehicleType.VIRTUAL_STATIC;
-			impedingObj.length = 0;
-			impedingObj.factor = SlowdownFactor.FRONT;
+		if (impObj.headPosition < 0) {
+			impObj.speed = 100;
+			impObj.headPosition = vehicle.headPosition + 10000;
+			impObj.type = VehicleType.VIRTUAL_STATIC;
+			impObj.length = 0;
+			impObj.factor = SlowdownFactor.FRONT;
 		}
 
 	}
