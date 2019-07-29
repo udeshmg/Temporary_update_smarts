@@ -6,6 +6,7 @@ import java.util.*;
 import common.Settings;
 import traffic.light.LightColor;
 import traffic.vehicle.Vehicle;
+import traffic.vehicle.VehicleUtil;
 
 /**
  * Edge is a basic element in road network. A network consists of a number of
@@ -109,6 +110,9 @@ public class Edge {
 	 */
 	public int numLeftLanes;
 	public int numLeftOnlyLanes;
+	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
+	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
+	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
 
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
@@ -343,4 +347,86 @@ public class Edge {
 	public Point2D getEndPoint(){
 		return new Point2D.Double(endNode.lon, endNode.lat);
 	}
+
+	public double getLaneChangeWaitingPos(Vehicle vehicle){
+		return length - getEndIntersectionSize() + vehicle.driverProfile.IDM_s0 - 0.0001;
+	}
+
+	public double getLaneChangeGiveChancePos(){
+		Vehicle first = currentVehicleInBeforeTurnLaneChangePos;
+		return (getLaneChangeWaitingPos(first) - first.driverProfile.IDM_s0) - first.length - first.driverProfile.IDM_s0 - 0.0001;
+	}
+
+	public double getBeforeTurnLaneChangePos(Vehicle vehicle){
+	    if(!laneChangePositions.containsKey(vehicle)){
+			updateLaneChangeConflicts();
+		}
+		Double val = laneChangePositions.get(vehicle);
+	    if(val != null){
+	    	return val;
+		}else{
+	    	//If the next edge in lookahead distance ask for position
+			return getLaneChangeWaitingPos(vehicle);
+		}
+    }
+
+	public List<Vehicle> laneChangeNeedVehicles(){
+		List<Vehicle> vehicles = new ArrayList<>();
+		for (Lane lane : lanes) {
+			for (Vehicle v: lane.getVehicles()) {
+				if(v.isNotWithinIntersections() && VehicleUtil.isNeedLaneChangeForTurn(this, v)){
+					vehicles.add(v);
+				}
+			}
+		}
+		Collections.sort(vehicles, new Comparator<Vehicle>() {
+			@Override
+			public int compare(Vehicle o1, Vehicle o2) {
+				if(o1.headPosition > o2.headPosition){
+					return -1;
+				}else if(o1.headPosition < o2.headPosition){
+					return 1;
+				}else {
+					return 0;
+				}
+			}
+		});
+		return vehicles;
+	}
+
+	public void updateLaneChangeConflicts(){
+		laneChangePositions.clear();
+		currentVehicleInBeforeTurnLaneChangePos = null;
+		chanceGivingVehicles.clear();
+		List<Vehicle> vehicles = laneChangeNeedVehicles();
+		for (int i = 0; i < vehicles.size(); i++) {
+			Vehicle current = vehicles.get(i);
+			if(i == 0){
+				currentVehicleInBeforeTurnLaneChangePos = current;
+				laneChangePositions.put(current, getLaneChangeWaitingPos(current));
+				current.setLaneBeforeChange(current.lane);
+			}else{
+				laneChangePositions.put(vehicles.get(i), getLaneChangeGiveChancePos());
+			}
+		}
+	}
+
+	public void findChanceGivingVehicle(){
+		for (Lane lane : lanes) {
+			for (Vehicle vehicle : lane.getVehicles()) {
+				if(vehicle.headPosition < getLaneChangeGiveChancePos() - Settings.lookAheadDistance) {
+					chanceGivingVehicles.add(vehicle);
+				}
+			}
+		}
+	}
+
+	public boolean hasAWaitingVehicle(Vehicle vehicle){
+		Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
+		if(v != null && chanceGivingVehicles.contains(vehicle)){
+			return true;
+		}
+		return false;
+	}
+
 }

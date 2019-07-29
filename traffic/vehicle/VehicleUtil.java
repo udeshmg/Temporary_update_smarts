@@ -1,10 +1,7 @@
 package traffic.vehicle;
 
 import common.Settings;
-import traffic.road.Edge;
-import traffic.road.Lane;
-import traffic.road.Node;
-import traffic.road.RoadType;
+import traffic.road.*;
 import traffic.vehicle.carfollow.SimpleCurve;
 
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -107,6 +104,34 @@ public class VehicleUtil {
 		return (vehicle.speed * vehicle.speed) / 2.0 / vehicle.driverProfile.IDM_b;
 	}
 
+
+	public static boolean isNeedLaneChangeForTurn(Edge edgeBeingChecked, Vehicle vehicle){
+        int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
+                vehicle.lane.laneNumber);
+        boolean isNeedToBlock = false;
+        if (Settings.isDriveOnLeft) {
+            if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
+                    && laneNumberBeingChecked >= edgeBeingChecked.numLeftLanes
+                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
+                isNeedToBlock = true;
+            } else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
+                    && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numRightLanes
+                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
+                isNeedToBlock = true;
+            }
+        } else {
+            if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
+                    && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numLeftLanes
+                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
+                isNeedToBlock = true;
+            } else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
+                    && laneNumberBeingChecked >= edgeBeingChecked.numRightLanes
+                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
+                isNeedToBlock = true;
+            }
+        }
+        return isNeedToBlock;
+    }
 
 
 

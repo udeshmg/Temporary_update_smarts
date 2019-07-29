@@ -66,6 +66,8 @@ public class Vehicle {
 	private SlowdownFactor recentSlowDownFactor = null;
 	private IntersectionDecision decision = null;
 
+	private Lane laneBeforeChange = null;
+
 	/**
 	 * This method tries to find a start position for a vehicle such that the
 	 * vehicle will be unlikely to collide with an existing vehicle. For
@@ -358,7 +360,25 @@ public class Vehicle {
 			// Check whether road is explicitly blocked on vehicle's route
 			updateRoadBlockInfo();
 			takeIntersectionDecision();
+			updateLaneChangeConflictData();
 		}
+	}
+
+	public void updateLaneChangeConflictData(){
+		if(laneBeforeChange != null){
+			if(laneBeforeChange != lane || headPosition > lane.edge.getLaneChangeWaitingPos(this)){
+				//The vehicle has changed the lane or gone beyond the waiting position
+				laneBeforeChange = null;
+				lane.edge.updateLaneChangeConflicts();
+			}else if(headPosition > lane.edge.getLaneChangeGiveChancePos()){
+				lane.edge.findChanceGivingVehicle();
+			}
+		}
+	}
+
+	public void setLaneBeforeChange(Lane laneBeforeChange) {
+		this.laneBeforeChange = laneBeforeChange;
+
 	}
 
 	public void takeIntersectionDecision(){
@@ -626,6 +646,7 @@ public class Vehicle {
 		}
 	}
 
+
 	public void setCityMeteringSpeed(double cityMeteringSpeed) {
 		this.cityMeteringSpeed = cityMeteringSpeed;
 	}
@@ -705,6 +726,20 @@ public class Vehicle {
 
 	public void setRecentSlowDownFactor(SlowdownFactor recentSlowDownFactor) {
 		this.recentSlowDownFactor = recentSlowDownFactor;
+	}
+
+	public boolean isWithinEndIntersection(){
+		Edge e = lane.edge;
+		return headPosition >= e.length - e.getEndIntersectionSize();
+	}
+
+	public boolean isWithinStartIntersection(){
+		Edge e = lane.edge;
+		return headPosition <= e.getStartIntersectionSize();
+	}
+
+	public boolean isNotWithinIntersections(){
+		return (!isWithinEndIntersection() && !isWithinStartIntersection());
 	}
 
 	public class IntersectionDecision{

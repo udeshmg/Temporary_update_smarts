@@ -120,8 +120,9 @@ public class IDM {
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
 				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LANEBLOCK));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane,
-						SlowdownFactor.PRIORITY_VEHICLE));
+				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.PRIORITY_VEHICLE));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
+				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.WAITING_VEHICLE));
 		return lowestAcceleration;
 	}
 
@@ -499,34 +500,9 @@ public class IDM {
 		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft || edgeBeingChecked == vehicle.edgeBeforeTurnRight) {
 			// Block vehicle if vehicle's lane cannot be used for turning
-			int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
-					vehicle.lane.laneNumber);
-			boolean isNeedToBlock = false;
-			if (Settings.isDriveOnLeft) {
-				if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
-						&& laneNumberBeingChecked >= edgeBeingChecked.numLeftLanes
-						&& !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
-					isNeedToBlock = true;
-				} else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
-						&& laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numRightLanes
-						&& !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
-					isNeedToBlock = true;
-				}
-			} else {
-				if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
-						&& laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numLeftLanes
-						&& !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
-					isNeedToBlock = true;
-				} else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
-						&& laneNumberBeingChecked >= edgeBeingChecked.numRightLanes
-						&& !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
-					isNeedToBlock = true;
-				}
-			}
+			boolean isNeedToBlock = VehicleUtil.isNeedLaneChangeForTurn(edgeBeingChecked, vehicle);
 			if (isNeedToBlock) {
-//				slowdownObj.headPosition = (examinedDist + edgeBeingChecked.length + vehicle.driverProfile.IDM_s0)
-//						- 0.00001;
-				slowdownObj.headPosition = examinedDist + edgeBeingChecked.length/2; //TODO this should be properly implemented, may not work for realworld networks
+				slowdownObj.headPosition = examinedDist + edgeBeingChecked.getBeforeTurnLaneChangePos(vehicle); //TODO this should be properly implemented, may not work for realworld networks
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.speed = 0;
 				slowdownObj.length = 0;
@@ -539,6 +515,19 @@ public class IDM {
 				slowdownObj.length = 0;
 				slowdownObj.factor = SlowdownFactor.TURN;
 			}
+		}
+	}
+
+	void updateImpedingObject_WaitingVehicle(final Vehicle vehicle, final double examinedDist,
+											  final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj){
+		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
+		if(edgeBeingChecked.hasAWaitingVehicle(vehicle)){
+			double giveChancePos = edgeBeingChecked.getLaneChangeGiveChancePos();
+			slowdownObj.headPosition = examinedDist + giveChancePos;
+			slowdownObj.type = VehicleType.VIRTUAL_STATIC;
+			slowdownObj.speed = 0;
+			slowdownObj.length = 0;
+			slowdownObj.factor = SlowdownFactor.WAITING_VEHICLE;
 		}
 	}
 }
