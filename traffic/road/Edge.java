@@ -358,7 +358,7 @@ public class Edge {
 	}
 
 	public double getBeforeTurnLaneChangePos(Vehicle vehicle){
-	    if(!laneChangePositions.containsKey(vehicle)){
+	    if(!laneChangePositions.containsKey(vehicle) && vehicle.lane.edge == this){
 			updateLaneChangeConflicts();
 		}
 		Double val = laneChangePositions.get(vehicle);
