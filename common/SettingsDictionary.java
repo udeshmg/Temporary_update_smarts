@@ -1,10 +1,7 @@
 package common;
 
 import processor.SimulationListener;
-import traffic.network.ODDistributor;
-import traffic.network.RandomODDistributor;
-import traffic.network.TemporalDistributor;
-import traffic.network.UniformTemporalDistributor;
+import traffic.network.*;
 import traffic.routing.Routing;
 
 import java.util.HashMap;
@@ -36,6 +33,7 @@ public class SettingsDictionary {
     private Map<String, SimulationListener> listenerMap;
     private Map<String, ODDistributor> odDistributorMap;
     private Map<String, TemporalDistributor> temporalDistributorMap;
+    private Map<String, VehicleTypeDistributor> vehicleTypeDistributorMap;
     private Map<String, Routing> routingAlgoMap;
 
     public SettingsDictionary() {
@@ -44,6 +42,8 @@ public class SettingsDictionary {
         addODDistributor("Random", new RandomODDistributor());
         this.temporalDistributorMap = new HashMap<>();
         addTemporalDistributor("Uniform", new UniformTemporalDistributor());
+        this.vehicleTypeDistributorMap = new HashMap<>();
+        addVehicleTypeDistributor("Default", new DefaultVehicleTypeDistributor());
         this.routingAlgoMap = new HashMap<>();
     }
 
@@ -57,6 +57,10 @@ public class SettingsDictionary {
 
     public void addTemporalDistributor(String key, TemporalDistributor temporalDistributor){
         temporalDistributorMap.put(key, temporalDistributor);
+    }
+
+    public void addVehicleTypeDistributor(String key, VehicleTypeDistributor vehicleTypeDistributor) {
+        vehicleTypeDistributorMap.put(key, vehicleTypeDistributor);
     }
 
     public void addRoutingAlgorithm(String key, Routing algorithm){
@@ -74,4 +78,6 @@ public class SettingsDictionary {
     public TemporalDistributor getTemporalDistributor(String key){
         return temporalDistributorMap.get(key);
     }
+
+    public VehicleTypeDistributor getVehicleTypeDistributor(String key) {return  vehicleTypeDistributorMap.get(key);}
 }

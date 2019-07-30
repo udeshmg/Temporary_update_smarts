@@ -345,6 +345,7 @@ public class SimServerData {
         Settings.odDistributor = experiment.getOdDistributor();
         Settings.temporalDistributor = experiment.getTemporalDistributor();
         Settings.simulationListener = experiment.getSimulationListener();
+        Settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
 
         return isNewMap;
     }

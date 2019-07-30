@@ -296,15 +296,7 @@ public class TrafficNetwork extends RoadNetwork {
 			final int numVehiclesNeeded = Settings.getTemporalDistributor().getCurrentVehicleLimit(numLocalRandomPrivateVehicles,
 					(int) (timeNow*Settings.numStepsPerSecond),Settings.maxNumSteps) - numInternalNonPublicVehicle;
 			for (int i = 0; i < numVehiclesNeeded; i++) {
-				final double typeDecider = random.nextDouble();
-				VehicleType type = null;
-				if (typeDecider < 0.05) {
-					type = VehicleType.BIKE;
-				} else if ((0.05 <= typeDecider) && (typeDecider < 0.1)) {
-					type = VehicleType.TRUCK;
-				} else {
-					type = VehicleType.CAR;
-				}
+				VehicleType type = Settings.getVehicleTypeDistributor().getVehicleType();
 				ArrayList<RouteLeg> route = createOneRandomInternalRoute(type);
 				if (route != null) {
 					addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", -1,

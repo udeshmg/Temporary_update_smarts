@@ -5,11 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import processor.SimulationListener;
-import traffic.network.ODDistributor;
+import traffic.network.*;
 import traffic.light.TrafficLightTiming;
-import traffic.network.RandomODDistributor;
-import traffic.network.TemporalDistributor;
-import traffic.network.UniformTemporalDistributor;
 import traffic.routing.Routing;
 import traffic.vehicle.EmergencyStrategy;
 
@@ -139,6 +136,7 @@ public class Settings {
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
 	public static String odDistributor = "Random";
 	public static String temporalDistributor = "Uniform";
+	public static String vehicleTypeDistributor = "Default";
 	public static double safetyHeadwayMultiplier = 1;
 	public static String defaultDownloadDirectory = "download";
 	public static String defaultTestName = null;
@@ -158,6 +156,10 @@ public class Settings {
 
 	public static TemporalDistributor getTemporalDistributor(){
 		return dictionary.getTemporalDistributor(temporalDistributor);
+	}
+
+	public static VehicleTypeDistributor getVehicleTypeDistributor(){
+		return dictionary.getVehicleTypeDistributor(vehicleTypeDistributor);
 	}
 
 	public static SimulationListener getSimulationListener(){

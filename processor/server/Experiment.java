@@ -37,6 +37,7 @@ public class Experiment {
     String simulationListener;
     String odDistributor;
     String temporalDistributor;
+    String vehicleTypeDistributor;
 
     public void setExperimentId(String experimentId) {
         this.experimentId = experimentId;
@@ -270,6 +271,14 @@ public class Experiment {
         this.temporalDistributor = temporalDistributor;
     }
 
+    public String getVehicleTypeDistributor() {
+        return vehicleTypeDistributor;
+    }
+
+    public void setVehicleTypeDistributor(String vehicleTypeDistributor) {
+        this.vehicleTypeDistributor = vehicleTypeDistributor;
+    }
+
     public void setValues(String key, String value){
         switch (key) {
             case "driveOnLeft": {
@@ -394,6 +403,10 @@ public class Experiment {
                 setTemporalDistributor(value);
                 break;
             }
+            case "vehicleTypeDistributor":{
+                setVehicleTypeDistributor(value);
+                break;
+            }
         }
     }
 
@@ -427,6 +440,7 @@ public class Experiment {
         experiment.setSimulationListener(simulationListener);
         experiment.setOdDistributor(odDistributor);
         experiment.setTemporalDistributor(temporalDistributor);
+        experiment.setVehicleTypeDistributor(vehicleTypeDistributor);
         return experiment;
     }
 }
