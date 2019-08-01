@@ -395,10 +395,10 @@ public class TrafficNetwork extends RoadNetwork {
 	 * @return
 	 */
 	ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
-		final Edge edgeStart = Settings.getODDistributor().getStartEdge(this, internalNonPublicVehicleStartEdges);
-		final Edge edgeEnd = Settings.getODDistributor().getEndEdge(this, internalNonPublicVehicleEndEdges);
+		final Edge[] edges = Settings.getODDistributor().getStartAndEndEdge(this,
+                internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges);
 
-		final ArrayList<RouteLeg> route = routingAlgorithm.createCompleteRoute(edgeStart, edgeEnd, type);
+		final ArrayList<RouteLeg> route = routingAlgorithm.createCompleteRoute(edges[0], edges[1], type);
 
 		if ((route == null) || (route.size() == 0)) {
 			return null;

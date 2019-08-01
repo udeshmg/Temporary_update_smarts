@@ -38,8 +38,7 @@ public abstract class ODDistributor {
         return random;
     }
 
-    public abstract Edge getStartEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges);
-    public abstract Edge getEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleEndEdges);
+    public abstract Edge[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges);
     public abstract List<double[]> getSourceWidows(RoadNetwork network);
     public abstract List<double[]> getDestinationWidows(RoadNetwork network);
     public abstract List<double[]> getSourceDestinationWidows(RoadNetwork network);

@@ -32,15 +32,14 @@ import java.util.List;
 public class RandomODDistributor extends ODDistributor{
 
 
-
     @Override
-    public Edge getStartEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges) {
-        return possibleStartEdges.get(getRandom().nextInt(possibleStartEdges.size()));
-    }
-
-    @Override
-    public Edge getEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleEndEdges) {
-        return possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
+    public Edge[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges) {
+        Edge start = possibleStartEdges.get(getRandom().nextInt(possibleStartEdges.size()));
+        Edge end = possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
+        while(start.startNode == end.endNode){
+            end = possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
+        }
+        return new Edge[]{start, end};
     }
 
     @Override
