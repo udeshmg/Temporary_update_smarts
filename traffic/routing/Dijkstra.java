@@ -142,18 +142,16 @@ public class Dijkstra extends Routing {
 
 	public ArrayList<RouteLeg> createCompleteRoute(final Edge startEdge, final Edge endEdge, final VehicleType type) {
 		//StartEdge should be fixed to add vehicle . Otherwise it creates incorrect routes
-		computePathsFromTo(startEdge.endNode, endEdge.endNode, type);
+		computePathsFromTo(startEdge.startNode, endEdge.endNode, type);
 		final List<DijkstraVertex> path = getPathTo(endEdge.endNode);
 		if (path.size() < 2) {
 			return null;
 		}
 		final ArrayList<RouteLeg> legsOnRoute = new ArrayList<>();
-		legsOnRoute.add(new RouteLeg(startEdge, 0));
 		for (int i = 1; i < path.size(); i++) {
 			final Edge edge = getEdgeFromVertices(path.get(i - 1), path.get(i));
 			legsOnRoute.add(new RouteLeg(edge, 0));
 		}
-//		RouteUtil.removeRepeatSections(legsOnRoute);
 		return legsOnRoute;
 	}
 
