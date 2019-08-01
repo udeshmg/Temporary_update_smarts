@@ -140,10 +140,10 @@ public class Dijkstra extends Routing {
 		}
 	}
 
-	public ArrayList<RouteLeg> createCompleteRoute(final Edge startEdge, final Edge endEdge, final VehicleType type) {
+	public ArrayList<RouteLeg> createCompleteRoute(Node start, Node end, final VehicleType type) {
 		//StartEdge should be fixed to add vehicle . Otherwise it creates incorrect routes
-		computePathsFromTo(startEdge.startNode, endEdge.endNode, type);
-		final List<DijkstraVertex> path = getPathTo(endEdge.endNode);
+		computePathsFromTo(start, end, type);
+		final List<DijkstraVertex> path = getPathTo(end);
 		if (path.size() < 2) {
 			return null;
 		}

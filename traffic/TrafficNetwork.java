@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 import common.Settings;
+import processor.SimulationListener;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableRouteLeg;
 import traffic.light.LightCoordinator;
@@ -94,6 +95,8 @@ public class TrafficNetwork extends RoadNetwork {
 	HashMap<String, ArrayList<Edge>> internalBusEndEdgesInDestinationWindow = new HashMap<>();
 	List<Vehicle> finishedVehicles = new ArrayList<>();
 
+	private PriorityQueue<Vehicle> tripMakingVehicles;
+
 	/**
 	 * Initialize traffic network.
 	 */
@@ -101,6 +104,7 @@ public class TrafficNetwork extends RoadNetwork {
 		super();
 		identifyInternalTramStopEdges();
 		addTramStopsToParallelNonTramEdges();
+		tripMakingVehicles = new PriorityQueue<>(getTripMakingVehicleComparator());
 	}
 
 	public void clearReportedData() {
@@ -112,13 +116,13 @@ public class TrafficNetwork extends RoadNetwork {
 	 * Create a new vehicle object and add it to the pool of vehicles.
 	 *
 	 */
-	void addNewVehicle(final VehicleType type, final boolean isExternal, final boolean foreground,
-			final ArrayList<RouteLeg> routeLegs, final String idPrefix, final double timeRouteStart,
+	void addNewVehicle(final VehicleType type, final boolean isExternal, final boolean foreground, Node start, Node end,
+			List<RouteLeg> routeLegs, final String idPrefix, final double timeRouteStart,
 			final String externalId, final int vid, final DriverProfile dP) {
 		// Do not proceed if the route is empty
-		if (routeLegs.size() < 1) {
+		/*if (routeLegs.size() < 1) {
 			return;
-		}
+		}*///TODO if the start and end is not reachable it should be handled
 		// Create new vehicle
 		final Vehicle vehicle = new Vehicle();
 		// Creation time
@@ -133,6 +137,8 @@ public class TrafficNetwork extends RoadNetwork {
 		vehicle.isExternal = isExternal;
 		// Length of vehicle
 		vehicle.length = type.length;
+		vehicle.setStart(start);
+		vehicle.setEnd(end);
 		// Legs of route
 		vehicle.setRouteLegs(routeLegs);
 		// Driver profile
@@ -155,14 +161,15 @@ public class TrafficNetwork extends RoadNetwork {
 			vehicle.vid = numInternalVehicleAllTime;
 			// Add vehicle to system
 			vehicles.add(vehicle);
-
-			vehicle.park(true, timeRouteStart);
+			tripMakingVehicles.add(vehicle);
+			//vehicle.park(true, timeRouteStart);
 		} else {
 			// Add external vehicle to system
 			vehicle.id = externalId;
 			vehicle.vid = vid;
 			vehicles.add(vehicle);
-			vehicle.park(true, timeRouteStart);
+			tripMakingVehicles.add(vehicle);
+			//vehicle.park(true, timeRouteStart);
 		}
 
 		// Certain information about this vehicle will be reported to server
@@ -275,7 +282,9 @@ public class TrafficNetwork extends RoadNetwork {
 		for (final SerializableExternalVehicle vehicle : externalRoutes) {
 			final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 			if (vehicle.numberRepeatPerSecond <= 0) {
-				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
+				List<RouteLeg> routeLegs = createOneRouteFromSerializedData(vehicle.route, type);
+				addNewVehicle(type, true, vehicle.foreground, routeLegs.get(0).edge.startNode,
+						routeLegs.get(routeLegs.size()-1).edge.endNode, routeLegs , "",
 						vehicle.startTime, vehicle.id, vehicle.vid, DriverProfile.valueOf(vehicle.driverProfile));
 			} else {
 				// This is a simple way to get number of vehicles per step. The result number may be inaccurate.
@@ -297,11 +306,10 @@ public class TrafficNetwork extends RoadNetwork {
 					(int) (timeNow*Settings.numStepsPerSecond),Settings.maxNumSteps) - numInternalNonPublicVehicle;
 			for (int i = 0; i < numVehiclesNeeded; i++) {
 				VehicleType type = Settings.getVehicleTypeDistributor().getVehicleType();
-				ArrayList<RouteLeg> route = createOneRandomInternalRoute(type);
-				if (route != null) {
-					addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", -1,
+				Edge[] edges = Settings.getODDistributor().getStartAndEndEdge(this,
+						internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges);
+				addNewVehicle(type, false, false, edges[0].startNode, edges[1].endNode, null, internalVehiclePrefix, timeNow, "", -1,
 							getRandomDriverProfile());
-				}
 			}
 		}
 	}
@@ -384,9 +392,9 @@ public class TrafficNetwork extends RoadNetwork {
 				break;
 			}
 		}
-		if (route != null) {
-			addNewVehicle(type, false, false, route, internalVehiclePrefix, timeNow, "", -1, getRandomDriverProfile());
-		}
+		Node start = route.get(0).edge.startNode;
+		Node end = route.get(route.size()-1).edge.endNode;
+		addNewVehicle(type, false, false, start, end, route, internalVehiclePrefix, timeNow, "", -1, getRandomDriverProfile());
 	}
 
 	/**
@@ -394,9 +402,8 @@ public class TrafficNetwork extends RoadNetwork {
 	 * @param type
 	 * @return
 	 */
-	ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
-		final Edge[] edges = Settings.getODDistributor().getStartAndEndEdge(this,
-                internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges);
+	/*ArrayList<RouteLeg> createOneRandomInternalRoute(final VehicleType type) {
+
 
 		final ArrayList<RouteLeg> route = routingAlgorithm.createCompleteRoute(edges[0], edges[1], type);
 
@@ -405,13 +412,13 @@ public class TrafficNetwork extends RoadNetwork {
 		} else {
 			return route;
 		}
-	}
+	}*/
 
 	ArrayList<RouteLeg> createOneRouteFromSerializedData(final ArrayList<SerializableRouteLeg> serializedData, VehicleType type) {
 		if(Settings.inputOnlyODPairsOfForegroundVehicleFile){
 			SerializableRouteLeg legStart = serializedData.get(0);
 			SerializableRouteLeg legEnd = serializedData.get(serializedData.size()-1);
-			return routingAlgorithm.createCompleteRoute(edges.get(legStart.edgeIndex), edges.get(legEnd.edgeIndex), type);
+			return routingAlgorithm.createCompleteRoute(edges.get(legStart.edgeIndex).startNode, edges.get(legEnd.edgeIndex).endNode, type);
 		}else {
 			final ArrayList<RouteLeg> route = new ArrayList<>(1000);
 			for (final SerializableRouteLeg sLeg : serializedData) {
@@ -619,7 +626,10 @@ public class TrafficNetwork extends RoadNetwork {
 			for (int i = 0; i < (int) numRepeatThisStep; i++) {
 				final VehicleType type = VehicleType.getVehicleTypeFromName(vehicle.vehicleType);
 				final DriverProfile profile = DriverProfile.valueOf(vehicle.driverProfile);
-				addNewVehicle(type, true, vehicle.foreground, createOneRouteFromSerializedData(vehicle.route, type), "",
+				List<RouteLeg> route = createOneRouteFromSerializedData(vehicle.route, type);
+				Node start = route.get(0).edge.startNode;
+				Node end = route.get(route.size()-1).edge.endNode;
+				addNewVehicle(type, true, vehicle.foreground,start, end, route , "",
 						timeNow, vehicle.id + "_time_" + timeNow + "_" + i, vehicle.vid,  profile);
 			}
 		}
@@ -711,6 +721,26 @@ public class TrafficNetwork extends RoadNetwork {
 		}
 	}
 
+	public void releaseTripMakingVehicles(final double timeNow, SimulationListener listener) {
+		Vehicle next = getNextTripMakingVehicle(timeNow);
+		while (next != null){
+			next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
+			if(listener != null){
+				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/Settings.numStepsPerSecond), this);
+			}
+			next.park(true, timeNow);
+			next = getNextTripMakingVehicle(timeNow);
+		}
+	}
+
+	public Vehicle getNextTripMakingVehicle(double timeNow){
+		Vehicle v =  tripMakingVehicles.peek();
+		if(v != null && v.isStartTripMaking(timeNow)){
+			return tripMakingVehicles.poll();
+		}
+		return null;
+	}
+
 	public void updateTrafficLights(){
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			lightCoordinator.updateLights();
@@ -745,5 +775,19 @@ public class TrafficNetwork extends RoadNetwork {
 
 	public boolean isPublishTime(int step){
 		return (step % Settings.updateStepInterval) == 1;
+	}
+
+	public Comparator<Vehicle> getTripMakingVehicleComparator(){
+		return new Comparator<Vehicle>() {
+			@Override
+			public int compare(Vehicle v1, Vehicle v2) {
+				if(v1.timeRouteStart < v2.timeRouteStart){
+					return -1;
+				}else if(v1.timeRouteStart > v2.timeRouteStart){
+					return 1;
+				}
+				return 0;
+			}
+		};
 	}
 }

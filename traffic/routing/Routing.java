@@ -5,6 +5,7 @@ import java.util.List;
 
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleType;
 
@@ -19,7 +20,7 @@ public abstract class Routing {
 		this.trafficNetwork = trafficNetwork;
 	}
 
-	public abstract ArrayList<RouteLeg> createCompleteRoute(Edge startEdge, Edge endEdge, VehicleType type);
+	public abstract ArrayList<RouteLeg> createCompleteRoute(Node start, Node end, VehicleType type);
 
 
 

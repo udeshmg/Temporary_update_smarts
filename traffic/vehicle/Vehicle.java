@@ -67,6 +67,8 @@ public class Vehicle {
 	private IntersectionDecision decision = null;
 
 	private Lane laneBeforeChange = null;
+	private Node start;
+	private Node end;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -211,6 +213,10 @@ public class Vehicle {
 
 	public boolean isStartFromParking(double timeNow){
 		return active && (lane == null) && (timeNow >= earliestTimeToLeaveParking);
+	}
+
+	public boolean isStartTripMaking(double timeNow){
+		return active && (timeNow >= timeRouteStart);
 	}
 
 	public void changeLane(final double timeNow){
@@ -558,8 +564,8 @@ public class Vehicle {
 
 		// Try a few times for computing new route.
 		for (int i = 0; i < 3; i++) {
-			ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute + 1).edge,
-					oldRoute.get(oldRoute.size() - 1).edge, type);
+			ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute + 1).edge.startNode,
+					oldRoute.get(oldRoute.size() - 1).edge.endNode, type);
 			// The next leg on the old route cannot be the next leg on the new route!
 			if (partialRoute != null && partialRoute.get(0).edge != oldRoute.get(currentIndexOnOldRoute + 1).edge) {
 				newRoute.addAll(partialRoute);
@@ -740,6 +746,22 @@ public class Vehicle {
 
 	public boolean isNotWithinIntersections(){
 		return (!isWithinEndIntersection() && !isWithinStartIntersection());
+	}
+
+	public Node getStart() {
+		return start;
+	}
+
+	public void setStart(Node start) {
+		this.start = start;
+	}
+
+	public Node getEnd() {
+		return end;
+	}
+
+	public void setEnd(Node end) {
+		this.end = end;
 	}
 
 	public class IntersectionDecision{

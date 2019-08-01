@@ -164,9 +164,9 @@ public class RandomAStar extends Routing {
 		}
 	}
 
-	public ArrayList<RouteLeg> createCompleteRoute(final Edge startEdge, final Edge endEdge, final VehicleType type) {
-		computePathsFromTo(startEdge.startNode, endEdge.endNode, type);
-		final List<DijkstraVertex> path = getPathTo(endEdge.endNode);
+	public ArrayList<RouteLeg> createCompleteRoute(Node start, Node end, final VehicleType type) {
+		computePathsFromTo(start, end, type);
+		final List<DijkstraVertex> path = getPathTo(end);
 		if (path.size() < 2) {
 			return null;
 		}
