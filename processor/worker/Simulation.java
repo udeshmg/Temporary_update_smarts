@@ -22,7 +22,6 @@ public class Simulation {
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	SimulationListener simulationListener = null;
-	List<Vehicle> routeRequested = new ArrayList<>();
 
 	public Simulation(final TrafficNetwork trafficNetwork) {
 		this.trafficNetwork = trafficNetwork;
@@ -172,16 +171,6 @@ public class Simulation {
 	void removeTripFinishedVehicles(){
 		trafficNetwork.addTripFinishedVehicles(oneStepData_allVehiclesReachedDestination);
 		trafficNetwork.removeActiveVehicles(oneStepData_allVehiclesReachedDestination);
-	}
-
-	public void onVehicleAdd(double timeNow, int step){
-		if(simulationListener != null){
-			List<Vehicle> newVehicles = trafficNetwork.vehicles.stream().filter(vehicle ->
-					vehicle.active && vehicle.lane == null && vehicle.earliestTimeToLeaveParking <= timeNow && !routeRequested.contains(vehicle))
-					.collect(Collectors.toList());
-			simulationListener.onVehicleAdd(newVehicles, step, trafficNetwork);
-			routeRequested.addAll(newVehicles);
-		}
 	}
 
 	public void onVehicleMove(int step){
