@@ -91,7 +91,7 @@ public class FileOutput {
 
 	void initRouteOutputFile() {
 		try {
-			final File file = getNewFile(Settings.prefixOutputRoutePlan, "xml");
+			final File file = getNewFile(Settings.prefixOutputRoutePlan);
 			fosRoute = new FileOutputStream(file, true);
 			outputStringToFile(fosRoute,
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.getProperty("line.separator"));
