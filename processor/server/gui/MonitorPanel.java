@@ -46,6 +46,8 @@ import traffic.road.RoadNetwork;
 import traffic.road.RoadUtil;
 import traffic.vehicle.VehicleType;
 
+import static processor.server.gui.GUI.VehicleDetailType.Slowdown_Factor;
+
 /**
  * Panel that shows moving vehicles on map.
  *
@@ -932,18 +934,21 @@ public class MonitorPanel extends JPanel {
 			if (vehicleDetailOn) {
 				String detail = "";
 				switch (VehicleDetailType.valueOf(vehicleDetailType)) {
-				case Type:
-					detail = vehicle.type;
-					break;
-				case Remaining_Links:
-					detail = String.valueOf(vehicle.numLinksToGo);
-					break;
-				case ID_Worker:
-					detail = vehicle.vid + "@" + vehicle.worker;
-					break;
-				case Driver_Profile:
-					detail = vehicle.driverProfile;
-					break;
+					case Type:
+						detail = vehicle.type;
+						break;
+					case Remaining_Links:
+						detail = String.valueOf(vehicle.numLinksToGo);
+						break;
+					case ID_Worker:
+						detail = vehicle.vid + "@" + vehicle.worker;
+						break;
+					case Driver_Profile:
+						detail = vehicle.driverProfile;
+						break;
+					case Slowdown_Factor:
+						detail = vehicle.slowDownFactor;
+						break;
 				}
 
 				g2d.setColor(Color.black);
