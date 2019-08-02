@@ -348,13 +348,23 @@ public class Edge {
 		return new Point2D.Double(endNode.lon, endNode.lat);
 	}
 
-	public double getLaneChangeWaitingPos(Vehicle vehicle){
-		return length - getEndIntersectionSize() + vehicle.driverProfile.IDM_s0 - 0.0001;
+	public double getEndIntersectionLaneChangeProhibitedPos(){
+		return length - getEndIntersectionSize() - 1;
+	}
+
+	public double getStartIntersectionLaneChangeProhibitedPos(Vehicle vehicle){
+		return getStartIntersectionSize() + vehicle.length;
+	}
+
+
+
+	public double getLaneChangeWaitingPos(){
+		return getEndIntersectionLaneChangeProhibitedPos();
 	}
 
 	public double getLaneChangeGiveChancePos(){
-		Vehicle first = currentVehicleInBeforeTurnLaneChangePos;
-		return (getLaneChangeWaitingPos(first) - first.driverProfile.IDM_s0) - first.length - first.driverProfile.IDM_s0 - 0.0001;
+		Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
+		return getLaneChangeWaitingPos() - v.driverProfile.IDM_s0 - v.length - v.driverProfile.IDM_s0 - 0.0001;
 	}
 
 	public double getBeforeTurnLaneChangePos(Vehicle vehicle){
@@ -366,7 +376,7 @@ public class Edge {
 	    	return val;
 		}else{
 	    	//If the next edge in lookahead distance ask for position
-			return getLaneChangeWaitingPos(vehicle);
+			return getLaneChangeWaitingPos();
 		}
     }
 
@@ -374,7 +384,7 @@ public class Edge {
 		List<Vehicle> vehicles = new ArrayList<>();
 		for (Lane lane : lanes) {
 			for (Vehicle v: lane.getVehicles()) {
-				if(v.isNotWithinIntersections() && VehicleUtil.isNeedLaneChangeForTurn(this, v)){
+				if(!v.isWithinLaneChangeProhibitedArea() && VehicleUtil.isNeedLaneChangeForTurn(this, v)){
 					vehicles.add(v);
 				}
 			}
@@ -403,7 +413,7 @@ public class Edge {
 			Vehicle current = vehicles.get(i);
 			if(i == 0){
 				currentVehicleInBeforeTurnLaneChangePos = current;
-				laneChangePositions.put(current, getLaneChangeWaitingPos(current));
+				laneChangePositions.put(current, getLaneChangeWaitingPos());
 				current.setLaneBeforeChange(current.lane);
 			}else{
 				laneChangePositions.put(vehicles.get(i), getLaneChangeGiveChancePos());
@@ -414,7 +424,7 @@ public class Edge {
 	public void findChanceGivingVehicle(){
 		for (Lane lane : lanes) {
 			for (Vehicle vehicle : lane.getVehicles()) {
-				if(vehicle.headPosition < getLaneChangeGiveChancePos() - Settings.lookAheadDistance) {
+				if(vehicle.headPosition < getLaneChangeGiveChancePos() - vehicle.speed * vehicle.driverProfile.IDM_T) {
 					chanceGivingVehicles.add(vehicle);
 				}
 			}

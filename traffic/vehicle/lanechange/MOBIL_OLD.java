@@ -206,10 +206,7 @@ public class MOBIL_OLD {
         if (vehicle.type == VehicleType.TRAM) {
             return false;
         }
-        Lane lane = vehicle.lane;
-        Edge edge = lane.edge;
-        if((vehicle.headPosition >= edge.length - edge.getEndIntersectionSize())
-            || (vehicle.headPosition <= edge.getStartIntersectionSize() + vehicle.length)){
+        if(vehicle.isWithinLaneChangeProhibitedArea()){
             //Do not change lanes within an intersection
             return false;
         }

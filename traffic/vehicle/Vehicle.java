@@ -372,7 +372,7 @@ public class Vehicle {
 
 	public void updateLaneChangeConflictData(){
 		if(laneBeforeChange != null){
-			if(laneBeforeChange != lane || headPosition > lane.edge.getLaneChangeWaitingPos(this)){
+			if(laneBeforeChange != lane || headPosition > lane.edge.getEndIntersectionLaneChangeProhibitedPos()){
 				//The vehicle has changed the lane or gone beyond the waiting position
 				laneBeforeChange = null;
 				lane.edge.updateLaneChangeConflicts();
@@ -390,10 +390,10 @@ public class Vehicle {
 	public void takeIntersectionDecision(){
 		Edge current = lane.edge;
 		if(hasNextEdge()) {
-			if (headPosition >= current.length - current.endNode.getIntersectionSize(current.startNode)) {
+			if (headPosition > current.getEndIntersectionLaneChangeProhibitedPos()) {
 				Lane next = getLaneInNextEdge(getNextEdge());
 				decision = new IntersectionDecision(lane, next);
-			}else if(headPosition > current.startNode.getIntersectionSize(current.endNode) + length){
+			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
 				decision = null;
 			}
 		}
@@ -736,16 +736,25 @@ public class Vehicle {
 
 	public boolean isWithinEndIntersection(){
 		Edge e = lane.edge;
-		return headPosition >= e.length - e.getEndIntersectionSize();
+		return headPosition > e.length - e.getEndIntersectionSize();
 	}
 
 	public boolean isWithinStartIntersection(){
 		Edge e = lane.edge;
-		return headPosition <= e.getStartIntersectionSize();
+		return (headPosition - length) <= e.getStartIntersectionSize();
+	}
+
+	public boolean isWithinAnyIntersection(){
+		return isWithinEndIntersection() || isWithinStartIntersection();
 	}
 
 	public boolean isNotWithinIntersections(){
 		return (!isWithinEndIntersection() && !isWithinStartIntersection());
+	}
+
+	public boolean isWithinLaneChangeProhibitedArea(){
+		return headPosition > lane.edge.getEndIntersectionLaneChangeProhibitedPos()
+				|| headPosition <= lane.edge.getStartIntersectionLaneChangeProhibitedPos(this);
 	}
 
 	public Node getStart() {
