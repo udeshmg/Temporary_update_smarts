@@ -439,4 +439,18 @@ public class Edge {
 		return false;
 	}
 
+	public boolean hasSpaceForAvehicleInBack(Lane lane, Vehicle vehicle){
+		Vehicle last = lane.getLastVehicleInLane();
+		double startPos = lane.edge.length - lane.edge.getEndIntersectionSize();
+		if(last != null){
+			startPos = last.headPosition - last.length + last.speed * Settings.minTimeSafeToCrossIntersection;
+		}
+		double expectedFill = 0;
+		for (Vehicle v : lane.vehiclesStartedMovingTowards()) {
+			expectedFill += v.length + v.driverProfile.IDM_s0;
+		}
+		double freeSpace = startPos - expectedFill - lane.edge.getStartIntersectionSize();
+		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);
+	}
+
 }

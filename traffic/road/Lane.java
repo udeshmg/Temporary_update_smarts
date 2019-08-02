@@ -148,6 +148,49 @@ public class Lane {
 	    return new Line2D.Double(lonStart, latStart, lonEnd, latEnd);
     }
 
+    public List<Vehicle> getVehiclesBelowHeadPosition(double headPos){
+		List<Vehicle> list = new ArrayList<>();
+		for (int i = vehicles.size() - 1; i >= 0; i--) {
+			Vehicle v = vehicles.get(i);
+			if(v.headPosition < headPos){
+				list.add(v);
+			}else{
+				break;
+			}
+		}
+		return list;
+	}
+
+	public List<Vehicle> getVehiclesAboveHeadPosition(double headPos){
+		List<Vehicle> list = new ArrayList<>();
+		for (int i = 0; i < vehicles.size(); i++) {
+			Vehicle v = vehicles.get(i);
+			if(v.headPosition > headPos){
+				list.add(v);
+			}else{
+				break;
+			}
+		}
+		return list;
+	}
+
+	public List<Vehicle> vehiclesStartedMovingTowards(){
+		List<Vehicle> towardsVehicles = new ArrayList<>();
+		Node junc = edge.startNode;
+		for (Edge inwardEdge : junc.inwardEdges) {
+			for (Lane lane : inwardEdge.getLanes()) {
+				List<Vehicle> vehiclesInsideIntersection = lane.getVehiclesAboveHeadPosition(inwardEdge.length - inwardEdge.getEndIntersectionSize());
+				for (Vehicle vehicle : vehiclesInsideIntersection) {
+					Vehicle.IntersectionDecision decision = vehicle.getDecision();
+					if(decision != null && decision.getEndLane() == this){//decision can be null for ending vehicles
+						towardsVehicles.add(vehicle);
+					}
+				}
+			}
+		}
+		return towardsVehicles;
+	}
+
 	/**
 	 * Comparator of vehicles based on their positions in a lane. The vehicle
 	 * closest to the end of the lane, will be the first element in the sorted

@@ -123,6 +123,8 @@ public class IDM {
 				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.PRIORITY_VEHICLE));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
 				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.WAITING_VEHICLE));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
+				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.QUEUE_SPILLBACK));
 		return lowestAcceleration;
 	}
 
@@ -169,6 +171,8 @@ public class IDM {
 				updateImpedingObject_PriorityVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			} else if (factor == SlowdownFactor.WAITING_VEHICLE) {
 				updateImpedingObject_WaitingVehicle(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
+			}else if (factor == SlowdownFactor.QUEUE_SPILLBACK) {
+				updateImpedingObject_QueueSpillback(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			}
 			if (impObj.headPosition < 0) {
 				examinedDist += vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length;
@@ -534,6 +538,25 @@ public class IDM {
 			slowdownObj.speed = 0;
 			slowdownObj.length = 0;
 			slowdownObj.factor = SlowdownFactor.WAITING_VEHICLE;
+		}
+	}
+
+	void updateImpedingObject_QueueSpillback(final Vehicle vehicle, final double examinedDist,
+											 final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj){
+		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
+		if(vehicle.getDecision() != null){
+			Vehicle.IntersectionDecision decision = vehicle.getDecision();
+			Edge current = vehicle.getCurrentEdge();
+			if(current == decision.getStartLane().edge && edgeBeingChecked == decision.getEndLane().edge){
+				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle) && vehicle.isNotWithinIntersections()){
+					slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
+					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
+					slowdownObj.speed = 0;
+//					slowdownObj.length = current.getEndIntersectionSize() + edgeBeingChecked.getStartIntersectionSize() - vehicle.driverProfile.IDM_s0;
+					slowdownObj.length = 0;
+					slowdownObj.factor = SlowdownFactor.QUEUE_SPILLBACK;
+				}
+			}
 		}
 	}
 }
