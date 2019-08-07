@@ -149,6 +149,8 @@ public class Settings {
 	public static String simulationListener = "";
 	public static double startGapOffset = 0.0;
 	public static double startPosOffset = 0.0;
+	public static boolean stopsAtMaxSteps = true;
+	public static int gridlockDetectionTime = 600;
 
 	public static ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);

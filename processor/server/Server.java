@@ -420,7 +420,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			updateWorkerState(msg.workerName, WorkerState.FINISHED_ONE_STEP);
 			if (isAllWorkersAtState(WorkerState.FINISHED_ONE_STEP)) {
 				data.updateSimulationTime();
-				if (data.getStep() >= Settings.maxNumSteps) {
+				if (data.isSimulationStopReached()) {
 					stopSim();
 				} else if (isSimulating) {
 					askWorkersShareTrafficDataWithFellowWorkers();

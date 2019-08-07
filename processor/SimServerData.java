@@ -59,6 +59,8 @@ public class SimServerData {
     private List<Experiment> experiments = null;
     private int experimentIndex = 0;
     private int runIndex = 0;
+    private int lastVehicleFinishedStep = 0;
+    private int notFinishedVehicles = 0;
 
     public void showNumberOfConnectedWorkers(int number) {
         if (Settings.isVisualize) {
@@ -125,6 +127,7 @@ public class SimServerData {
         }
         // Add new vehicle position to its trajectory
         double timeStamp = step / Settings.numStepsPerSecond;
+        notFinishedVehicles = vehicleList.size();
         if (Settings.isOutputTrajectory) {
             for (Serializable_GUI_Vehicle vehicle : vehicleList) {
                 if (!allTrajectories.containsKey(vehicle.id)) {
@@ -132,6 +135,9 @@ public class SimServerData {
                 }
                 allTrajectories.get(vehicle.id).put(timeStamp, new double[]{vehicle.latHead, vehicle.lonHead});
             }
+        }
+        if(finished.size() > 0){
+            lastVehicleFinishedStep = step;
         }
         for (Serializable_Finished_Vehicle finishedVehicle : finished) {
             vdOutput.outputVehicleData(finishedVehicle);
@@ -347,6 +353,7 @@ public class SimServerData {
         Settings.temporalDistributor = experiment.getTemporalDistributor();
         Settings.simulationListener = experiment.getSimulationListener();
         Settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
+        Settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
 
         return isNewMap;
     }
@@ -413,5 +420,30 @@ public class SimServerData {
 
     public boolean loadScript() {
         return scriptLoader.loadScriptFile();
+    }
+
+
+    public boolean isSimulationStopReached(){
+        if(getStep() < Settings.maxNumSteps){
+            return false;
+        }else{
+            if(Settings.stopsAtMaxSteps) {
+                return true;
+            }else{
+                if (notFinishedVehicles > 0) {
+                    if ((getStep() - lastVehicleFinishedStep) > Settings.gridlockDetectionTime * Settings.numStepsPerSecond) {
+                        System.out.println("Deadlock Reached at step " + getStep());
+                        return true;
+                    } else {
+                        Settings.maxNumSteps += 100;
+                        System.out.println("Max step count extended at step " + getStep());
+                        return false;
+                    }
+                } else {
+                    System.out.println("All vehicles finished at step " + getStep());
+                    return true;
+                }
+            }
+        }
     }
 }
