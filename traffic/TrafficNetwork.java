@@ -171,9 +171,6 @@ public class TrafficNetwork extends RoadNetwork {
 			tripMakingVehicles.add(vehicle);
 			//vehicle.park(true, timeRouteStart);
 		}
-
-		// Certain information about this vehicle will be reported to server
-		newVehiclesSinceLastReport.add(vehicle);
 	}
 
 	/**
@@ -728,6 +725,7 @@ public class TrafficNetwork extends RoadNetwork {
 			if(listener != null){
 				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/Settings.numStepsPerSecond), this);
 			}
+			newVehiclesSinceLastReport.add(next);
 			next.park(true, timeNow);
 			next = getNextTripMakingVehicle(timeNow);
 		}

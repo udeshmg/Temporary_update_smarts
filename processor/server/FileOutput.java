@@ -3,16 +3,14 @@ package processor.server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import common.Settings;
 import common.SysUtil;
 import processor.communication.message.SerializableRouteDump;
 import processor.communication.message.SerializableRouteDumpPoint;
 import processor.communication.message.SerializableTrajectory;
+import processor.communication.message.Serializable_Finished_Vehicle;
 
 public class FileOutput {
 	FileOutputStream fosLog;
@@ -20,6 +18,7 @@ public class FileOutput {
 	FileOutputStream fosRoute;
 	FileOutputStream trjFos;
 	FileOutputStream vdFos;
+	FileOutputStream bestTTFos;
 
 	/**
 	 * Close output file
@@ -42,6 +41,9 @@ public class FileOutput {
 			if(vdFos != null){
 				vdFos.close();
 			}
+			if(bestTTFos != null){
+				bestTTFos.close();
+			}
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,6 +56,7 @@ public class FileOutput {
 		}
 		if (Settings.isOutputInitialRoutes) {
 			initRouteOutputFile();
+			initBestTTOutputFile();
 		}
 		if (Settings.isOutputSimulationLog) {
 			initSimLogOutputFile();
@@ -152,6 +155,19 @@ public class FileOutput {
 		}
 	}
 
+	void initBestTTOutputFile() {
+		try {
+			final File fileTrj = getNewFile("BestTT_");
+			// Print column titles
+			bestTTFos = new FileOutputStream(fileTrj, true);
+			outputStringToFile(bestTTFos,
+					"ID,VID,Source,Destination,BestTravelTime,ActualTravelTime,RouteLength,Route" + System.getProperty("line.separator"));
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Output trajectory of individual vehicles
 	 */
@@ -211,6 +227,21 @@ public class FileOutput {
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public void outputBestTTData(List<SerializableRouteDump> routes){
+		for (SerializableRouteDump route : routes) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(route.vehicleId+",");
+			sb.append(route.vid+",");
+			sb.append(route.s+",");
+			sb.append(route.d+",");
+			sb.append(route.spTime+",");
+			sb.append(route.spTime+",");
+			sb.append(route.spLength+",");
+			sb.append(route.route+ System.getProperty("line.separator"));
+			outputStringToFile(bestTTFos, sb.toString());
 		}
 	}
 

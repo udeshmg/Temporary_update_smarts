@@ -130,7 +130,10 @@ public class Message_WS_TrafficReport {
 						routeLeg.stopover);
 				routeDumpPoints.add(point);
 			}
-			list.add(new SerializableRouteDump(vehicle.id, vehicle.vid, vehicle.type.name(), vehicle.timeRouteStart, routeDumpPoints,
+			list.add(new SerializableRouteDump(vehicle.id, vehicle.vid, vehicle.type.name(), vehicle.timeRouteStart,
+					vehicle.getRouteLeg(0).edge.startNode.index,
+					vehicle.getRouteLeg(vehicle.getRouteLegCount()-1).edge.endNode.index,
+					vehicle.getBestTravelTime(), vehicle.getRouteLength(), vehicle.getRouteString(), routeDumpPoints,
 					vehicle.driverProfile.name()));
 		}
 
@@ -151,28 +154,13 @@ public class Message_WS_TrafficReport {
 			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, vehicle.vid,
 					vehicle.getRouteLeg(0).edge.startNode.index,
 					vehicle.getRouteLeg(vehicle.getRouteLegCount()-1).edge.endNode.index,
-					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), getRoute(vehicle.getRouteLegs()));
+					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), vehicle.getRouteString());
 			finishedVehicles.add(finishedVehicle);
 		}
 		return finishedVehicles;
 	}
 
-	public String getRoute(List<RouteLeg> routeLegs){
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		if(routeLegs.size() > 0){
-			sb.append(routeLegs.get(0).edge.startNode.index);
-			sb.append("-");
-			for (int i = 0; i < routeLegs.size(); i++) {
-				sb.append(routeLegs.get(i).edge.endNode.index);
-				if(i != routeLegs.size() -1){
-					sb.append("-");
-				}
-			}
-		}
-		sb.append("]");
-		return sb.toString();
-	}
+
 
 	public ArrayList<Serializable_Finished_Vehicle> getFinishedList() {
 		return finishedList;

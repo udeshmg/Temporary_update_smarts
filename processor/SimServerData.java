@@ -210,6 +210,7 @@ public class SimServerData {
     public void writeOutputFiles(int step) {
         fileOutput.outputSimLog(step, simulationWallTime, totalNumWwCommChannels);
         fileOutput.outputRoutes(allRoutes);
+        fileOutput.outputBestTTData(allRoutes);
         allRoutes.clear();
         fileOutput.outputTrajectories(allTrajectories);
         allTrajectories.clear();

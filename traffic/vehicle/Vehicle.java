@@ -706,6 +706,23 @@ public class Vehicle {
 		return length;
 	}
 
+	public String getRouteString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		if(routeLegs.size() > 0){
+			sb.append(routeLegs.get(0).edge.startNode.index);
+			sb.append("-");
+			for (int i = 0; i < routeLegs.size(); i++) {
+				sb.append(routeLegs.get(i).edge.endNode.index);
+				if(i != routeLegs.size() -1){
+					sb.append("-");
+				}
+			}
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+
 	public Edge getNextEdge(){
 		if(hasNextEdge()) {
 			return routeLegs.get(indexLegOnRoute + 1).edge;
