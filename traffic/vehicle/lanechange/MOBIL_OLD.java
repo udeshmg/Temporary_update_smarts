@@ -326,6 +326,11 @@ public class MOBIL_OLD {
             if (newAccBackVehicleTargetLane > (-1 * vehicle.driverProfile.MOBIL_b_save)) {
                 return true;
             } else {
+                if((vehicle.lane.getFrontVehicleInLane() == vehicle) && backVehicleInTargetLane.lane.getFrontVehicleInLane()==backVehicleInTargetLane){
+                    if(backVehicleInTargetLane.getRecentSlowDownFactor().equals(SlowdownFactor.WAITING_VEHICLE.name())){
+                        return true;
+                    }
+                }
                 // Deceleration of back vehicle in target lane would be too significant: unsafe
                 return false;
             }
