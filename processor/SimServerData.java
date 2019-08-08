@@ -354,6 +354,7 @@ public class SimServerData {
         Settings.simulationListener = experiment.getSimulationListener();
         Settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
         Settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
+        Settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
 
         return isNewMap;
     }

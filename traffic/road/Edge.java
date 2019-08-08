@@ -446,7 +446,7 @@ public class Edge {
 			startPos = last.headPosition - last.length + last.speed * Settings.minTimeSafeToCrossIntersection;
 		}
 		double expectedFill = 0;
-		for (Vehicle v : lane.vehiclesStartedMovingTowards()) {
+		for (Vehicle v : lane.vehiclesStartedMovingTowards(vehicle)) {
 			expectedFill += v.length + v.driverProfile.IDM_s0;
 		}
 		double freeSpace = startPos - expectedFill - lane.edge.getStartIntersectionSize();

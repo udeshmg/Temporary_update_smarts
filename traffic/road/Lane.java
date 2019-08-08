@@ -174,15 +174,19 @@ public class Lane {
 		return list;
 	}
 
-	public List<Vehicle> vehiclesStartedMovingTowards(){
+	public List<Vehicle> vehiclesStartedMovingTowards(Vehicle v){
 		List<Vehicle> towardsVehicles = new ArrayList<>();
 		Node junc = edge.startNode;
 		for (Edge inwardEdge : junc.inwardEdges) {
 			for (Lane lane : inwardEdge.getLanes()) {
-				List<Vehicle> vehiclesInsideIntersection = lane.getVehiclesAboveHeadPosition(inwardEdge.length - inwardEdge.getEndIntersectionSize());
+				double aboveHeadPos = inwardEdge.length - inwardEdge.getEndIntersectionSize();
+				if(v.lane == lane){
+					aboveHeadPos = v.headPosition;
+				}
+				List<Vehicle> vehiclesInsideIntersection = lane.getVehiclesAboveHeadPosition(aboveHeadPos);
 				for (Vehicle vehicle : vehiclesInsideIntersection) {
 					Vehicle.IntersectionDecision decision = vehicle.getDecision();
-					if(decision != null && decision.getEndLane() == this){//decision can be null for ending vehicles
+					if (decision != null && decision.getEndLane() == this) {//decision can be null for ending vehicles
 						towardsVehicles.add(vehicle);
 					}
 				}
