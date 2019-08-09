@@ -35,8 +35,8 @@ public class TrafficLightCluster {
 
     private List<Phase> phases;
     private int activePhase;
-    double trafficSignalTimerGYR;
-    double trafficSignalAccumulatedGYRTime;
+    double timeForColor;
+    double spentTimeInColor;
 
     public TrafficLightCluster(final List<Phase> phases) {
         this.phases = phases;
@@ -64,7 +64,7 @@ public class TrafficLightCluster {
 
     public void updateLights(){
         double secEachStep = 1 / Settings.numStepsPerSecond;
-        trafficSignalAccumulatedGYRTime += secEachStep;
+        spentTimeInColor += secEachStep;
 
         LightColor activePhaseColor = getActivePhaseColor();
         if (isPriorityVehicleInInactiveApproach() && !isPriorityVehicleInActiveApproach()) {
@@ -81,29 +81,29 @@ public class TrafficLightCluster {
             if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
                 if (!isTrafficExistAtNonActiveStreet()) {
                     return;
-                } else if (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime) {
+                } else if (timeForColor <= spentTimeInColor) {
                     // Switch to yellow if traffic waiting at conflicting approach
                     if (!isTrafficExistAtActiveStreet()) {
                         setGYR(LightColor.GYR_Y);
                     } else {
                         // Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
-                        if (trafficSignalAccumulatedGYRTime < LightColor.GYR_G.maxDynamicTime) {
-                            trafficSignalTimerGYR += secEachStep;
+                        if (spentTimeInColor < LightColor.GYR_G.maxDynamicTime) {
+                            timeForColor += secEachStep;
                         } else {
                             setGYR(LightColor.GYR_Y);
                         }
                     }
                 }
             } else if ((Settings.trafficLightTiming == TrafficLightTiming.FIXED)
-                    && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+                    && (timeForColor <= spentTimeInColor)) {
                 setGYR(LightColor.GYR_Y);
             }
         } else if ((activePhaseColor == LightColor.GYR_Y)
-                && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+                && (timeForColor <= spentTimeInColor)) {
             setGYR(LightColor.GYR_R);
         } else if ((activePhaseColor == LightColor.GYR_R
                 || activePhaseColor == LightColor.KEEP_RED)
-                && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+                && (timeForColor <= spentTimeInColor)) {
             // Starts GYR cycle for next group of edges	(Switching Phase)
             activePhase = (activePhase + 1) % phases.size();
             setGYR(LightColor.GYR_G);
@@ -198,8 +198,8 @@ public class TrafficLightCluster {
                 edge.lightColor = LightColor.GYR_G;
             }
         }
-        trafficSignalTimerGYR = LightColor.GYR_G.minDynamicTime;
-        trafficSignalAccumulatedGYRTime = 0;
+        timeForColor = LightColor.GYR_G.minDynamicTime;
+        spentTimeInColor = 0;
     }
 
     /**
@@ -218,11 +218,11 @@ public class TrafficLightCluster {
                 }
             }
         }
-        trafficSignalAccumulatedGYRTime = 0;
+        spentTimeInColor = 0;
         if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-            trafficSignalTimerGYR = type.minDynamicTime;
+            timeForColor = type.minDynamicTime;
         } else if (Settings.trafficLightTiming == TrafficLightTiming.FIXED) {
-            trafficSignalTimerGYR = type.fixedTime;
+            timeForColor = type.fixedTime;
         }
     }
 
