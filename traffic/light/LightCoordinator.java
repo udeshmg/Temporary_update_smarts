@@ -169,7 +169,7 @@ public class LightCoordinator {
 			final TrafficLightCluster cluster = lightClusters.get(i);
 			cluster.trafficSignalAccumulatedGYRTime += secEachStep;
 
-			final Edge anEdgeInActiveApproach = cluster.getActivePhase().getEdges().get(0);
+			LightColor activePhaseColor = cluster.getActivePhaseColor();
 			if (cluster.isPriorityVehicleInInactiveApproach() && !cluster.isPriorityVehicleInActiveApproach()) {
 				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
 				cluster.phaseIndex = cluster.getEdgeGroupIndexOfPriorityInactiveApproach();
@@ -180,7 +180,7 @@ public class LightCoordinator {
 				cluster.setGYR(LightColor.GYR_G);
 			}
 
-			if (anEdgeInActiveApproach.lightColor == LightColor.GYR_G) {
+			if (activePhaseColor == LightColor.GYR_G) {
 				if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
 					if (!cluster.isTrafficExistAtNonActiveStreet()) {
 						continue;
@@ -201,11 +201,11 @@ public class LightCoordinator {
 						&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
 					cluster.setGYR(LightColor.GYR_Y);
 				}
-			} else if ((anEdgeInActiveApproach.lightColor == LightColor.GYR_Y)
+			} else if ((activePhaseColor == LightColor.GYR_Y)
 					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
 				cluster.setGYR(LightColor.GYR_R);
-			} else if ((anEdgeInActiveApproach.lightColor == LightColor.GYR_R
-					|| anEdgeInActiveApproach.lightColor == LightColor.KEEP_RED)
+			} else if ((activePhaseColor == LightColor.GYR_R
+					|| activePhaseColor == LightColor.KEEP_RED)
 					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
 				// Starts GYR cycle for next group of edges	(Switching Phase)
 				cluster.phaseIndex = (cluster.phaseIndex + 1) % cluster.phases.size();

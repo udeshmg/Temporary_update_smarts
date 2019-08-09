@@ -54,6 +54,10 @@ public class TrafficLightCluster {
         return phases.get(phaseIndex);
     }
 
+    public LightColor getActivePhaseColor(){
+        return getActivePhase().getEdges().get(0).lightColor;
+    }
+
 
 
     public int getEdgeGroupIndexOfPriorityInactiveApproach() {
