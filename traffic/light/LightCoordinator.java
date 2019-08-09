@@ -155,61 +155,7 @@ public class LightCoordinator {
 
 	}
 
-	/**
-	 * Check whether the current active approach has a priority vehicle.
-	 */
-	boolean isPriorityVehicleInActiveApproach(final TrafficLightCluster egbn) {
-		for (final Edge e : egbn.getActivePhase().getEdges()) {
-			if (e.isEdgeContainsPriorityVehicle()) {
-				return true;
-			}
-		}
-		return false;
-	}
 
-	/**
-	 * Check whether inactive approaches have a priority vehicle.
-	 */
-	boolean isPriorityVehicleInInactiveApproach(final TrafficLightCluster egbn) {
-		for (int i = 0; i < egbn.phases.size(); i++) {
-			for (final Edge e : egbn.getPhase(i).getEdges()) {
-				if (e.isEdgeContainsPriorityVehicle()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Check whether there is vehicle coming to the current approach under
-	 * active control.
-	 */
-	boolean isTrafficExistAtActiveStreet(final TrafficLightCluster egbn) {
-		for (final Edge e : egbn.getActivePhase().getEdges()) {
-			if (e.isDetectedVehicleForLight) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Checks whether there is incoming vehicle at conflicting approaches.
-	 */
-	boolean isTrafficExistAtNonActiveStreet(final TrafficLightCluster egbn) {
-		for (int i = 0; i < egbn.phases.size(); i++) {
-			if (i == egbn.phaseIndex) {
-				continue;
-			}
-			for (final Edge e : egbn.getPhase(i).getEdges()) {
-				if (e.isDetectedVehicleForLight) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * Reset timer of all light groups.
@@ -260,23 +206,23 @@ public class LightCoordinator {
 			egbn.trafficSignalAccumulatedGYRTime += secEachStep;
 
 			final Edge anEdgeInActiveApproach = egbn.getActivePhase().getEdges().get(0);
-			if (isPriorityVehicleInInactiveApproach(egbn) && !isPriorityVehicleInActiveApproach(egbn)) {
+			if (egbn.isPriorityVehicleInInactiveApproach() && !egbn.isPriorityVehicleInActiveApproach()) {
 				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-				egbn.phaseIndex = getEdgeGroupIndexOfPriorityInactiveApproach(egbn);
+				egbn.phaseIndex = egbn.getEdgeGroupIndexOfPriorityInactiveApproach();
 				setGYR(egbn, LightColor.GYR_G);
 			}
-			if (!isPriorityVehicleInInactiveApproach(egbn) && isPriorityVehicleInActiveApproach(egbn)) {
+			if (!egbn.isPriorityVehicleInInactiveApproach() && egbn.isPriorityVehicleInActiveApproach()) {
 				// Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
 				setGYR(egbn, LightColor.GYR_G);
 			}
 
 			if (anEdgeInActiveApproach.lightColor == LightColor.GYR_G) {
 				if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-					if (!isTrafficExistAtNonActiveStreet(egbn)) {
+					if (!egbn.isTrafficExistAtNonActiveStreet()) {
 						continue;
 					} else if (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime) {
 						// Switch to yellow if traffic waiting at conflicting approach
-						if (!isTrafficExistAtActiveStreet(egbn)) {
+						if (!egbn.isTrafficExistAtActiveStreet()) {
 							setGYR(egbn, LightColor.GYR_Y);
 						} else {
 							// Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
@@ -310,20 +256,6 @@ public class LightCoordinator {
 			}
 		}
 
-	}
-
-	int getEdgeGroupIndexOfPriorityInactiveApproach(TrafficLightCluster egbn) {
-		for (int i = 0; i < egbn.phases.size(); i++) {
-			if (i == egbn.phaseIndex) {
-				continue;
-			}
-			for (Edge e : egbn.getPhase(i).getEdges()) {
-				if (e.isEdgeContainsPriorityVehicle()) {
-					return i;
-				}
-			}
-		}
-		return -1;
 	}
 
 }

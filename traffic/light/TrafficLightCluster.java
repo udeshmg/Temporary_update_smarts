@@ -53,4 +53,76 @@ public class TrafficLightCluster {
         return phases.get(phaseIndex);
     }
 
+
+
+    public int getEdgeGroupIndexOfPriorityInactiveApproach() {
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == phaseIndex) {
+                continue;
+            }
+            for (Edge e : getPhase(i).getEdges()) {
+                if (e.isEdgeContainsPriorityVehicle()) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Check whether the current active approach has a priority vehicle.
+     */
+    boolean isPriorityVehicleInActiveApproach() {
+        for (final Edge e : getActivePhase().getEdges()) {
+            if (e.isEdgeContainsPriorityVehicle()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether inactive approaches have a priority vehicle.
+     */
+    boolean isPriorityVehicleInInactiveApproach() {
+        for (int i = 0; i < phases.size(); i++) {
+            for (final Edge e : getPhase(i).getEdges()) {
+                if (e.isEdgeContainsPriorityVehicle()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check whether there is vehicle coming to the current approach under
+     * active control.
+     */
+    boolean isTrafficExistAtActiveStreet() {
+        for (final Edge e : getActivePhase().getEdges()) {
+            if (e.isDetectedVehicleForLight) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether there is incoming vehicle at conflicting approaches.
+     */
+    boolean isTrafficExistAtNonActiveStreet() {
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == phaseIndex) {
+                continue;
+            }
+            for (final Edge e : getPhase(i).getEdges()) {
+                if (e.isDetectedVehicleForLight) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
