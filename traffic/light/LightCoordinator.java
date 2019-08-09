@@ -144,7 +144,7 @@ public class LightCoordinator {
 
 		// Set green color to the first street at any light group
 		for (final TrafficLightCluster cluster : lightClusters) {
-			cluster.phaseIndex = 0;
+			cluster.setActivePhase(0);
 			cluster.setGYR(LightColor.GYR_G);
 		}
 

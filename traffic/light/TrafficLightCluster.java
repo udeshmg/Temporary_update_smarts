@@ -34,11 +34,7 @@ import java.util.List;
 public class TrafficLightCluster {
 
     private List<Phase> phases;
-    /**
-     * This identifies the active street, i.e., a street in green-yellow-red
-     * cycle. Non-active streets always get red lights.
-     */
-    public int phaseIndex;
+    private int activePhase;
     double trafficSignalTimerGYR;
     double trafficSignalAccumulatedGYRTime;
 
@@ -54,8 +50,12 @@ public class TrafficLightCluster {
         return phases.get(phaseIndex);
     }
 
+    public void setActivePhase(int activePhase) {
+        this.activePhase = activePhase;
+    }
+
     public Phase getActivePhase(){
-        return phases.get(phaseIndex);
+        return phases.get(activePhase);
     }
 
     public LightColor getActivePhaseColor(){
@@ -69,7 +69,7 @@ public class TrafficLightCluster {
         LightColor activePhaseColor = getActivePhaseColor();
         if (isPriorityVehicleInInactiveApproach() && !isPriorityVehicleInActiveApproach()) {
             // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-            phaseIndex = getEdgeGroupIndexOfPriorityInactiveApproach();
+            activePhase = getEdgeGroupIndexOfPriorityInactiveApproach();
             setGYR(LightColor.GYR_G);
         }
         if (!isPriorityVehicleInInactiveApproach() && isPriorityVehicleInActiveApproach()) {
@@ -105,7 +105,7 @@ public class TrafficLightCluster {
                 || activePhaseColor == LightColor.KEEP_RED)
                 && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
             // Starts GYR cycle for next group of edges	(Switching Phase)
-            phaseIndex = (phaseIndex + 1) % phases.size();
+            activePhase = (activePhase + 1) % phases.size();
             setGYR(LightColor.GYR_G);
         }
 
@@ -120,7 +120,7 @@ public class TrafficLightCluster {
 
     public int getEdgeGroupIndexOfPriorityInactiveApproach() {
         for (int i = 0; i < phases.size(); i++) {
-            if (i == phaseIndex) {
+            if (i == activePhase) {
                 continue;
             }
             for (Edge e : getPhase(i).getEdges()) {
@@ -176,7 +176,7 @@ public class TrafficLightCluster {
      */
     boolean isTrafficExistAtNonActiveStreet() {
         for (int i = 0; i < phases.size(); i++) {
-            if (i == phaseIndex) {
+            if (i == activePhase) {
                 continue;
             }
             for (final Edge e : getPhase(i).getEdges()) {
@@ -208,7 +208,7 @@ public class TrafficLightCluster {
      */
     public void setGYR(final LightColor type) {
         for (int i = 0; i < phases.size(); i++) {
-            if (i == phaseIndex) {
+            if (i == activePhase) {
                 for (final Edge edge : getPhase(i).getEdges()) {
                     edge.lightColor = type;
                 }
