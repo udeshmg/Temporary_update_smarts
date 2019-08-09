@@ -101,19 +101,20 @@ public class LightCoordinator {
 		 * links.
 		 */
 		for (final List<Node> nodeGroup : nodeGroups) {
-			final HashMap<String, List<Edge>> inwardEdgeGroupsHashMap = new HashMap<>();
+			final HashMap<String, Phase> inwardEdgeGroupsHashMap = new HashMap<>();
 
 			for (final Node node : nodeGroup) {
 				for (final Edge edge : node.inwardEdges) {
 					if (!inwardEdgeGroupsHashMap.containsKey(edge.name)) {
-						inwardEdgeGroupsHashMap.put(edge.name, new ArrayList<Edge>());
+						inwardEdgeGroupsHashMap.put(edge.name, new Phase());
 					}
-					inwardEdgeGroupsHashMap.get(edge.name).add(edge);
+					Phase phase = inwardEdgeGroupsHashMap.get(edge.name);
+					phase.addEdge(edge);
 					edge.isDetectedVehicleForLight = false;
 				}
 			}
 
-			final List<List<Edge>> inwardEdgeGroupsList = new ArrayList<>();
+			final List<Phase> inwardEdgeGroupsList = new ArrayList<>();
 			inwardEdgeGroupsList.addAll(inwardEdgeGroupsHashMap.values());
 
 			lightGroups.add(new TrafficLightCluster(inwardEdgeGroupsList));
@@ -158,7 +159,7 @@ public class LightCoordinator {
 	 * Check whether the current active approach has a priority vehicle.
 	 */
 	boolean isPriorityVehicleInActiveApproach(final TrafficLightCluster egbn) {
-		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
+		for (final Edge e : egbn.getActivePhase().getEdges()) {
 			if (e.isEdgeContainsPriorityVehicle()) {
 				return true;
 			}
@@ -171,7 +172,7 @@ public class LightCoordinator {
 	 */
 	boolean isPriorityVehicleInInactiveApproach(final TrafficLightCluster egbn) {
 		for (int i = 0; i < egbn.phases.size(); i++) {
-			for (final Edge e : egbn.phases.get(i)) {
+			for (final Edge e : egbn.getPhase(i).getEdges()) {
 				if (e.isEdgeContainsPriorityVehicle()) {
 					return true;
 				}
@@ -185,7 +186,7 @@ public class LightCoordinator {
 	 * active control.
 	 */
 	boolean isTrafficExistAtActiveStreet(final TrafficLightCluster egbn) {
-		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
+		for (final Edge e : egbn.getActivePhase().getEdges()) {
 			if (e.isDetectedVehicleForLight) {
 				return true;
 			}
@@ -201,7 +202,7 @@ public class LightCoordinator {
 			if (i == egbn.phaseIndex) {
 				continue;
 			}
-			for (final Edge e : egbn.phases.get(i)) {
+			for (final Edge e : egbn.getPhase(i).getEdges()) {
 				if (e.isDetectedVehicleForLight) {
 					return true;
 				}
@@ -215,8 +216,8 @@ public class LightCoordinator {
 	 *
 	 */
 	public void resetGYR(final TrafficLightCluster edgeGroupsAtNode) {
-		for (final List<Edge> edgeGraoup : edgeGroupsAtNode.phases) {
-			for (final Edge edge : edgeGraoup) {
+		for (final Phase phase : edgeGroupsAtNode.phases) {
+			for (final Edge edge : phase.getEdges()) {
 				edge.lightColor = LightColor.GYR_G;
 			}
 		}
@@ -231,11 +232,11 @@ public class LightCoordinator {
 	public void setGYR(final TrafficLightCluster edgeGroupsAtNode, final LightColor type) {
 		for (int i = 0; i < edgeGroupsAtNode.phases.size(); i++) {
 			if (i == edgeGroupsAtNode.phaseIndex) {
-				for (final Edge edge : edgeGroupsAtNode.phases.get(i)) {
+				for (final Edge edge : edgeGroupsAtNode.getPhase(i).getEdges()) {
 					edge.lightColor = type;
 				}
 			} else {
-				for (final Edge edge : edgeGroupsAtNode.phases.get(i)) {
+				for (final Edge edge : edgeGroupsAtNode.getPhase(i).getEdges()) {
 					edge.lightColor = LightColor.KEEP_RED;
 				}
 			}
@@ -258,7 +259,7 @@ public class LightCoordinator {
 			final TrafficLightCluster egbn = lightGroups.get(i);
 			egbn.trafficSignalAccumulatedGYRTime += secEachStep;
 
-			final Edge anEdgeInActiveApproach = egbn.phases.get(egbn.phaseIndex).get(0);
+			final Edge anEdgeInActiveApproach = egbn.getActivePhase().getEdges().get(0);
 			if (isPriorityVehicleInInactiveApproach(egbn) && !isPriorityVehicleInActiveApproach(egbn)) {
 				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
 				egbn.phaseIndex = getEdgeGroupIndexOfPriorityInactiveApproach(egbn);
@@ -302,8 +303,8 @@ public class LightCoordinator {
 			}
 
 			// Reset vehicle detection flag at all edges
-			for (final List<Edge> edgeGroup : egbn.phases) {
-				for (final Edge edge : edgeGroup) {
+			for (Phase phase : egbn.phases) {
+				for (final Edge edge : phase.getEdges()) {
 					edge.isDetectedVehicleForLight = false;
 				}
 			}
@@ -316,7 +317,7 @@ public class LightCoordinator {
 			if (i == egbn.phaseIndex) {
 				continue;
 			}
-			for (Edge e : egbn.phases.get(i)) {
+			for (Edge e : egbn.getPhase(i).getEdges()) {
 				if (e.isEdgeContainsPriorityVehicle()) {
 					return i;
 				}

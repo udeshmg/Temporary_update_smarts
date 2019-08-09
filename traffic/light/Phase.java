@@ -2,6 +2,7 @@ package traffic.light;
 
 import traffic.road.Edge;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,32 +26,19 @@ import java.util.List;
  * <p>
  * Created by tmuthugama on 8/9/2019
  */
+public class Phase {
 
-/**
- * A cluster of lights consists of one or more phases.  At any time, only one of the phases
- * is in a green-yellow-red cycle. This phase is called the active phase. All other phases remain in red color.
- */
-public class TrafficLightCluster {
+    private List<Edge> edges;
 
-    public List<Phase> phases;
-    /**
-     * This identifies the active street, i.e., a street in green-yellow-red
-     * cycle. Non-active streets always get red lights.
-     */
-    public int phaseIndex;
-    double trafficSignalTimerGYR;
-    double trafficSignalAccumulatedGYRTime;
-
-    public TrafficLightCluster(final List<Phase> phases) {
-        this.phases = phases;
+    public Phase() {
+        this.edges = new ArrayList<>();
     }
 
-    public Phase getPhase(int phaseIndex){
-        return phases.get(phaseIndex);
+    public void addEdge(Edge edge){
+        edges.add(edge);
     }
 
-    public Phase getActivePhase(){
-        return phases.get(phaseIndex);
+    public List<Edge> getEdges() {
+        return edges;
     }
-
 }
