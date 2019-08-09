@@ -17,8 +17,7 @@ import traffic.road.RoadUtil;
  *
  */
 public class LightCoordinator {
-
-
+	
 	List<List<Node>> nodeGroups = new ArrayList<>();
 
 	/**
@@ -47,13 +46,9 @@ public class LightCoordinator {
 		for (final Node node : lightNodes) {
 			node.idLightNodeGroup = 0;
 		}
-
 		if (Settings.trafficLightTiming == TrafficLightTiming.NONE) {
 			return;
 		}
-
-
-
 		/*
 		 * For each node with traffic light, find other nodes with lights within
 		 * a certain distance.
@@ -155,71 +150,14 @@ public class LightCoordinator {
 
 	}
 
-
-
-
-
 	/**
 	 * Compute how long the active streets have been given their current color.
 	 * Change the color and/or change active streets depending on the situation.
 	 */
 	public void updateLights() {
-		final double secEachStep = 1 / Settings.numStepsPerSecond;
-		for (int i = 0; i < lightClusters.size(); i++) {
-			final TrafficLightCluster cluster = lightClusters.get(i);
-			cluster.trafficSignalAccumulatedGYRTime += secEachStep;
-
-			LightColor activePhaseColor = cluster.getActivePhaseColor();
-			if (cluster.isPriorityVehicleInInactiveApproach() && !cluster.isPriorityVehicleInActiveApproach()) {
-				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-				cluster.phaseIndex = cluster.getEdgeGroupIndexOfPriorityInactiveApproach();
-				cluster.setGYR(LightColor.GYR_G);
-			}
-			if (!cluster.isPriorityVehicleInInactiveApproach() && cluster.isPriorityVehicleInActiveApproach()) {
-				// Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
-				cluster.setGYR(LightColor.GYR_G);
-			}
-
-			if (activePhaseColor == LightColor.GYR_G) {
-				if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-					if (!cluster.isTrafficExistAtNonActiveStreet()) {
-						continue;
-					} else if (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime) {
-						// Switch to yellow if traffic waiting at conflicting approach
-						if (!cluster.isTrafficExistAtActiveStreet()) {
-							cluster.setGYR(LightColor.GYR_Y);
-						} else {
-							// Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
-							if (cluster.trafficSignalAccumulatedGYRTime < LightColor.GYR_G.maxDynamicTime) {
-								cluster.trafficSignalTimerGYR += secEachStep;
-							} else {
-								cluster.setGYR(LightColor.GYR_Y);
-							}
-						}
-					}
-				} else if ((Settings.trafficLightTiming == TrafficLightTiming.FIXED)
-						&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
-					cluster.setGYR(LightColor.GYR_Y);
-				}
-			} else if ((activePhaseColor == LightColor.GYR_Y)
-					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
-				cluster.setGYR(LightColor.GYR_R);
-			} else if ((activePhaseColor == LightColor.GYR_R
-					|| activePhaseColor == LightColor.KEEP_RED)
-					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
-				// Starts GYR cycle for next group of edges	(Switching Phase)
-				cluster.phaseIndex = (cluster.phaseIndex + 1) % cluster.phases.size();
-				cluster.setGYR(LightColor.GYR_G);
-			}
-
-			// Reset vehicle detection flag at all edges
-			for (Phase phase : cluster.phases) {
-				for (final Edge edge : phase.getEdges()) {
-					edge.isDetectedVehicleForLight = false;
-				}
-			}
+		for (TrafficLightCluster lightCluster : lightClusters) {
+			lightCluster.updateLights();
 		}
-
 	}
 
 }

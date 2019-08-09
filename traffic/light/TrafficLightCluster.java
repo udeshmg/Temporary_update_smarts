@@ -58,6 +58,60 @@ public class TrafficLightCluster {
         return getActivePhase().getEdges().get(0).lightColor;
     }
 
+    public void updateLights(){
+        double secEachStep = 1 / Settings.numStepsPerSecond;
+        trafficSignalAccumulatedGYRTime += secEachStep;
+
+        LightColor activePhaseColor = getActivePhaseColor();
+        if (isPriorityVehicleInInactiveApproach() && !isPriorityVehicleInActiveApproach()) {
+            // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
+            phaseIndex = getEdgeGroupIndexOfPriorityInactiveApproach();
+            setGYR(LightColor.GYR_G);
+        }
+        if (!isPriorityVehicleInInactiveApproach() && isPriorityVehicleInActiveApproach()) {
+            // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
+            setGYR(LightColor.GYR_G);
+        }
+
+        if (activePhaseColor == LightColor.GYR_G) {
+            if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
+                if (!isTrafficExistAtNonActiveStreet()) {
+                    return;
+                } else if (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime) {
+                    // Switch to yellow if traffic waiting at conflicting approach
+                    if (!isTrafficExistAtActiveStreet()) {
+                        setGYR(LightColor.GYR_Y);
+                    } else {
+                        // Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
+                        if (trafficSignalAccumulatedGYRTime < LightColor.GYR_G.maxDynamicTime) {
+                            trafficSignalTimerGYR += secEachStep;
+                        } else {
+                            setGYR(LightColor.GYR_Y);
+                        }
+                    }
+                }
+            } else if ((Settings.trafficLightTiming == TrafficLightTiming.FIXED)
+                    && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+                setGYR(LightColor.GYR_Y);
+            }
+        } else if ((activePhaseColor == LightColor.GYR_Y)
+                && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+            setGYR(LightColor.GYR_R);
+        } else if ((activePhaseColor == LightColor.GYR_R
+                || activePhaseColor == LightColor.KEEP_RED)
+                && (trafficSignalTimerGYR <= trafficSignalAccumulatedGYRTime)) {
+            // Starts GYR cycle for next group of edges	(Switching Phase)
+            phaseIndex = (phaseIndex + 1) % phases.size();
+            setGYR(LightColor.GYR_G);
+        }
+
+        // Reset vehicle detection flag at all edges
+        for (Phase phase : phases) {
+            for (final Edge edge : phase.getEdges()) {
+                edge.isDetectedVehicleForLight = false;
+            }
+        }
+    }
 
 
     public int getEdgeGroupIndexOfPriorityInactiveApproach() {
