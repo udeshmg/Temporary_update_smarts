@@ -25,7 +25,7 @@ public class LightCoordinator {
 	 * Groups of traffic lights. Lights in the same group are within a certain
 	 * distance to each other.
 	 */
-	public List<TrafficLightCluster> lightGroups = new ArrayList<>();
+	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
 
 	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
 			final List<SerializableInt> indexNodesToRemoveLight) {
@@ -91,7 +91,7 @@ public class LightCoordinator {
 	 * Group inward edges based on the street names in node groups.
 	 */
 	void groupInwardEdges() {
-		lightGroups.clear();
+		lightClusters.clear();
 		if (Settings.trafficLightTiming == TrafficLightTiming.NONE) {
 			return;
 		}
@@ -117,7 +117,7 @@ public class LightCoordinator {
 			final List<Phase> inwardEdgeGroupsList = new ArrayList<>();
 			inwardEdgeGroupsList.addAll(inwardEdgeGroupsHashMap.values());
 
-			lightGroups.add(new TrafficLightCluster(inwardEdgeGroupsList));
+			lightClusters.add(new TrafficLightCluster(inwardEdgeGroupsList));
 
 		}
 	}
@@ -135,8 +135,8 @@ public class LightCoordinator {
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
 		// Reset timer of light groups
-		for (final TrafficLightCluster egbn : lightGroups) {
-			resetGYR(egbn);
+		for (final TrafficLightCluster cluster : lightClusters) {
+			resetGYR(cluster);
 		}
 
 		// Groups adjacent nodes with traffic lights based on distance.
@@ -148,9 +148,9 @@ public class LightCoordinator {
 		System.out.println("Divided lights in each light group based on street names.");
 
 		// Set green color to the first street at any light group
-		for (final TrafficLightCluster egbn : lightGroups) {
-			egbn.phaseIndex = 0;
-			setGYR(egbn, LightColor.GYR_G);
+		for (final TrafficLightCluster cluster : lightClusters) {
+			cluster.phaseIndex = 0;
+			setGYR(cluster, LightColor.GYR_G);
 		}
 
 	}
@@ -201,55 +201,55 @@ public class LightCoordinator {
 	 */
 	public void updateLights() {
 		final double secEachStep = 1 / Settings.numStepsPerSecond;
-		for (int i = 0; i < lightGroups.size(); i++) {
-			final TrafficLightCluster egbn = lightGroups.get(i);
-			egbn.trafficSignalAccumulatedGYRTime += secEachStep;
+		for (int i = 0; i < lightClusters.size(); i++) {
+			final TrafficLightCluster cluster = lightClusters.get(i);
+			cluster.trafficSignalAccumulatedGYRTime += secEachStep;
 
-			final Edge anEdgeInActiveApproach = egbn.getActivePhase().getEdges().get(0);
-			if (egbn.isPriorityVehicleInInactiveApproach() && !egbn.isPriorityVehicleInActiveApproach()) {
+			final Edge anEdgeInActiveApproach = cluster.getActivePhase().getEdges().get(0);
+			if (cluster.isPriorityVehicleInInactiveApproach() && !cluster.isPriorityVehicleInActiveApproach()) {
 				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-				egbn.phaseIndex = egbn.getEdgeGroupIndexOfPriorityInactiveApproach();
-				setGYR(egbn, LightColor.GYR_G);
+				cluster.phaseIndex = cluster.getEdgeGroupIndexOfPriorityInactiveApproach();
+				setGYR(cluster, LightColor.GYR_G);
 			}
-			if (!egbn.isPriorityVehicleInInactiveApproach() && egbn.isPriorityVehicleInActiveApproach()) {
+			if (!cluster.isPriorityVehicleInInactiveApproach() && cluster.isPriorityVehicleInActiveApproach()) {
 				// Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
-				setGYR(egbn, LightColor.GYR_G);
+				setGYR(cluster, LightColor.GYR_G);
 			}
 
 			if (anEdgeInActiveApproach.lightColor == LightColor.GYR_G) {
 				if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-					if (!egbn.isTrafficExistAtNonActiveStreet()) {
+					if (!cluster.isTrafficExistAtNonActiveStreet()) {
 						continue;
-					} else if (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime) {
+					} else if (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime) {
 						// Switch to yellow if traffic waiting at conflicting approach
-						if (!egbn.isTrafficExistAtActiveStreet()) {
-							setGYR(egbn, LightColor.GYR_Y);
+						if (!cluster.isTrafficExistAtActiveStreet()) {
+							setGYR(cluster, LightColor.GYR_Y);
 						} else {
 							// Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
-							if (egbn.trafficSignalAccumulatedGYRTime < LightColor.GYR_G.maxDynamicTime) {
-								egbn.trafficSignalTimerGYR += secEachStep;
+							if (cluster.trafficSignalAccumulatedGYRTime < LightColor.GYR_G.maxDynamicTime) {
+								cluster.trafficSignalTimerGYR += secEachStep;
 							} else {
-								setGYR(egbn, LightColor.GYR_Y);
+								setGYR(cluster, LightColor.GYR_Y);
 							}
 						}
 					}
 				} else if ((Settings.trafficLightTiming == TrafficLightTiming.FIXED)
-						&& (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime)) {
-					setGYR(egbn, LightColor.GYR_Y);
+						&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
+					setGYR(cluster, LightColor.GYR_Y);
 				}
 			} else if ((anEdgeInActiveApproach.lightColor == LightColor.GYR_Y)
-					&& (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime)) {
-				setGYR(egbn, LightColor.GYR_R);
+					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
+				setGYR(cluster, LightColor.GYR_R);
 			} else if ((anEdgeInActiveApproach.lightColor == LightColor.GYR_R
 					|| anEdgeInActiveApproach.lightColor == LightColor.KEEP_RED)
-					&& (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime)) {
+					&& (cluster.trafficSignalTimerGYR <= cluster.trafficSignalAccumulatedGYRTime)) {
 				// Starts GYR cycle for next group of edges	(Switching Phase)
-				egbn.phaseIndex = (egbn.phaseIndex + 1) % egbn.phases.size();
-				setGYR(egbn, LightColor.GYR_G);
+				cluster.phaseIndex = (cluster.phaseIndex + 1) % cluster.phases.size();
+				setGYR(cluster, LightColor.GYR_G);
 			}
 
 			// Reset vehicle detection flag at all edges
-			for (Phase phase : egbn.phases) {
+			for (Phase phase : cluster.phases) {
 				for (final Edge edge : phase.getEdges()) {
 					edge.isDetectedVehicleForLight = false;
 				}
