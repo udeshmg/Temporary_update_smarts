@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class TrafficLightCluster {
 
-    public List<Phase> phases;
+    private List<Phase> phases;
     /**
      * This identifies the active street, i.e., a street in green-yellow-red
      * cycle. Non-active streets always get red lights.
@@ -44,6 +44,10 @@ public class TrafficLightCluster {
 
     public TrafficLightCluster(final List<Phase> phases) {
         this.phases = phases;
+    }
+
+    public List<Phase> getPhases() {
+        return phases;
     }
 
     public Phase getPhase(int phaseIndex){

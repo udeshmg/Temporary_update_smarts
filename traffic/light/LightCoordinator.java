@@ -17,7 +17,7 @@ import traffic.road.RoadUtil;
  *
  */
 public class LightCoordinator {
-	
+
 	List<List<Node>> nodeGroups = new ArrayList<>();
 
 	/**
