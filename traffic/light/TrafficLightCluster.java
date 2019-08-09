@@ -1,5 +1,6 @@
 package traffic.light;
 
+import common.Settings;
 import traffic.road.Edge;
 
 import java.util.List;
@@ -123,6 +124,44 @@ public class TrafficLightCluster {
             }
         }
         return false;
+    }
+
+    /**
+     * Reset timer of all light groups.
+     *
+     */
+    public void resetGYR() {
+        for (final Phase phase : phases) {
+            for (final Edge edge : phase.getEdges()) {
+                edge.lightColor = LightColor.GYR_G;
+            }
+        }
+        trafficSignalTimerGYR = LightColor.GYR_G.minDynamicTime;
+        trafficSignalAccumulatedGYRTime = 0;
+    }
+
+    /**
+     * Set the color of an active street and initialize the timer for the color.
+     * Non-active streets get red lights.
+     */
+    public void setGYR(final LightColor type) {
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == phaseIndex) {
+                for (final Edge edge : getPhase(i).getEdges()) {
+                    edge.lightColor = type;
+                }
+            } else {
+                for (final Edge edge : getPhase(i).getEdges()) {
+                    edge.lightColor = LightColor.KEEP_RED;
+                }
+            }
+        }
+        trafficSignalAccumulatedGYRTime = 0;
+        if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
+            trafficSignalTimerGYR = type.minDynamicTime;
+        } else if (Settings.trafficLightTiming == TrafficLightTiming.FIXED) {
+            trafficSignalTimerGYR = type.fixedTime;
+        }
     }
 
 }
