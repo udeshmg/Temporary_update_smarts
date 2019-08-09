@@ -102,7 +102,7 @@ public class Message_WS_TrafficReport {
 	ArrayList<Serializable_GUI_Light> getDetailOfLights(final LightCoordinator lightCoordinator) {
 		final ArrayList<Serializable_GUI_Light> list = new ArrayList<>();
 		for (final LightGroup edgeGroups : lightCoordinator.lightGroups) {
-			for (final ArrayList<Edge> edgeGroup : edgeGroups.edgeGroups) {
+			for (final List<Edge> edgeGroup : edgeGroups.phases) {
 				for (final Edge e : edgeGroup) {
 					final double lightPositionToEdgeRatio = (e.length - 1) / e.length;
 					final double latitude = (e.startNode.lat

@@ -3,10 +3,10 @@ package traffic.light;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import common.Settings;
 import processor.communication.message.SerializableInt;
-import processor.worker.Workarea;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.road.RoadUtil;
@@ -24,30 +24,30 @@ public class LightCoordinator {
 	 * sub-group (or active street). All other sub-groups remain in red color.
 	 */
 	public class LightGroup {
-		public ArrayList<ArrayList<Edge>> edgeGroups = new ArrayList<>();
+		public List<List<Edge>> phases;
 		/**
 		 * This identifies the active street, i.e., a street in green-yellow-red
 		 * cycle. Non-active streets always get red lights.
 		 */
-		public int inwardEdgeGroupIndexForGYR;
+		public int phaseIndex;
 		double trafficSignalTimerGYR;
 		double trafficSignalAccumulatedGYRTime;
 
-		public LightGroup(final ArrayList<ArrayList<Edge>> groups) {
-			edgeGroups = groups;
+		public LightGroup(final List<List<Edge>> groups) {
+			phases = groups;
 		}
 	}
 
-	ArrayList<ArrayList<Node>> nodeGroups = new ArrayList<>();
+	List<List<Node>> nodeGroups = new ArrayList<>();
 
 	/**
 	 * Groups of traffic lights. Lights in the same group are within a certain
 	 * distance to each other.
 	 */
-	public ArrayList<LightGroup> lightGroups = new ArrayList<>();
+	public List<LightGroup> lightGroups = new ArrayList<>();
 
-	public void addRemoveLights(final ArrayList<Node> nodes, final ArrayList<SerializableInt> indexNodesToAddLight,
-			final ArrayList<SerializableInt> indexNodesToRemoveLight) {
+	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
+			final List<SerializableInt> indexNodesToRemoveLight) {
 		for (final SerializableInt si : indexNodesToAddLight) {
 			nodes.get(si.value).light = true;
 		}
@@ -60,7 +60,7 @@ public class LightCoordinator {
 	 * Group nodes with traffic signals. Nodes in the same group are within
 	 * certain distance to each other.
 	 */
-	void groupAdjacentNodes(final ArrayList<Node> lightNodes) {
+	void groupAdjacentNodes(final List<Node> lightNodes) {
 		nodeGroups.clear();
 
 		for (final Node node : lightNodes) {
@@ -82,7 +82,7 @@ public class LightCoordinator {
 			if (checkedNodes.contains(node)) {
 				continue;
 			}
-			final ArrayList<Node> nodeGroup = new ArrayList<>();
+			final List<Node> nodeGroup = new ArrayList<>();
 			final long idNodeGroup = node.osmId;
 
 			nodeGroup.add(node);
@@ -119,8 +119,8 @@ public class LightCoordinator {
 		 * Identify the lights on the same street based on the name of the
 		 * links.
 		 */
-		for (final ArrayList<Node> nodeGroup : nodeGroups) {
-			final HashMap<String, ArrayList<Edge>> inwardEdgeGroupsHashMap = new HashMap<>();
+		for (final List<Node> nodeGroup : nodeGroups) {
+			final HashMap<String, List<Edge>> inwardEdgeGroupsHashMap = new HashMap<>();
 
 			for (final Node node : nodeGroup) {
 				for (final Edge edge : node.inwardEdges) {
@@ -132,10 +132,10 @@ public class LightCoordinator {
 				}
 			}
 
-			final ArrayList<ArrayList<Edge>> inwardEdgeGroupsArrayList = new ArrayList<>();
-			inwardEdgeGroupsArrayList.addAll(inwardEdgeGroupsHashMap.values());
+			final List<List<Edge>> inwardEdgeGroupsList = new ArrayList<>();
+			inwardEdgeGroupsList.addAll(inwardEdgeGroupsHashMap.values());
 
-			lightGroups.add(new LightGroup(inwardEdgeGroupsArrayList));
+			lightGroups.add(new LightGroup(inwardEdgeGroupsList));
 
 		}
 	}
@@ -147,8 +147,8 @@ public class LightCoordinator {
 	 * first street gets green light and other streets get red lights.
 	 *
 	 */
-	public void init(final ArrayList<Node> mapNodes, final ArrayList<SerializableInt> indexNodesToAddLight,
-			final ArrayList<SerializableInt> indexNodesToRemoveLight) {
+	public void init(final List<Node> mapNodes, final List<SerializableInt> indexNodesToAddLight,
+			final List<SerializableInt> indexNodesToRemoveLight) {
 		// Add or remove lights
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
@@ -167,7 +167,7 @@ public class LightCoordinator {
 
 		// Set green color to the first street at any light group
 		for (final LightGroup egbn : lightGroups) {
-			egbn.inwardEdgeGroupIndexForGYR = 0;
+			egbn.phaseIndex = 0;
 			setGYR(egbn, LightColor.GYR_G);
 		}
 
@@ -177,7 +177,7 @@ public class LightCoordinator {
 	 * Check whether the current active approach has a priority vehicle.
 	 */
 	boolean isPriorityVehicleInActiveApproach(final LightGroup egbn) {
-		for (final Edge e : egbn.edgeGroups.get(egbn.inwardEdgeGroupIndexForGYR)) {
+		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
 			if (e.isEdgeContainsPriorityVehicle()) {
 				return true;
 			}
@@ -189,8 +189,8 @@ public class LightCoordinator {
 	 * Check whether inactive approaches have a priority vehicle.
 	 */
 	boolean isPriorityVehicleInInactiveApproach(final LightGroup egbn) {
-		for (int i = 0; i < egbn.edgeGroups.size(); i++) {
-			for (final Edge e : egbn.edgeGroups.get(i)) {
+		for (int i = 0; i < egbn.phases.size(); i++) {
+			for (final Edge e : egbn.phases.get(i)) {
 				if (e.isEdgeContainsPriorityVehicle()) {
 					return true;
 				}
@@ -204,7 +204,7 @@ public class LightCoordinator {
 	 * active control.
 	 */
 	boolean isTrafficExistAtActiveStreet(final LightGroup egbn) {
-		for (final Edge e : egbn.edgeGroups.get(egbn.inwardEdgeGroupIndexForGYR)) {
+		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
 			if (e.isDetectedVehicleForLight) {
 				return true;
 			}
@@ -216,11 +216,11 @@ public class LightCoordinator {
 	 * Checks whether there is incoming vehicle at conflicting approaches.
 	 */
 	boolean isTrafficExistAtNonActiveStreet(final LightGroup egbn) {
-		for (int i = 0; i < egbn.edgeGroups.size(); i++) {
-			if (i == egbn.inwardEdgeGroupIndexForGYR) {
+		for (int i = 0; i < egbn.phases.size(); i++) {
+			if (i == egbn.phaseIndex) {
 				continue;
 			}
-			for (final Edge e : egbn.edgeGroups.get(i)) {
+			for (final Edge e : egbn.phases.get(i)) {
 				if (e.isDetectedVehicleForLight) {
 					return true;
 				}
@@ -234,7 +234,7 @@ public class LightCoordinator {
 	 *
 	 */
 	public void resetGYR(final LightGroup edgeGroupsAtNode) {
-		for (final ArrayList<Edge> edgeGraoup : edgeGroupsAtNode.edgeGroups) {
+		for (final List<Edge> edgeGraoup : edgeGroupsAtNode.phases) {
 			for (final Edge edge : edgeGraoup) {
 				edge.lightColor = LightColor.GYR_G;
 			}
@@ -248,13 +248,13 @@ public class LightCoordinator {
 	 * Non-active streets get red lights.
 	 */
 	public void setGYR(final LightGroup edgeGroupsAtNode, final LightColor type) {
-		for (int i = 0; i < edgeGroupsAtNode.edgeGroups.size(); i++) {
-			if (i == edgeGroupsAtNode.inwardEdgeGroupIndexForGYR) {
-				for (final Edge edge : edgeGroupsAtNode.edgeGroups.get(i)) {
+		for (int i = 0; i < edgeGroupsAtNode.phases.size(); i++) {
+			if (i == edgeGroupsAtNode.phaseIndex) {
+				for (final Edge edge : edgeGroupsAtNode.phases.get(i)) {
 					edge.lightColor = type;
 				}
 			} else {
-				for (final Edge edge : edgeGroupsAtNode.edgeGroups.get(i)) {
+				for (final Edge edge : edgeGroupsAtNode.phases.get(i)) {
 					edge.lightColor = LightColor.KEEP_RED;
 				}
 			}
@@ -277,10 +277,10 @@ public class LightCoordinator {
 			final LightGroup egbn = lightGroups.get(i);
 			egbn.trafficSignalAccumulatedGYRTime += secEachStep;
 
-			final Edge anEdgeInActiveApproach = egbn.edgeGroups.get(egbn.inwardEdgeGroupIndexForGYR).get(0);
+			final Edge anEdgeInActiveApproach = egbn.phases.get(egbn.phaseIndex).get(0);
 			if (isPriorityVehicleInInactiveApproach(egbn) && !isPriorityVehicleInActiveApproach(egbn)) {
 				// Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-				egbn.inwardEdgeGroupIndexForGYR = getEdgeGroupIndexOfPriorityInactiveApproach(egbn);
+				egbn.phaseIndex = getEdgeGroupIndexOfPriorityInactiveApproach(egbn);
 				setGYR(egbn, LightColor.GYR_G);
 			}
 			if (!isPriorityVehicleInInactiveApproach(egbn) && isPriorityVehicleInActiveApproach(egbn)) {
@@ -315,13 +315,13 @@ public class LightCoordinator {
 			} else if ((anEdgeInActiveApproach.lightColor == LightColor.GYR_R
 					|| anEdgeInActiveApproach.lightColor == LightColor.KEEP_RED)
 					&& (egbn.trafficSignalTimerGYR <= egbn.trafficSignalAccumulatedGYRTime)) {
-				// Starts GYR cycle for next group of edges			
-				egbn.inwardEdgeGroupIndexForGYR = (egbn.inwardEdgeGroupIndexForGYR + 1) % egbn.edgeGroups.size();
+				// Starts GYR cycle for next group of edges	(Switching Phase)
+				egbn.phaseIndex = (egbn.phaseIndex + 1) % egbn.phases.size();
 				setGYR(egbn, LightColor.GYR_G);
 			}
 
 			// Reset vehicle detection flag at all edges
-			for (final ArrayList<Edge> edgeGroup : egbn.edgeGroups) {
+			for (final List<Edge> edgeGroup : egbn.phases) {
 				for (final Edge edge : edgeGroup) {
 					edge.isDetectedVehicleForLight = false;
 				}
@@ -331,11 +331,11 @@ public class LightCoordinator {
 	}
 
 	int getEdgeGroupIndexOfPriorityInactiveApproach(LightGroup egbn) {
-		for (int i = 0; i < egbn.edgeGroups.size(); i++) {
-			if (i == egbn.inwardEdgeGroupIndexForGYR) {
+		for (int i = 0; i < egbn.phases.size(); i++) {
+			if (i == egbn.phaseIndex) {
 				continue;
 			}
-			for (Edge e : egbn.edgeGroups.get(i)) {
+			for (Edge e : egbn.phases.get(i)) {
 				if (e.isEdgeContainsPriorityVehicle()) {
 					return i;
 				}
