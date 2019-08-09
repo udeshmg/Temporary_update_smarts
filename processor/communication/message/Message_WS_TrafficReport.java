@@ -6,7 +6,7 @@ import java.util.List;
 import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.light.LightCoordinator;
-import traffic.light.LightCoordinator.LightGroup;
+import traffic.light.TrafficLightCluster;
 import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.routing.RouteLeg;
@@ -101,7 +101,7 @@ public class Message_WS_TrafficReport {
 
 	ArrayList<Serializable_GUI_Light> getDetailOfLights(final LightCoordinator lightCoordinator) {
 		final ArrayList<Serializable_GUI_Light> list = new ArrayList<>();
-		for (final LightGroup edgeGroups : lightCoordinator.lightGroups) {
+		for (final TrafficLightCluster edgeGroups : lightCoordinator.lightGroups) {
 			for (final List<Edge> edgeGroup : edgeGroups.phases) {
 				for (final Edge e : edgeGroup) {
 					final double lightPositionToEdgeRatio = (e.length - 1) / e.length;

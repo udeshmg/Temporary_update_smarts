@@ -17,26 +17,7 @@ import traffic.road.RoadUtil;
  *
  */
 public class LightCoordinator {
-	/**
-	 * A group of lights consists of one or more sub-groups. The sub-groups are
-	 * organized based on street name. At any time, only one of the sub-groups
-	 * is in a green-yellow-red cycle. This sub-group is called the active
-	 * sub-group (or active street). All other sub-groups remain in red color.
-	 */
-	public class LightGroup {
-		public List<List<Edge>> phases;
-		/**
-		 * This identifies the active street, i.e., a street in green-yellow-red
-		 * cycle. Non-active streets always get red lights.
-		 */
-		public int phaseIndex;
-		double trafficSignalTimerGYR;
-		double trafficSignalAccumulatedGYRTime;
 
-		public LightGroup(final List<List<Edge>> groups) {
-			phases = groups;
-		}
-	}
 
 	List<List<Node>> nodeGroups = new ArrayList<>();
 
@@ -44,7 +25,7 @@ public class LightCoordinator {
 	 * Groups of traffic lights. Lights in the same group are within a certain
 	 * distance to each other.
 	 */
-	public List<LightGroup> lightGroups = new ArrayList<>();
+	public List<TrafficLightCluster> lightGroups = new ArrayList<>();
 
 	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
 			final List<SerializableInt> indexNodesToRemoveLight) {
@@ -135,7 +116,7 @@ public class LightCoordinator {
 			final List<List<Edge>> inwardEdgeGroupsList = new ArrayList<>();
 			inwardEdgeGroupsList.addAll(inwardEdgeGroupsHashMap.values());
 
-			lightGroups.add(new LightGroup(inwardEdgeGroupsList));
+			lightGroups.add(new TrafficLightCluster(inwardEdgeGroupsList));
 
 		}
 	}
@@ -153,7 +134,7 @@ public class LightCoordinator {
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
 		// Reset timer of light groups
-		for (final LightGroup egbn : lightGroups) {
+		for (final TrafficLightCluster egbn : lightGroups) {
 			resetGYR(egbn);
 		}
 
@@ -166,7 +147,7 @@ public class LightCoordinator {
 		System.out.println("Divided lights in each light group based on street names.");
 
 		// Set green color to the first street at any light group
-		for (final LightGroup egbn : lightGroups) {
+		for (final TrafficLightCluster egbn : lightGroups) {
 			egbn.phaseIndex = 0;
 			setGYR(egbn, LightColor.GYR_G);
 		}
@@ -176,7 +157,7 @@ public class LightCoordinator {
 	/**
 	 * Check whether the current active approach has a priority vehicle.
 	 */
-	boolean isPriorityVehicleInActiveApproach(final LightGroup egbn) {
+	boolean isPriorityVehicleInActiveApproach(final TrafficLightCluster egbn) {
 		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
 			if (e.isEdgeContainsPriorityVehicle()) {
 				return true;
@@ -188,7 +169,7 @@ public class LightCoordinator {
 	/**
 	 * Check whether inactive approaches have a priority vehicle.
 	 */
-	boolean isPriorityVehicleInInactiveApproach(final LightGroup egbn) {
+	boolean isPriorityVehicleInInactiveApproach(final TrafficLightCluster egbn) {
 		for (int i = 0; i < egbn.phases.size(); i++) {
 			for (final Edge e : egbn.phases.get(i)) {
 				if (e.isEdgeContainsPriorityVehicle()) {
@@ -203,7 +184,7 @@ public class LightCoordinator {
 	 * Check whether there is vehicle coming to the current approach under
 	 * active control.
 	 */
-	boolean isTrafficExistAtActiveStreet(final LightGroup egbn) {
+	boolean isTrafficExistAtActiveStreet(final TrafficLightCluster egbn) {
 		for (final Edge e : egbn.phases.get(egbn.phaseIndex)) {
 			if (e.isDetectedVehicleForLight) {
 				return true;
@@ -215,7 +196,7 @@ public class LightCoordinator {
 	/**
 	 * Checks whether there is incoming vehicle at conflicting approaches.
 	 */
-	boolean isTrafficExistAtNonActiveStreet(final LightGroup egbn) {
+	boolean isTrafficExistAtNonActiveStreet(final TrafficLightCluster egbn) {
 		for (int i = 0; i < egbn.phases.size(); i++) {
 			if (i == egbn.phaseIndex) {
 				continue;
@@ -233,7 +214,7 @@ public class LightCoordinator {
 	 * Reset timer of all light groups.
 	 *
 	 */
-	public void resetGYR(final LightGroup edgeGroupsAtNode) {
+	public void resetGYR(final TrafficLightCluster edgeGroupsAtNode) {
 		for (final List<Edge> edgeGraoup : edgeGroupsAtNode.phases) {
 			for (final Edge edge : edgeGraoup) {
 				edge.lightColor = LightColor.GYR_G;
@@ -247,7 +228,7 @@ public class LightCoordinator {
 	 * Set the color of an active street and initialize the timer for the color.
 	 * Non-active streets get red lights.
 	 */
-	public void setGYR(final LightGroup edgeGroupsAtNode, final LightColor type) {
+	public void setGYR(final TrafficLightCluster edgeGroupsAtNode, final LightColor type) {
 		for (int i = 0; i < edgeGroupsAtNode.phases.size(); i++) {
 			if (i == edgeGroupsAtNode.phaseIndex) {
 				for (final Edge edge : edgeGroupsAtNode.phases.get(i)) {
@@ -274,7 +255,7 @@ public class LightCoordinator {
 	public void updateLights() {
 		final double secEachStep = 1 / Settings.numStepsPerSecond;
 		for (int i = 0; i < lightGroups.size(); i++) {
-			final LightGroup egbn = lightGroups.get(i);
+			final TrafficLightCluster egbn = lightGroups.get(i);
 			egbn.trafficSignalAccumulatedGYRTime += secEachStep;
 
 			final Edge anEdgeInActiveApproach = egbn.phases.get(egbn.phaseIndex).get(0);
@@ -330,7 +311,7 @@ public class LightCoordinator {
 
 	}
 
-	int getEdgeGroupIndexOfPriorityInactiveApproach(LightGroup egbn) {
+	int getEdgeGroupIndexOfPriorityInactiveApproach(TrafficLightCluster egbn) {
 		for (int i = 0; i < egbn.phases.size(); i++) {
 			if (i == egbn.phaseIndex) {
 				continue;
