@@ -129,11 +129,6 @@ public class LightCoordinator {
 		// Add or remove lights
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
-		// Reset timer of light groups
-		for (final TrafficLightCluster cluster : lightClusters) {
-			cluster.resetGYR();
-		}
-
 		// Groups adjacent nodes with traffic lights based on distance.
 		groupAdjacentNodes(mapNodes);
 		System.out.println("Grouped adjacent traffic lights.");

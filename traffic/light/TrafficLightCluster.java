@@ -189,20 +189,6 @@ public class TrafficLightCluster {
     }
 
     /**
-     * Reset timer of all light groups.
-     *
-     */
-    public void resetGYR() {
-        for (final Phase phase : phases) {
-            for (final Edge edge : phase.getEdges()) {
-                edge.lightColor = LightColor.GYR_G;
-            }
-        }
-        timeForColor = LightColor.GYR_G.minDynamicTime;
-        spentTimeInColor = 0;
-    }
-
-    /**
      * Set the color of an active street and initialize the timer for the color.
      * Non-active streets get red lights.
      */
