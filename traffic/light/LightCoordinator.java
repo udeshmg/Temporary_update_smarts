@@ -7,6 +7,7 @@ import java.util.List;
 
 import common.Settings;
 import processor.communication.message.SerializableInt;
+import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.road.RoadUtil;
@@ -25,6 +26,7 @@ public class LightCoordinator {
 	 * distance to each other.
 	 */
 	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
+	private TLScheduler tlScheduler;
 
 	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
 			final List<SerializableInt> indexNodesToRemoveLight) {
@@ -137,12 +139,16 @@ public class LightCoordinator {
 		groupInwardEdges();
 		System.out.println("Divided lights in each light group based on street names.");
 
-		// Set green color to the first street at any light group
-		for (final TrafficLightCluster cluster : lightClusters) {
-			cluster.setActivePhase(0);
-			cluster.setGYR(LightColor.GYR_G);
+		tlScheduler = Settings.getLightScheduler();
+		if(tlScheduler != null){
+			tlScheduler.init(lightClusters);
 		}
+	}
 
+	public void scheduleLights(TrafficNetwork trafficNetwork, double timeNow){
+		if(tlScheduler != null){
+			tlScheduler.schedule(trafficNetwork, timeNow);
+		}
 	}
 
 	/**

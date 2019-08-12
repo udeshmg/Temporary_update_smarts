@@ -3,7 +3,9 @@ package traffic.light;
 import common.Settings;
 import traffic.road.Edge;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -34,12 +36,17 @@ import java.util.List;
 public class TrafficLightCluster {
 
     private List<Phase> phases;
-    private int activePhase;
+    private int activePhase = -1;
+    private int nextPhase = -1;
     double timeForColor;
     double spentTimeInColor;
+    private Map<LightColor, Double> activePhaseSchedule;
+    private Map<LightColor, Double> nextPhaseSchedule;
 
     public TrafficLightCluster(final List<Phase> phases) {
         this.phases = phases;
+        activePhaseSchedule = new HashMap<>();
+        nextPhaseSchedule = new HashMap<>();
     }
 
     public List<Phase> getPhases() {
@@ -54,12 +61,54 @@ public class TrafficLightCluster {
         this.activePhase = activePhase;
     }
 
-    public Phase getActivePhase(){
-        return phases.get(activePhase);
+    public double getTimeForColor() {
+        return timeForColor;
+    }
+
+    public void setTimeForColor(double timeForColor) {
+        this.timeForColor = timeForColor;
+    }
+
+    public void setNextPhase(int nextPhase) {
+        this.nextPhase = nextPhase;
+    }
+
+    public int getNextPhase() {
+        return nextPhase;
+    }
+
+    public int getActivePhase(){
+        return activePhase;
+    }
+
+    public int getPhaseCount(){
+        return phases.size();
+    }
+
+    public List<Edge> getActivePhaseEdges(){
+        return phases.get(activePhase).getEdges();
     }
 
     public LightColor getActivePhaseColor(){
-        return getActivePhase().getEdges().get(0).lightColor;
+        return getActivePhaseEdges().get(0).lightColor;
+    }
+
+    public boolean hasToChangeColor(){
+        return timeForColor <= spentTimeInColor;
+    }
+
+    public double getSpentTimeInColor() {
+        return spentTimeInColor;
+    }
+
+    public void setActivePhaseSchedule(Map<LightColor, Double> activePhaseSchedule) {
+        this.activePhaseSchedule.clear();
+        this.activePhaseSchedule.putAll(activePhaseSchedule);
+    }
+
+    public void setNextPhaseSchedule(Map<LightColor, Double> nextPhaseSchedule) {
+        this.nextPhaseSchedule.clear();
+        this.nextPhaseSchedule.putAll(nextPhaseSchedule);
     }
 
     public void updateLights(){
@@ -67,37 +116,17 @@ public class TrafficLightCluster {
         spentTimeInColor += secEachStep;
 
         LightColor activePhaseColor = getActivePhaseColor();
-        if (isPriorityVehicleInInactiveApproach() && !isPriorityVehicleInActiveApproach()) {
-            // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-            activePhase = getEdgeGroupIndexOfPriorityInactiveApproach();
-            setGYR(LightColor.GYR_G);
-        }
-        if (!isPriorityVehicleInInactiveApproach() && isPriorityVehicleInActiveApproach()) {
-            // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
-            setGYR(LightColor.GYR_G);
-        }
-
-        if(activePhaseColor == LightColor.GYR_G){
-            if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-                if (!isTrafficExistAtNonActiveStreet()) {
-                    timeForColor += secEachStep;
-                } else if (timeForColor <= spentTimeInColor) {
-                    // Switch to yellow if traffic waiting at conflicting approach
-                    if(isTrafficExistAtActiveStreet() && spentTimeInColor < LightColor.GYR_G.maxDynamicTime){
-                        timeForColor += secEachStep;
-                    }
-                }
-            }
-        }
-
-        if(timeForColor <= spentTimeInColor) {
+        if(hasToChangeColor()) {
             if (activePhaseColor == LightColor.GYR_G) {
                 setGYR(LightColor.GYR_Y);
             } else if (activePhaseColor == LightColor.GYR_Y) {
                 setGYR(LightColor.GYR_R);
             } else if ((activePhaseColor == LightColor.GYR_R || activePhaseColor == LightColor.KEEP_RED)) {
                 // Starts GYR cycle for next group of edges	(Switching Phase)
-                activePhase = (activePhase + 1) % phases.size();
+                activePhase = nextPhase;
+                activePhaseSchedule.putAll(nextPhaseSchedule);
+                nextPhase = -1;
+                nextPhaseSchedule.clear();
                 setGYR(LightColor.GYR_G);
             }
         }
@@ -108,77 +137,6 @@ public class TrafficLightCluster {
                 edge.isDetectedVehicleForLight = false;
             }
         }
-    }
-
-
-    public int getEdgeGroupIndexOfPriorityInactiveApproach() {
-        for (int i = 0; i < phases.size(); i++) {
-            if (i == activePhase) {
-                continue;
-            }
-            for (Edge e : getPhase(i).getEdges()) {
-                if (e.isEdgeContainsPriorityVehicle()) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Check whether the current active approach has a priority vehicle.
-     */
-    boolean isPriorityVehicleInActiveApproach() {
-        for (final Edge e : getActivePhase().getEdges()) {
-            if (e.isEdgeContainsPriorityVehicle()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check whether inactive approaches have a priority vehicle.
-     */
-    boolean isPriorityVehicleInInactiveApproach() {
-        for (int i = 0; i < phases.size(); i++) {
-            for (final Edge e : getPhase(i).getEdges()) {
-                if (e.isEdgeContainsPriorityVehicle()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check whether there is vehicle coming to the current approach under
-     * active control.
-     */
-    boolean isTrafficExistAtActiveStreet() {
-        for (final Edge e : getActivePhase().getEdges()) {
-            if (e.isDetectedVehicleForLight) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks whether there is incoming vehicle at conflicting approaches.
-     */
-    boolean isTrafficExistAtNonActiveStreet() {
-        for (int i = 0; i < phases.size(); i++) {
-            if (i == activePhase) {
-                continue;
-            }
-            for (final Edge e : getPhase(i).getEdges()) {
-                if (e.isDetectedVehicleForLight) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -198,11 +156,64 @@ public class TrafficLightCluster {
             }
         }
         spentTimeInColor = 0;
-        if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
-            timeForColor = type.minDynamicTime;
-        } else if (Settings.trafficLightTiming == TrafficLightTiming.FIXED) {
-            timeForColor = type.fixedTime;
+        timeForColor = activePhaseSchedule.get(type);
+    }
+
+    public int getInactivePhaseWithPriorityVehicles() {
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == activePhase) {
+                continue;
+            }
+            for (Edge e : getPhase(i).getEdges()) {
+                if (e.isEdgeContainsPriorityVehicle()) {
+                    return i;
+                }
+            }
         }
+        return -1;
+    }
+
+    boolean hasActivePhasePriorityVehicles() {
+        for (final Edge e : getActivePhaseEdges()) {
+            if (e.isEdgeContainsPriorityVehicle()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean hasInactivePhasePriorityVehicles() {
+        for (int i = 0; i < phases.size(); i++) {
+            for (final Edge e : getPhase(i).getEdges()) {
+                if (e.isEdgeContainsPriorityVehicle()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    boolean hasActivePhaseTraffic() {
+        for (final Edge e : getActivePhaseEdges()) {
+            if (e.isDetectedVehicleForLight) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean hasInactivePhaseTraffic() {
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == activePhase) {
+                continue;
+            }
+            for (final Edge e : getPhase(i).getEdges()) {
+                if (e.isDetectedVehicleForLight) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

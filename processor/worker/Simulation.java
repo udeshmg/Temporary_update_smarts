@@ -137,7 +137,7 @@ public class Simulation {
 		removeTripFinishedVehicles();
 		onVehicleRemove(oneStepData_allVehiclesReachedDestination, step);
 		trafficNetwork.changeLaneOfVehicles(timeNow);
-		trafficNetwork.updateTrafficLights();
+		trafficNetwork.updateTrafficLights(timeNow);
 		trafficNetwork.updateTramStopTimers();
 		trafficNetwork.releaseTripMakingVehicles(timeNow, simulationListener);
 		trafficNetwork.releaseVehicleFromParking(timeNow);

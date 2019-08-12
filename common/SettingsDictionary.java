@@ -1,6 +1,9 @@
 package common;
 
 import processor.SimulationListener;
+import traffic.light.SimpleDynamicTLScheduler;
+import traffic.light.SimpleFixedTLScheduler;
+import traffic.light.TLScheduler;
 import traffic.network.*;
 import traffic.routing.Routing;
 
@@ -35,6 +38,7 @@ public class SettingsDictionary {
     private Map<String, TemporalDistributor> temporalDistributorMap;
     private Map<String, VehicleTypeDistributor> vehicleTypeDistributorMap;
     private Map<String, Routing> routingAlgoMap;
+    private Map<String, TLScheduler> lightSchedulerMap;
 
     public SettingsDictionary() {
         this.listenerMap = new HashMap<>();
@@ -45,6 +49,9 @@ public class SettingsDictionary {
         this.vehicleTypeDistributorMap = new HashMap<>();
         addVehicleTypeDistributor("Default", new DefaultVehicleTypeDistributor());
         this.routingAlgoMap = new HashMap<>();
+        this.lightSchedulerMap = new HashMap<>();
+        addTLScheduler("FIXED", new SimpleFixedTLScheduler());
+        addTLScheduler("DYNAMIC", new SimpleDynamicTLScheduler());
     }
 
     public void addSimulationListener(String key, SimulationListener listener){
@@ -80,4 +87,12 @@ public class SettingsDictionary {
     }
 
     public VehicleTypeDistributor getVehicleTypeDistributor(String key) {return  vehicleTypeDistributorMap.get(key);}
+
+    public void addTLScheduler(String key, TLScheduler tlScheduler){
+        lightSchedulerMap.put(key, tlScheduler);
+    }
+
+    public TLScheduler getTLScheduler(String key){
+        return lightSchedulerMap.get(key);
+    }
 }
