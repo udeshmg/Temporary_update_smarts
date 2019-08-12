@@ -77,36 +77,29 @@ public class TrafficLightCluster {
             setGYR(LightColor.GYR_G);
         }
 
-        if (activePhaseColor == LightColor.GYR_G) {
+        if(activePhaseColor == LightColor.GYR_G){
             if (Settings.trafficLightTiming == TrafficLightTiming.DYNAMIC) {
                 if (!isTrafficExistAtNonActiveStreet()) {
-                    return;
+                    timeForColor += secEachStep;
                 } else if (timeForColor <= spentTimeInColor) {
                     // Switch to yellow if traffic waiting at conflicting approach
-                    if (!isTrafficExistAtActiveStreet()) {
-                        setGYR(LightColor.GYR_Y);
-                    } else {
-                        // Without conflicting traffic: increment green light time if possible; change to yellow immediately if max green time passed
-                        if (spentTimeInColor < LightColor.GYR_G.maxDynamicTime) {
-                            timeForColor += secEachStep;
-                        } else {
-                            setGYR(LightColor.GYR_Y);
-                        }
+                    if(isTrafficExistAtActiveStreet() && spentTimeInColor < LightColor.GYR_G.maxDynamicTime){
+                        timeForColor += secEachStep;
                     }
                 }
-            } else if ((Settings.trafficLightTiming == TrafficLightTiming.FIXED)
-                    && (timeForColor <= spentTimeInColor)) {
-                setGYR(LightColor.GYR_Y);
             }
-        } else if ((activePhaseColor == LightColor.GYR_Y)
-                && (timeForColor <= spentTimeInColor)) {
-            setGYR(LightColor.GYR_R);
-        } else if ((activePhaseColor == LightColor.GYR_R
-                || activePhaseColor == LightColor.KEEP_RED)
-                && (timeForColor <= spentTimeInColor)) {
-            // Starts GYR cycle for next group of edges	(Switching Phase)
-            activePhase = (activePhase + 1) % phases.size();
-            setGYR(LightColor.GYR_G);
+        }
+
+        if(timeForColor <= spentTimeInColor) {
+            if (activePhaseColor == LightColor.GYR_G) {
+                setGYR(LightColor.GYR_Y);
+            } else if (activePhaseColor == LightColor.GYR_Y) {
+                setGYR(LightColor.GYR_R);
+            } else if ((activePhaseColor == LightColor.GYR_R || activePhaseColor == LightColor.KEEP_RED)) {
+                // Starts GYR cycle for next group of edges	(Switching Phase)
+                activePhase = (activePhase + 1) % phases.size();
+                setGYR(LightColor.GYR_G);
+            }
         }
 
         // Reset vehicle detection flag at all edges
