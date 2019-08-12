@@ -1,5 +1,6 @@
 package traffic.road;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 
@@ -453,4 +454,15 @@ public class Edge {
 		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);
 	}
 
+	public Point2D getEdgeStartMidlle(){
+		Line2D l1 = lanes.get(0).getLaneLine();
+		Line2D l2 = lanes.get(lanes.size()-1).getLaneLine();
+		return RoadUtil.getDividingPoint(l1.getP1(), l2.getP1(), 1, 1);
+	}
+
+	public Point2D getEdgeEndMidlle(){
+		Line2D l1 = lanes.get(0).getLaneLine();
+		Line2D l2 = lanes.get(lanes.size()-1).getLaneLine();
+		return RoadUtil.getDividingPoint(l1.getP2(), l2.getP2(), 1, 1);
+	}
 }

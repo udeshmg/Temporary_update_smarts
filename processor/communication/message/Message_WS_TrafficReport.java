@@ -1,5 +1,6 @@
 package processor.communication.message;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,11 +106,13 @@ public class Message_WS_TrafficReport {
 		for (final TrafficLightCluster cluster : lightCoordinator.lightClusters) {
 			for (Phase phase : cluster.getPhases()) {
 				for (final Edge e : phase.getEdges()) {
-					final double lightPositionToEdgeRatio = (e.length - 1) / e.length;
-					final double latitude = (e.startNode.lat
-							+ ((e.endNode.lat - e.startNode.lat) * lightPositionToEdgeRatio));
-					final double longitude = (e.startNode.lon
-							+ ((e.endNode.lon - e.startNode.lon) * lightPositionToEdgeRatio));
+					final double lightPositionToEdgeRatio = (e.length - e.getEndIntersectionSize() + 1) / e.length;
+
+					Point2D start = e.getEdgeStartMidlle();
+					Point2D end = e.getEdgeEndMidlle();
+
+					final double latitude = (start.getY() + ((end.getY() - start.getY()) * lightPositionToEdgeRatio));
+					final double longitude = (start.getX() + ((end.getX() - start.getX()) * lightPositionToEdgeRatio));
 					list.add(new Serializable_GUI_Light(longitude, latitude, e.lightColor.color));
 				}
 			}
