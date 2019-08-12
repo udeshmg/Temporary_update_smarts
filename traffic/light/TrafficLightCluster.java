@@ -38,8 +38,8 @@ public class TrafficLightCluster {
     private List<Phase> phases;
     private int activePhase = -1;
     private int nextPhase = -1;
-    double timeForColor;
-    double spentTimeInColor;
+    private double timeForColor;
+    private double spentTimeInColor;
     private Map<LightColor, Double> activePhaseSchedule;
     private Map<LightColor, Double> nextPhaseSchedule;
 
