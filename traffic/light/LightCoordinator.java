@@ -1,9 +1,6 @@
 package traffic.light;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import common.Settings;
 import processor.communication.message.SerializableInt;
@@ -98,21 +95,21 @@ public class LightCoordinator {
 		 * links.
 		 */
 		for (List<Node> nodeGroup : nodeGroups) {
-			HashMap<String, Phase> phaseHashMap = new HashMap<>();
+			Map<String, Phase> phaseMap = new HashMap<>();
 
 			for (Node node : nodeGroup) {
 				for (Edge edge : node.inwardEdges) {
-					if (!phaseHashMap.containsKey(edge.name)) {
-						phaseHashMap.put(edge.name, new Phase());
+					if (!phaseMap.containsKey(edge.name)) {
+						phaseMap.put(edge.name, new Phase());
 					}
-					Phase phase = phaseHashMap.get(edge.name);
+					Phase phase = phaseMap.get(edge.name);
 					phase.addEdge(edge);
 					edge.isDetectedVehicleForLight = false;
 				}
 			}
 
 			List<Phase> phaseList = new ArrayList<>();
-			phaseList.addAll(phaseHashMap.values());
+			phaseList.addAll(phaseMap.values());
 
 
 
