@@ -95,8 +95,8 @@ public class LightCoordinator {
 		 * links.
 		 */
 		for (List<Node> nodeGroup : nodeGroups) {
-			Map<String, Phase> phaseMap = new HashMap<>();
 
+			Map<String, Phase> phaseMap = new HashMap<>();
 			for (Node node : nodeGroup) {
 				for (Edge edge : node.inwardEdges) {
 					if (!phaseMap.containsKey(edge.name)) {
@@ -107,15 +107,42 @@ public class LightCoordinator {
 					edge.isDetectedVehicleForLight = false;
 				}
 			}
-
 			List<Phase> phaseList = new ArrayList<>();
 			phaseList.addAll(phaseMap.values());
 
-
+			List<Movement> moveList = findMovementsInsideNodeGroup(nodeGroup);
 
 			lightClusters.add(new TrafficLightCluster(phaseList));
 
 		}
+	}
+
+	private List<Movement> findMovementsInsideNodeGroup(List<Node> nodeGroup){
+		List<Movement> fullMovements = new ArrayList<>();
+		List<Movement> partialMovements = new ArrayList<>();
+		for (Node node : nodeGroup) {
+			for (Edge inEdge : node.inwardEdges) {
+				if(!nodeGroup.contains(inEdge.startNode)){
+					Movement movement = new Movement();
+					movement.addEdge(inEdge);
+					partialMovements.add(movement);
+				}
+			}
+		}
+		while(!partialMovements.isEmpty()){
+			Movement partial = partialMovements.remove(0);
+			Node end = partial.getEndNode();
+			if(nodeGroup.contains(end)){
+				for (Edge outwardEdge : end.outwardEdges) {
+					Movement newMove = partial.clone();
+					newMove.addEdge(outwardEdge);
+					partialMovements.add(newMove);
+				}
+			}else{
+				fullMovements.add(partial);
+			}
+		}
+		return fullMovements;
 	}
 
 	/**
