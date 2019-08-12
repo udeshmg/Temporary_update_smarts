@@ -98,23 +98,23 @@ public class LightCoordinator {
 		 * links.
 		 */
 		for (final List<Node> nodeGroup : nodeGroups) {
-			final HashMap<String, Phase> inwardEdgeGroupsHashMap = new HashMap<>();
+			final HashMap<String, Phase> phaseHashMap = new HashMap<>();
 
 			for (final Node node : nodeGroup) {
 				for (final Edge edge : node.inwardEdges) {
-					if (!inwardEdgeGroupsHashMap.containsKey(edge.name)) {
-						inwardEdgeGroupsHashMap.put(edge.name, new Phase());
+					if (!phaseHashMap.containsKey(edge.name)) {
+						phaseHashMap.put(edge.name, new Phase());
 					}
-					Phase phase = inwardEdgeGroupsHashMap.get(edge.name);
+					Phase phase = phaseHashMap.get(edge.name);
 					phase.addEdge(edge);
 					edge.isDetectedVehicleForLight = false;
 				}
 			}
 
-			final List<Phase> inwardEdgeGroupsList = new ArrayList<>();
-			inwardEdgeGroupsList.addAll(inwardEdgeGroupsHashMap.values());
+			final List<Phase> phaseList = new ArrayList<>();
+			phaseList.addAll(phaseHashMap.values());
 
-			lightClusters.add(new TrafficLightCluster(inwardEdgeGroupsList));
+			lightClusters.add(new TrafficLightCluster(phaseList));
 
 		}
 	}
