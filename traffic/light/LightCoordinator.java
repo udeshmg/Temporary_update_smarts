@@ -97,11 +97,11 @@ public class LightCoordinator {
 		 * Identify the lights on the same street based on the name of the
 		 * links.
 		 */
-		for (final List<Node> nodeGroup : nodeGroups) {
-			final HashMap<String, Phase> phaseHashMap = new HashMap<>();
+		for (List<Node> nodeGroup : nodeGroups) {
+			HashMap<String, Phase> phaseHashMap = new HashMap<>();
 
-			for (final Node node : nodeGroup) {
-				for (final Edge edge : node.inwardEdges) {
+			for (Node node : nodeGroup) {
+				for (Edge edge : node.inwardEdges) {
 					if (!phaseHashMap.containsKey(edge.name)) {
 						phaseHashMap.put(edge.name, new Phase());
 					}
@@ -111,8 +111,10 @@ public class LightCoordinator {
 				}
 			}
 
-			final List<Phase> phaseList = new ArrayList<>();
+			List<Phase> phaseList = new ArrayList<>();
 			phaseList.addAll(phaseHashMap.values());
+
+
 
 			lightClusters.add(new TrafficLightCluster(phaseList));
 
