@@ -5,6 +5,7 @@ import java.util.*;
 import common.Settings;
 import processor.communication.message.SerializableInt;
 import traffic.TrafficNetwork;
+import traffic.light.schedule.TLScheduler;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.road.RoadUtil;

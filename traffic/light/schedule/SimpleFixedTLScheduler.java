@@ -1,8 +1,8 @@
-package traffic.light;
+package traffic.light.schedule;
 
-import common.Settings;
 import traffic.TrafficNetwork;
-import traffic.road.Edge;
+import traffic.light.LightColor;
+import traffic.light.TrafficLightCluster;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,18 +29,16 @@ import java.util.Map;
  * <p>
  * Created by tmuthugama on 8/9/2019
  */
-public class SimpleDynamicTLScheduler extends TLScheduler{
+public class SimpleFixedTLScheduler extends TLScheduler{
 
     private Map<LightColor, Double> schedule;
-    private double maxGreenTime;
 
-    public SimpleDynamicTLScheduler(){
+    public SimpleFixedTLScheduler(){
         schedule = new HashMap<>();
-        schedule.put(LightColor.GYR_G, 10.0);
+        schedule.put(LightColor.GYR_G, 30.0);
         schedule.put(LightColor.GYR_Y, 10.0);
         schedule.put(LightColor.GYR_R, 5.0);
         schedule.put(LightColor.KEEP_RED, 0.0);
-        maxGreenTime = 180.0;
     }
 
     @Override
@@ -57,31 +55,11 @@ public class SimpleDynamicTLScheduler extends TLScheduler{
 
     @Override
     public void schedule(TrafficNetwork trafficNetwork, double timeNow) {
-        double secEachStep = 1 / Settings.numStepsPerSecond;
-
         for (TrafficLightCluster cluster : getClusters()) {
-            LightColor activePhaseColor = cluster.getActivePhaseColor();
-//            if (cluster.hasInactivePhasePriorityVehicles() && !cluster.hasActivePhasePriorityVehicles()) {
-//                // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-//                cluster.setActivePhase(cluster.getInactivePhaseWithPriorityVehicles());
-//                setGYR(LightColor.GYR_G);
-//            }
-//            if (!cluster.hasInactivePhasePriorityVehicles() && cluster.hasActivePhasePriorityVehicles()) {
-//                // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
-//                setGYR(LightColor.GYR_G);
-//            }
-            double spentTime = cluster.getSpentTimeInColor() + secEachStep;
-            if (activePhaseColor == LightColor.GYR_G && spentTime >= cluster.getTimeForColor()) {
-                if(cluster.hasActivePhaseTraffic() && spentTime < maxGreenTime){
-                    cluster.setTimeForColor(cluster.getTimeForColor() + secEachStep);
-                }
-            }
             if(cluster.getNextPhase() == -1){
                 cluster.setNextPhase((cluster.getActivePhase() + 1) % cluster.getPhaseCount());
                 cluster.setNextPhaseSchedule(schedule);
             }
         }
     }
-
-
 }

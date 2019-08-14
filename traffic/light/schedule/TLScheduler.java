@@ -1,6 +1,7 @@
-package traffic.light;
+package traffic.light.schedule;
 
 import traffic.TrafficNetwork;
+import traffic.light.TrafficLightCluster;
 
 import java.util.List;
 

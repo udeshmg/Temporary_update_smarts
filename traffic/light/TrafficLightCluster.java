@@ -193,7 +193,7 @@ public class TrafficLightCluster {
         return false;
     }
 
-    boolean hasActivePhaseTraffic() {
+    public boolean hasActivePhaseTraffic() {
         for (final Edge e : getActivePhaseEdges()) {
             if (e.isDetectedVehicleForLight) {
                 return true;

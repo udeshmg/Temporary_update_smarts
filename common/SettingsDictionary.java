@@ -1,9 +1,9 @@
 package common;
 
 import processor.SimulationListener;
-import traffic.light.SimpleDynamicTLScheduler;
-import traffic.light.SimpleFixedTLScheduler;
-import traffic.light.TLScheduler;
+import traffic.light.schedule.SimpleDynamicTLScheduler;
+import traffic.light.schedule.SimpleFixedTLScheduler;
+import traffic.light.schedule.TLScheduler;
 import traffic.network.*;
 import traffic.routing.Routing;
 

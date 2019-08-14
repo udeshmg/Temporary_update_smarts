@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import processor.SimulationListener;
-import traffic.light.TLScheduler;
+import traffic.light.schedule.TLScheduler;
 import traffic.network.*;
 import traffic.light.TrafficLightTiming;
 import traffic.routing.Routing;
