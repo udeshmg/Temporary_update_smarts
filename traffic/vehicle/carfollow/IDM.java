@@ -46,7 +46,7 @@ public class IDM {
 		/*
 		 * Desired dynamic distance
 		 */
-		final double sS = vehicle.driverProfile.IDM_s0 + (v * vehicle.driverProfile.IDM_T * Settings.safetyHeadwayMultiplier)
+		final double sS = vehicle.driverProfile.IDM_s0 + (v * vehicle.driverProfile.IDM_T * vehicle.getHeadWayMultiplier())
 				+ ((v * dV) / (2 * Math.sqrt(vehicle.driverProfile.IDM_a * vehicle.driverProfile.IDM_b)));
 		/*
 		 * Desired speed

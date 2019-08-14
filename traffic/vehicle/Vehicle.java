@@ -60,7 +60,7 @@ public class Vehicle {
 	private boolean finished = false;
 	private boolean reachedFellow = false;
 
-	private double cityMeteringSpeed = Double.MAX_VALUE;
+	private double headWayMultiplier = 1.0;
 	private double lastSpeedChangeTime = 0;
 	private double startHeadPosition = 0;
 	private SlowdownFactor recentSlowDownFactor = null;
@@ -160,7 +160,7 @@ public class Vehicle {
 	}
 
 	public double getUnsafeDistanceForVehiclesFromParking(){
-		return speed * driverProfile.IDM_T;
+		return speed * (driverProfile.IDM_T * headWayMultiplier);
 	}
 
 
@@ -652,13 +652,12 @@ public class Vehicle {
 		}
 	}
 
-
-	public void setCityMeteringSpeed(double cityMeteringSpeed) {
-		this.cityMeteringSpeed = cityMeteringSpeed;
+	public double getHeadWayMultiplier() {
+		return headWayMultiplier;
 	}
 
-	public double getCityMeteringSpeed() {
-		return cityMeteringSpeed;
+	public void setHeadWayMultiplier(double headWayMultiplier) {
+		this.headWayMultiplier = headWayMultiplier;
 	}
 
 	public double getLastSpeedChangeTime() {
