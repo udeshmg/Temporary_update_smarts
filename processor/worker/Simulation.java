@@ -177,13 +177,13 @@ public class Simulation {
 		if(simulationListener != null && trafficNetwork.isPublishTime(step)){
 			List<Vehicle> allmovedVehicles = trafficNetwork.vehicles.stream().filter(vehicle -> vehicle.active)
 					.collect(Collectors.toList());
-			simulationListener.onVehicleMove(allmovedVehicles, step);
+			simulationListener.onVehicleMove(allmovedVehicles, step, trafficNetwork);
 		}
 	}
 
 	public void onVehicleRemove(List<Vehicle> vehicles, int step){
 		if(simulationListener != null){
-			simulationListener.onVehicleRemove(vehicles, step);
+			simulationListener.onVehicleRemove(vehicles, step, trafficNetwork);
 		}
 	}
 }

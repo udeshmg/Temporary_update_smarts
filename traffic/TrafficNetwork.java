@@ -146,6 +146,7 @@ public class TrafficNetwork extends RoadNetwork {
 		// Set as active
 		vehicle.active = true;
 		// Add vehicle to system
+		vehicle.setHeadWayMultiplier(Settings.safetyHeadwayMultiplier);
 		if (!vehicle.isExternal) {
 			// Update vehicle counters				
 			numInternalVehicleAllTime++;
@@ -773,7 +774,11 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	public boolean isPublishTime(int step){
-		return (step % Settings.updateStepInterval) == 1;
+		if(Settings.updateStepInterval == 1){
+			return true;
+		}else {
+			return (step % Settings.updateStepInterval) == 0;
+		}
 	}
 
 	public Comparator<Vehicle> getTripMakingVehicleComparator(){

@@ -133,7 +133,7 @@ public class SimServerData {
                 if (!allTrajectories.containsKey(vehicle.id)) {
                     allTrajectories.put(vehicle.id, new TreeMap<Double, double[]>());
                 }
-                allTrajectories.get(vehicle.id).put(timeStamp, new double[]{vehicle.latHead, vehicle.lonHead});
+                allTrajectories.get(vehicle.id).put(timeStamp, new double[]{vehicle.displacement, vehicle.latHead, vehicle.lonHead});
             }
         }
         if(finished.size() > 0){
@@ -355,6 +355,7 @@ public class SimServerData {
         Settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
         Settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
         Settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
+        Settings.updateStepInterval = experiment.getUpdateStepInterval();
 
         return isNewMap;
     }

@@ -32,7 +32,7 @@ public interface SimulationListener {
     void onPause();
     void onStop();
     void onVehicleAdd(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork);
-    void onVehicleMove(List<Vehicle> vehicles, int step);
-    void onVehicleRemove(List<Vehicle> vehicles, int step);
+    void onVehicleMove(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork);
+    void onVehicleRemove(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork);
 
 }

@@ -789,6 +789,14 @@ public class Vehicle {
 		this.end = end;
 	}
 
+	public double getDisplacement(){
+		double displacement = headPosition;
+		for (int i = 0; i < indexLegOnRoute; i++) {
+			displacement += getRouteLeg(i).edge.length;
+		}
+		return displacement;
+	}
+
 	public class IntersectionDecision{
 		private Lane startLane;
 		private Lane endLane;

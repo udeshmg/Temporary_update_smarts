@@ -16,10 +16,12 @@ public class Serializable_GUI_Vehicle {
 	public String worker;
 	public String driverProfile;
 	public String slowDownFactor;
+	public double headwayMultiplier;
 	public int edgeIndex;
 	public int laneIndex;
 	public double originalEdgeMaxSpeed;
 	public boolean isAffectedByPriorityVehicle;
+	public double displacement;
 
 	public Serializable_GUI_Vehicle() {
 

@@ -138,7 +138,7 @@ public class Settings {
 	public static String odDistributor = "Random";
 	public static String temporalDistributor = "Uniform";
 	public static String vehicleTypeDistributor = "Default";
-	public static double safetyHeadwayMultiplier = 1;
+	public static double safetyHeadwayMultiplier = 2;
 	public static String defaultDownloadDirectory = "download";
 	public static String defaultTestName = null;
 	public static int defaultRunIndex = 1;
@@ -146,7 +146,7 @@ public class Settings {
 	public static String testName = defaultTestName;
 	public static int runIndex = defaultRunIndex;
 	public static boolean inputOnlyODPairsOfForegroundVehicleFile = false;
-	public static int updateStepInterval = 300;
+	public static int updateStepInterval = 1;
 	public static String simulationListener = "";
 	public static double startGapOffset = 0.0;
 	public static double startPosOffset = 0.0;

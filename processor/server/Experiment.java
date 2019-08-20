@@ -39,6 +39,7 @@ public class Experiment {
     String temporalDistributor;
     String vehicleTypeDistributor;
     boolean stopsAtMaxSteps;
+    int updateStepInterval;
 
     public void setExperimentId(String experimentId) {
         this.experimentId = experimentId;
@@ -288,6 +289,14 @@ public class Experiment {
         this.stopsAtMaxSteps = stopsAtMaxSteps;
     }
 
+    public int getUpdateStepInterval() {
+        return updateStepInterval;
+    }
+
+    public void setUpdateStepInterval(int updateStepInterval) {
+        this.updateStepInterval = updateStepInterval;
+    }
+
     public void setValues(String key, String value){
         switch (key) {
             case "driveOnLeft": {
@@ -418,6 +427,11 @@ public class Experiment {
             }
             case "stopsAtMaxSteps":{
                 setStopsAtMaxSteps(Boolean.valueOf(value));
+                break;
+            }
+            case "updateStepInterval":{
+                setUpdateStepInterval(Integer.valueOf(value));
+                break;
             }
         }
     }
@@ -454,6 +468,7 @@ public class Experiment {
         experiment.setTemporalDistributor(temporalDistributor);
         experiment.setVehicleTypeDistributor(vehicleTypeDistributor);
         experiment.setStopsAtMaxSteps(stopsAtMaxSteps);
+        experiment.setUpdateStepInterval(updateStepInterval);
         return experiment;
     }
 }

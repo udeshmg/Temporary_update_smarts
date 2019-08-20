@@ -39,7 +39,7 @@ public class GUI extends JFrame {
 	double lastSpeedUp = 0;
 
 	enum VehicleDetailType {
-		Type, Remaining_Links, ID_Worker, Driver_Profile, Slowdown_Factor
+		Type, Remaining_Links, ID_Worker, Driver_Profile, Slowdown_Factor, HeadwayMultiplier
 	}
 
 	private final HashMap<String, ArrayList<Serializable_GUI_Vehicle>> guiVehicleList = new HashMap<>();

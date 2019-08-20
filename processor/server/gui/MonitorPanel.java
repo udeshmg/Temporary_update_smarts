@@ -949,6 +949,9 @@ public class MonitorPanel extends JPanel {
 					case Slowdown_Factor:
 						detail = vehicle.slowDownFactor;
 						break;
+					case HeadwayMultiplier:
+						detail = String.valueOf(vehicle.headwayMultiplier);
+						break;
 				}
 
 				g2d.setColor(Color.black);

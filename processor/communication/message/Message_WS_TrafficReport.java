@@ -90,10 +90,12 @@ public class Message_WS_TrafficReport {
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
 				sVehicle.slowDownFactor = v.getRecentSlowDownFactor();
+				sVehicle.headwayMultiplier = v.getHeadWayMultiplier();
 				sVehicle.edgeIndex = v.lane.edge.index;
 				sVehicle.laneIndex = v.lane.index;
 				sVehicle.originalEdgeMaxSpeed = v.lane.edge.freeFlowSpeed;
 				sVehicle.isAffectedByPriorityVehicle = v.isAffectedByPriorityVehicle;
+				sVehicle.displacement = v.getDisplacement();
 				list.add(sVehicle);
 			}
 		}

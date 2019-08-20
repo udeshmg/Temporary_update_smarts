@@ -124,7 +124,7 @@ public class FileOutput {
 			// Print column titles
 			fosTrajectory = new FileOutputStream(file, true);
 			outputStringToFile(fosTrajectory,
-					"Trajectory ID,Vehicle ID,Time Stamp,Latitude,Longitude" + System.getProperty("line.separator"));
+					"Trajectory ID,Vehicle ID,Time Stamp,Displacement, Latitude,Longitude" + System.getProperty("line.separator"));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -194,6 +194,8 @@ public class FileOutput {
 					outputStringToFile(fosTrajectory, String.valueOf(point[0]));
 					outputStringToFile(fosTrajectory, ",");
 					outputStringToFile(fosTrajectory, String.valueOf(point[1]));
+					outputStringToFile(fosTrajectory, ",");
+					outputStringToFile(fosTrajectory, String.valueOf(point[2]));
 
 					outputStringToFile(fosTrajectory, System.getProperty("line.separator"));
 
