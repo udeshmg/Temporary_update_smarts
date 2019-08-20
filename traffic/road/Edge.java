@@ -425,6 +425,10 @@ public class Edge {
 	public void findChanceGivingVehicle(){
 		for (Lane lane : lanes) {
 			for (Vehicle vehicle : lane.getVehicles()) {
+				Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
+				if(vehicle != v && vehicle.headPosition < getLaneChangeGiveChancePos() && VehicleUtil.isNeedLaneChangeForTurn(lane.edge, vehicle)){
+					chanceGivingVehicles.add(vehicle);
+				}
 				if(vehicle.headPosition < getLaneChangeGiveChancePos() - vehicle.speed * (vehicle.driverProfile.IDM_T*vehicle.getHeadWayMultiplier())) {
 					chanceGivingVehicles.add(vehicle);
 				}

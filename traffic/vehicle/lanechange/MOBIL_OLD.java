@@ -327,7 +327,8 @@ public class MOBIL_OLD {
                 return true;
             } else {
                 if((vehicle.lane.getFrontVehicleInLane() == vehicle) && backVehicleInTargetLane.lane.getFrontVehicleInLane()==backVehicleInTargetLane){
-                    if(backVehicleInTargetLane.getRecentSlowDownFactor().equals(SlowdownFactor.WAITING_VEHICLE.name())){
+                    if(backVehicleInTargetLane.getRecentSlowDownFactor().equals(SlowdownFactor.WAITING_VEHICLE.name())
+                        || VehicleUtil.isNeedLaneChangeForTurn(vehicle.lane.edge, backVehicleInTargetLane)){
                         return true;
                     }
                 }
