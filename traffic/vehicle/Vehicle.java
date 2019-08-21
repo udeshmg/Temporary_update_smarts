@@ -367,6 +367,11 @@ public class Vehicle {
 			updateRoadBlockInfo();
 			takeIntersectionDecision();
 			updateLaneChangeConflictData();
+
+			if((indexLegOnRoute == getRouteLegCount() - 1) && (headPosition >= lane.edge.length - lane.edge.getEndIntersectionSize())){
+				markAsFinished();
+				timeTravel = timeNow - timeRouteStart;
+			}
 		}
 	}
 
@@ -599,14 +604,6 @@ public class Vehicle {
 					// Update route leg
 					indexLegOnRoute++;
 
-					// Check whether vehicle finishes trip
-					if (active && (indexLegOnRoute >= getRouteLegCount())) {
-						markAsFinished();
-						//if (isForeground) {
-							timeTravel = timeNow - timeRouteStart;
-						//}
-						break;
-					}
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;

@@ -79,9 +79,8 @@ public class Simulation {
 			if (!vehicle.active) {
 				continue;
 			}
-			vehicle.moveToNextLink(timeNow, connectedFellows);
-			if(vehicle.isFinished()){
-				oneStepData_allVehiclesReachedDestination.add(vehicle);
+			if(!vehicle.isFinished()){
+				vehicle.moveToNextLink(timeNow, connectedFellows);
 			}
 			if(vehicle.isReachedFellow()){
 				oneStepData_vehiclesReachedFellowWorker.add(vehicle);
