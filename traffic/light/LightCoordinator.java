@@ -23,6 +23,7 @@ public class LightCoordinator {
 	 * Groups of traffic lights. Lights in the same group are within a certain
 	 * distance to each other.
 	 */
+	public Map<Edge, TrafficLightCluster> clusterMap = new HashMap<>();
 	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
 	private TLScheduler tlScheduler;
 
@@ -97,23 +98,15 @@ public class LightCoordinator {
 		 */
 		for (List<Node> nodeGroup : nodeGroups) {
 
-			Map<String, Phase> phaseMap = new HashMap<>();
-			for (Node node : nodeGroup) {
-				for (Edge edge : node.inwardEdges) {
-					if (!phaseMap.containsKey(edge.name)) {
-						phaseMap.put(edge.name, new Phase());
-					}
-					Phase phase = phaseMap.get(edge.name);
-					phase.addEdge(edge);
-					edge.isDetectedVehicleForLight = false;
-				}
-			}
-			List<Phase> phaseList = new ArrayList<>();
-			phaseList.addAll(phaseMap.values());
-
 			List<Movement> moveList = findMovementsInsideNodeGroup(nodeGroup);
 
-			lightClusters.add(new TrafficLightCluster(phaseList));
+			TrafficLightCluster cluster = new TrafficLightCluster(moveList);
+			for (Movement movement : cluster.getMovements()) {
+				for (Edge edge : movement.getEdges()) {
+					clusterMap.put(edge, cluster);
+				}
+			}
+			lightClusters.add(cluster);
 
 		}
 	}
@@ -182,9 +175,9 @@ public class LightCoordinator {
 	 * Compute how long the active streets have been given their current color.
 	 * Change the color and/or change active streets depending on the situation.
 	 */
-	public void updateLights() {
+	public void updateLights(double timeNow) {
 		for (TrafficLightCluster lightCluster : lightClusters) {
-			lightCluster.updateLights();
+			lightCluster.updateLights(timeNow);
 		}
 	}
 

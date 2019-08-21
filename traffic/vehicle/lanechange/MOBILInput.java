@@ -2,6 +2,7 @@ package traffic.vehicle.lanechange;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.routing.RouteLeg;
@@ -126,8 +127,9 @@ public class MOBILInput {
         return aboutToTurnTowardsRoadSide && ((lane.laneNumber + 1) >= towardsRoadSideOnlyLanes) && !lane.isBlocked;
     }
 
-    public boolean isLaneInRedLight(){
-        return lane.edge.lightColor == LightColor.KEEP_RED || lane.edge.lightColor == LightColor.GYR_R;
+    public boolean isMovementInRedLight(Movement movement){
+        LightColor color = lane.edge.getMovementLight(movement);
+        return color == LightColor.KEEP_RED || color == LightColor.GYR_R;
     }
 
     public boolean isEncouragedToChangeTowardsRoadSide(){

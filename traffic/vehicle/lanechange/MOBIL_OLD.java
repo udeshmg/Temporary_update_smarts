@@ -5,6 +5,7 @@ import java.util.Random;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.RoadUtil;
@@ -67,9 +68,10 @@ public class MOBIL_OLD {
         LaneChangeDirection decision = LaneChangeDirection.SAME;
         double overallGainForChangeTowardsRoadside = 0, overallGainForChangeAwayFromRoadside = 0;
 
+        Movement movement = vehicle.getCurrentMovement();
         if (isSafeToChange(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
-            if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
-                    || (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
+            if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.getMovementLight(movement) == LightColor.KEEP_RED)
+                    || (vehicle.lane.edge.getMovementLight(movement) == LightColor.GYR_R))) {
                 // Do not attempt lane-change for the vehicle that is the closest one to a red light
                 overallGainForChangeTowardsRoadside = 0;
             } else {
@@ -83,8 +85,8 @@ public class MOBIL_OLD {
                     LaneChangeDirection.TOWARDS_ROADSIDE);
         }
         if (isSafeToChange(vehicle, LaneChangeDirection.AWAY_FROM_ROADSIDE)) {
-            if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.lightColor == LightColor.KEEP_RED)
-                    || (vehicle.lane.edge.lightColor == LightColor.GYR_R))) {
+            if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.getMovementLight(movement) == LightColor.KEEP_RED)
+                    || (vehicle.lane.edge.getMovementLight(movement) == LightColor.GYR_R))) {
                 // Do not attempt lane-change for the vehicle that is the closest one to a red light
                 overallGainForChangeAwayFromRoadside = 0;
             } else {

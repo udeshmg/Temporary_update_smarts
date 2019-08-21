@@ -6,6 +6,7 @@ import java.util.*;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleUtil;
 
@@ -59,7 +60,7 @@ public class Edge {
 	/**
 	 * Color of traffic light at the end of this edge.
 	 */
-	public LightColor lightColor = LightColor.GYR_G;
+	private Map<Movement, LightColor> lightColorMap;
 
 	/**
 	 * Tram edge parallel to this edge and is with tram stop.
@@ -133,6 +134,7 @@ public class Edge {
 		this.numLeftOnlyLanes = numLeftOnlyLanes;
 		this.numRightLanes = numRightLanes;
 		this.numRightOnlyLanes = numRightOnlyLanes;
+		this.lightColorMap = new HashMap<>();
 	}
 
 	public void clearVehicles(){
@@ -468,5 +470,13 @@ public class Edge {
 		Line2D l1 = lanes.get(0).getLaneLine();
 		Line2D l2 = lanes.get(lanes.size()-1).getLaneLine();
 		return RoadUtil.getDividingPoint(l1.getP2(), l2.getP2(), 1, 1);
+	}
+
+	public LightColor getMovementLight(Movement movement){
+		return lightColorMap.get(movement);
+	}
+
+	public void setMovementLight(Movement movement, LightColor light){
+		lightColorMap.put(movement, light);
 	}
 }

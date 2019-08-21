@@ -5,6 +5,7 @@ import traffic.road.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -35,6 +36,18 @@ public class Movement {
          this.edges = new ArrayList<>();
     }
 
+    public Movement(List<Edge> edges) {
+        this.edges = edges;
+    }
+
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    public Edge getControlEdge(){
+        return edges.get(0);
+    }
+
     public void addEdge(Edge edge){
         edges.add(edge);
     }
@@ -53,5 +66,18 @@ public class Movement {
             copy.addEdge(edge);
         }
         return copy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movement movement = (Movement) o;
+        return Objects.equals(edges, movement.edges);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(edges);
     }
 }

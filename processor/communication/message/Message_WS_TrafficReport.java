@@ -2,14 +2,13 @@ package processor.communication.message;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import common.Settings;
 import traffic.TrafficNetwork;
-import traffic.light.LightCoordinator;
-import traffic.light.Phase;
-import traffic.light.TrafficLightCluster;
-import traffic.light.TrafficLightTiming;
+import traffic.light.*;
 import traffic.road.Edge;
 import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
@@ -106,17 +105,23 @@ public class Message_WS_TrafficReport {
 	ArrayList<Serializable_GUI_Light> getDetailOfLights(final LightCoordinator lightCoordinator) {
 		final ArrayList<Serializable_GUI_Light> list = new ArrayList<>();
 		for (final TrafficLightCluster cluster : lightCoordinator.lightClusters) {
-			for (Phase phase : cluster.getPhases()) {
-				for (final Edge e : phase.getEdges()) {
-					final double lightPositionToEdgeRatio = (e.length - e.getEndIntersectionSize() + 1) / e.length;
-
-					Point2D start = e.getEdgeStartMidlle();
-					Point2D end = e.getEdgeEndMidlle();
-
-					final double latitude = (start.getY() + ((end.getY() - start.getY()) * lightPositionToEdgeRatio));
-					final double longitude = (start.getX() + ((end.getX() - start.getX()) * lightPositionToEdgeRatio));
-					list.add(new Serializable_GUI_Light(longitude, latitude, e.lightColor.color));
+			Map<Edge, Integer> lightCount = new HashMap<>();
+			for (int i = 0; i < cluster.getMovements().size(); i++) {
+				Movement movement = cluster.getMovements().get(i);
+				Edge e = movement.getControlEdge();
+				int count = 0;
+				if(lightCount.containsKey(e)){
+					count = lightCount.get(e) + 1;
 				}
+				final double lightPositionToEdgeRatio = (e.length - e.getEndIntersectionSize() + 0.5 + count * 0.3 ) / e.length;
+
+				Point2D start = e.getEdgeStartMidlle();
+				Point2D end = e.getEdgeEndMidlle();
+
+				final double latitude = (start.getY() + ((end.getY() - start.getY()) * lightPositionToEdgeRatio));
+				final double longitude = (start.getX() + ((end.getX() - start.getX()) * lightPositionToEdgeRatio));
+				list.add(new Serializable_GUI_Light(longitude, latitude, e.getMovementLight(movement).color));
+				lightCount.put(e, count);
 			}
 		}
 

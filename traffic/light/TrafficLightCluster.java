@@ -1,6 +1,7 @@
 package traffic.light;
 
 import common.Settings;
+import traffic.light.schedule.TLSchedule;
 import traffic.road.Edge;
 
 import java.util.HashMap;
@@ -35,131 +36,34 @@ import java.util.Map;
  */
 public class TrafficLightCluster {
 
-    private List<Phase> phases;
-    private int activePhase = -1;
-    private int nextPhase = -1;
-    private double timeForColor;
-    private double spentTimeInColor;
-    private Map<LightColor, Double> activePhaseSchedule;
-    private Map<LightColor, Double> nextPhaseSchedule;
+    private List<Movement> movements;
+    private TLSchedule lightSchedule;
 
-    public TrafficLightCluster(final List<Phase> phases) {
-        this.phases = phases;
-        activePhaseSchedule = new HashMap<>();
-        nextPhaseSchedule = new HashMap<>();
+    public TrafficLightCluster(List<Movement> movements) {
+        this.movements = movements;
+        lightSchedule = new TLSchedule();
     }
 
-    public List<Phase> getPhases() {
-        return phases;
+    public List<Movement> getMovements() {
+        return movements;
     }
 
-    public Phase getPhase(int phaseIndex){
-        return phases.get(phaseIndex);
+    public void setLightSchedule(TLSchedule lightSchedule) {
+        this.lightSchedule = lightSchedule;
     }
 
-    public void setActivePhase(int activePhase) {
-        this.activePhase = activePhase;
+    public TLSchedule getLightSchedule() {
+        return lightSchedule;
     }
 
-    public double getTimeForColor() {
-        return timeForColor;
-    }
-
-    public void setTimeForColor(double timeForColor) {
-        this.timeForColor = timeForColor;
-    }
-
-    public void setNextPhase(int nextPhase) {
-        this.nextPhase = nextPhase;
-    }
-
-    public int getNextPhase() {
-        return nextPhase;
-    }
-
-    public int getActivePhase(){
-        return activePhase;
-    }
-
-    public int getPhaseCount(){
-        return phases.size();
-    }
-
-    public List<Edge> getActivePhaseEdges(){
-        return phases.get(activePhase).getEdges();
-    }
-
-    public LightColor getActivePhaseColor(){
-        return getActivePhaseEdges().get(0).lightColor;
-    }
-
-    public boolean hasToChangeColor(){
-        return timeForColor <= spentTimeInColor;
-    }
-
-    public double getSpentTimeInColor() {
-        return spentTimeInColor;
-    }
-
-    public void setActivePhaseSchedule(Map<LightColor, Double> activePhaseSchedule) {
-        this.activePhaseSchedule.clear();
-        this.activePhaseSchedule.putAll(activePhaseSchedule);
-    }
-
-    public void setNextPhaseSchedule(Map<LightColor, Double> nextPhaseSchedule) {
-        this.nextPhaseSchedule.clear();
-        this.nextPhaseSchedule.putAll(nextPhaseSchedule);
-    }
-
-    public void updateLights(){
-        double secEachStep = 1 / Settings.numStepsPerSecond;
-        spentTimeInColor += secEachStep;
-
-        LightColor activePhaseColor = getActivePhaseColor();
-        if(hasToChangeColor()) {
-            if (activePhaseColor == LightColor.GYR_G) {
-                setGYR(LightColor.GYR_Y);
-            } else if (activePhaseColor == LightColor.GYR_Y) {
-                setGYR(LightColor.GYR_R);
-            } else if ((activePhaseColor == LightColor.GYR_R || activePhaseColor == LightColor.KEEP_RED)) {
-                // Starts GYR cycle for next group of edges	(Switching Phase)
-                activePhase = nextPhase;
-                activePhaseSchedule.putAll(nextPhaseSchedule);
-                nextPhase = -1;
-                nextPhaseSchedule.clear();
-                setGYR(LightColor.GYR_G);
-            }
-        }
-
-        // Reset vehicle detection flag at all edges
-        for (Phase phase : phases) {
-            for (final Edge edge : phase.getEdges()) {
-                edge.isDetectedVehicleForLight = false;
-            }
+    public void updateLights(double timeNow){
+        for (Movement movement : movements) {
+            LightColor color = lightSchedule.getLight(movement, timeNow);
+            movement.getControlEdge().setMovementLight(movement, color);
         }
     }
 
-    /**
-     * Set the color of an active street and initialize the timer for the color.
-     * Non-active streets get red lights.
-     */
-    public void setGYR(final LightColor type) {
-        for (int i = 0; i < phases.size(); i++) {
-            if (i == activePhase) {
-                for (final Edge edge : getPhase(i).getEdges()) {
-                    edge.lightColor = type;
-                }
-            } else {
-                for (final Edge edge : getPhase(i).getEdges()) {
-                    edge.lightColor = LightColor.KEEP_RED;
-                }
-            }
-        }
-        spentTimeInColor = 0;
-        timeForColor = activePhaseSchedule.get(type);
-    }
-
-    public int getInactivePhaseWithPriorityVehicles() {
+    /*public int getInactivePhaseWithPriorityVehicles() {
         for (int i = 0; i < phases.size(); i++) {
             if (i == activePhase) {
                 continue;
@@ -191,29 +95,6 @@ public class TrafficLightCluster {
             }
         }
         return false;
-    }
-
-    public boolean hasActivePhaseTraffic() {
-        for (final Edge e : getActivePhaseEdges()) {
-            if (e.isDetectedVehicleForLight) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    boolean hasInactivePhaseTraffic() {
-        for (int i = 0; i < phases.size(); i++) {
-            if (i == activePhase) {
-                continue;
-            }
-            for (final Edge e : getPhase(i).getEdges()) {
-                if (e.isDetectedVehicleForLight) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    }*/
 
 }

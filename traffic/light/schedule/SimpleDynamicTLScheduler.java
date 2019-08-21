@@ -3,8 +3,12 @@ package traffic.light.schedule;
 import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.light.LightColor;
+import traffic.light.Movement;
+import traffic.light.Phase;
 import traffic.light.TrafficLightCluster;
+import traffic.road.Edge;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +36,18 @@ import java.util.Map;
  */
 public class SimpleDynamicTLScheduler extends TLScheduler{
 
-    private Map<LightColor, Double> schedule;
+    private Map<LightColor, Double> fixedPeriods;
+    private double horizon = 90;
+    private Map<TrafficLightCluster, List<Phase>> fixedPhases;
     private double maxGreenTime;
 
     public SimpleDynamicTLScheduler(){
-        schedule = new HashMap<>();
-        schedule.put(LightColor.GYR_G, 10.0);
-        schedule.put(LightColor.GYR_Y, 10.0);
-        schedule.put(LightColor.GYR_R, 5.0);
-        schedule.put(LightColor.KEEP_RED, 0.0);
+        fixedPeriods = new HashMap<>();
+        fixedPeriods.put(LightColor.GYR_G, 10.0);
+        fixedPeriods.put(LightColor.GYR_Y, 10.0);
+        fixedPeriods.put(LightColor.GYR_R, 5.0);
+        fixedPeriods.put(LightColor.KEEP_RED, 0.0);
+        fixedPhases = new HashMap<>();
         maxGreenTime = 180.0;
     }
 
@@ -48,20 +55,25 @@ public class SimpleDynamicTLScheduler extends TLScheduler{
     public void init(List<TrafficLightCluster> clusters) {
         super.init(clusters);
         for (TrafficLightCluster cluster : getClusters()) {
-            if(cluster.getActivePhase() == -1){
-                cluster.setActivePhase(0);
-                cluster.setActivePhaseSchedule(schedule);
-                cluster.setGYR(LightColor.GYR_G);
+            Map<String, Phase> groups = new HashMap<>();
+            for (Movement movement : cluster.getMovements()) {
+                String groupName = movement.getControlEdge().name;
+                if(!groups.containsKey(groupName)){
+                    groups.put(groupName, new Phase());
+                }
+                groups.get(groupName).addMovement(movement);
             }
+            fixedPhases.put(cluster, new ArrayList<>(groups.values()));
+
+            updateSchedule(cluster,  0);
+            cluster.updateLights(0);
         }
     }
 
     @Override
     public void schedule(TrafficNetwork trafficNetwork, double timeNow) {
-        double secEachStep = 1 / Settings.numStepsPerSecond;
 
         for (TrafficLightCluster cluster : getClusters()) {
-            LightColor activePhaseColor = cluster.getActivePhaseColor();
 //            if (cluster.hasInactivePhasePriorityVehicles() && !cluster.hasActivePhasePriorityVehicles()) {
 //                // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
 //                cluster.setActivePhase(cluster.getInactivePhaseWithPriorityVehicles());
@@ -71,17 +83,82 @@ public class SimpleDynamicTLScheduler extends TLScheduler{
 //                // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
 //                setGYR(LightColor.GYR_G);
 //            }
-            double spentTime = cluster.getSpentTimeInColor() + secEachStep;
-            if (activePhaseColor == LightColor.GYR_G && spentTime >= cluster.getTimeForColor()) {
-                if(cluster.hasActivePhaseTraffic() && spentTime < maxGreenTime){
-                    cluster.setTimeForColor(cluster.getTimeForColor() + secEachStep);
+            extendPhase(cluster, timeNow);
+            updateSchedule(cluster, timeNow);
+
+        }
+    }
+
+    public void extendPhase(TrafficLightCluster cluster, double timeNow){
+        TLSchedule schedule = cluster.getLightSchedule();
+        LightPeriod current = schedule.getCurrentPeriod();
+        if(current != null){
+            if(current.getColor() == LightColor.GYR_G && timeNow >= current.getEnd()){
+                if(hasActivePhaseTraffic(current.getPhase()) && current.getDur() < maxGreenTime){
+                    schedule.extendDuration(current, 1);
                 }
             }
-            if(cluster.getNextPhase() == -1){
-                cluster.setNextPhase((cluster.getActivePhase() + 1) % cluster.getPhaseCount());
-                cluster.setNextPhaseSchedule(schedule);
+        }
+        // Reset vehicle detection flag at all edges
+        for (Phase phase : fixedPhases.get(cluster)) {
+            for (Movement m : phase.getMovements()) {
+                m.getControlEdge().isDetectedVehicleForLight = false;
             }
         }
+    }
+
+    public void updateSchedule(TrafficLightCluster cluster, double timeNow){
+        TLSchedule existing = cluster.getLightSchedule();
+        LightPeriod end = existing.getEndPeriod();
+        List<Phase> phases = fixedPhases.get(cluster);
+        double scheduleRemainder = 0;
+        if(end != null){
+            scheduleRemainder = end.getEnd() - timeNow;
+        }
+        while (horizon - scheduleRemainder > 0){
+            Phase phase;
+            double t;
+            if(end != null){
+                int i = phases.indexOf(end.getPhase());
+                phase = phases.get((i + 1) % phases.size());
+                t = end.getEnd();
+            }else{
+                phase = phases.get(0);
+                t = 0;
+            }
+            for (LightColor color : fixedPeriods.keySet()) {
+                double dur = fixedPeriods.get(color);
+                existing.addLightPeriod(new LightPeriod(phase, color, t, t + dur));
+                t = t + dur;
+            }
+            end = existing.getEndPeriod();
+            scheduleRemainder = end.getEnd() - timeNow;
+        }
+    }
+
+
+    public boolean hasActivePhaseTraffic(Phase phase) {
+        for (Movement m : phase.getMovements()) {
+            if (m.getControlEdge().isDetectedVehicleForLight) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean hasInactivePhaseTraffic(Phase active, List<Phase> phases) {
+        int activePhase = phases.indexOf(active);
+        for (int i = 0; i < phases.size(); i++) {
+            if (i == activePhase) {
+                continue;
+            }
+            for (Movement m : phases.get(i).getMovements()) {
+                if (m.getControlEdge().isDetectedVehicleForLight) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 

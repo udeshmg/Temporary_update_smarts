@@ -743,7 +743,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void updateTrafficLights(double timeNow){
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			lightCoordinator.scheduleLights(this, timeNow);
-			lightCoordinator.updateLights();
+			lightCoordinator.updateLights(timeNow);
 		}
 	}
 

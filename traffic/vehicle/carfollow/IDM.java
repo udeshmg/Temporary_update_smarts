@@ -2,6 +2,7 @@ package traffic.vehicle.carfollow;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.light.TrafficLightTiming;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -401,12 +402,12 @@ public class IDM {
 		    if(vehicle.headPosition > targetEdge.length - targetEdge.getEndIntersectionSize()){
 		        return;
             }
-
-			if ((vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge)
-
-					&& (targetEdge.lightColor == LightColor.GYR_Y)) {
-
-				return;
+			Movement movement = vehicle.getCurrentMovement();
+			if (vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge) {
+				LightColor movementLight = targetEdge.getMovementLight(movement);
+				if(movementLight == LightColor.GYR_Y) {
+					return;
+				}
 
 			}
 			// Ignore other lights if vehicle already passed one of the lights
@@ -422,11 +423,14 @@ public class IDM {
 			}
 
 			boolean stopAtLight = false;
-			if ((targetEdge.lightColor == LightColor.GYR_R) || (targetEdge.lightColor == LightColor.KEEP_RED)) {
-				stopAtLight = true;
-			} else if (targetEdge.lightColor == LightColor.GYR_Y) {
-				if (VehicleUtil.getBrakingDistance(vehicle) <= ((examinedDist + targetEdge.length) - vehicle.headPosition)) {
+			if(movement != null) {
+				LightColor movementLight = targetEdge.getMovementLight(movement);
+				if ((movementLight == LightColor.GYR_R) || (movementLight == LightColor.KEEP_RED)) {
 					stopAtLight = true;
+				} else if (movementLight == LightColor.GYR_Y) {
+					if (VehicleUtil.getBrakingDistance(vehicle) <= ((examinedDist + targetEdge.length) - vehicle.headPosition)) {
+						stopAtLight = true;
+					}
 				}
 			}
 

@@ -2,11 +2,11 @@ package traffic.light.schedule;
 
 import traffic.TrafficNetwork;
 import traffic.light.LightColor;
+import traffic.light.Movement;
+import traffic.light.Phase;
 import traffic.light.TrafficLightCluster;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -31,35 +31,70 @@ import java.util.Map;
  */
 public class SimpleFixedTLScheduler extends TLScheduler{
 
-    private Map<LightColor, Double> schedule;
+    private TreeMap<LightColor, Double> fixedPeriods;
+    private double horizon = 90;
+    private Map<TrafficLightCluster, List<Phase>> fixedPhases;
 
     public SimpleFixedTLScheduler(){
-        schedule = new HashMap<>();
-        schedule.put(LightColor.GYR_G, 30.0);
-        schedule.put(LightColor.GYR_Y, 10.0);
-        schedule.put(LightColor.GYR_R, 5.0);
-        schedule.put(LightColor.KEEP_RED, 0.0);
+        fixedPeriods = new TreeMap<>();
+        fixedPeriods.put(LightColor.GYR_G, 30.0);
+        fixedPeriods.put(LightColor.GYR_Y, 10.0);
+        fixedPeriods.put(LightColor.GYR_R, 5.0);
+        fixedPhases = new HashMap<>();
     }
 
     @Override
     public void init(List<TrafficLightCluster> clusters) {
         super.init(clusters);
         for (TrafficLightCluster cluster : getClusters()) {
-            if(cluster.getActivePhase() == -1){
-                cluster.setActivePhase(0);
-                cluster.setActivePhaseSchedule(schedule);
-                cluster.setGYR(LightColor.GYR_G);
+            Map<String, Phase> groups = new HashMap<>();
+            for (Movement movement : cluster.getMovements()) {
+                String groupName = movement.getControlEdge().name;
+                if(!groups.containsKey(groupName)){
+                    groups.put(groupName, new Phase());
+                }
+                groups.get(groupName).addMovement(movement);
             }
+            fixedPhases.put(cluster, new ArrayList<>(groups.values()));
+
+            updateSchedule(cluster,  0);
+            cluster.updateLights(0);
         }
     }
 
     @Override
     public void schedule(TrafficNetwork trafficNetwork, double timeNow) {
         for (TrafficLightCluster cluster : getClusters()) {
-            if(cluster.getNextPhase() == -1){
-                cluster.setNextPhase((cluster.getActivePhase() + 1) % cluster.getPhaseCount());
-                cluster.setNextPhaseSchedule(schedule);
+            updateSchedule(cluster, timeNow);
+        }
+    }
+
+    public void updateSchedule(TrafficLightCluster cluster, double timeNow){
+        TLSchedule existing = cluster.getLightSchedule();
+        LightPeriod end = existing.getEndPeriod();
+        List<Phase> phases = fixedPhases.get(cluster);
+        double scheduleRemainder = 0;
+        if(end != null){
+            scheduleRemainder = end.getEnd() - timeNow;
+        }
+        while (horizon - scheduleRemainder > 0){
+            Phase phase;
+            double t;
+            if(end != null){
+                int i = phases.indexOf(end.getPhase());
+                phase = phases.get((i + 1) % phases.size());
+                t = end.getEnd();
+            }else{
+                phase = phases.get(0);
+                t = 0;
             }
+            for (LightColor color : fixedPeriods.keySet()) {
+                double dur = fixedPeriods.get(color);
+                existing.addLightPeriod(new LightPeriod(phase, color, t, t + dur));
+                t = t + dur;
+            }
+            end = existing.getEndPeriod();
+            scheduleRemainder = end.getEnd() - timeNow;
         }
     }
 }

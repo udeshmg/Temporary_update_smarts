@@ -4,6 +4,7 @@ import java.util.Random;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.vehicle.*;
@@ -59,7 +60,8 @@ public class MOBIL {
 	private double getGainFromChangeTowardsRoadSide(MOBILInput input, Vehicle vehicle){
 		double gain = 0;
 		if (isSafeToChange(input, vehicle, TOWARDS_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
+			Movement movement = vehicle.getCurrentMovement();
+			if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isMovementInRedLight(movement))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
 			} else {
@@ -74,7 +76,8 @@ public class MOBIL {
 	private double getGainFromChangeAwayFromRoadSide(MOBILInput input, Vehicle vehicle){
 		double gain = 0;
 		if (isSafeToChange(input, vehicle, AWAY_FROM_ROADSIDE)) {
-			if ((vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isLaneInRedLight())) {
+			Movement movement = vehicle.getCurrentMovement();
+			if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && (input.isMovementInRedLight(movement))) {
 				// Do not attempt lane-change for the vehicle that is the closest one to a red light
 				gain = 0;
 			} else {

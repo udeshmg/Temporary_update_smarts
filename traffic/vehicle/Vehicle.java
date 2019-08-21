@@ -7,6 +7,7 @@ import java.util.*;
 import common.Settings;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
+import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
 import traffic.road.Node;
@@ -792,6 +793,15 @@ public class Vehicle {
 			displacement += getRouteLeg(i).edge.length;
 		}
 		return displacement;
+	}
+
+
+	public Movement getCurrentMovement(){
+		//TODO There is a conflict between light group movements and this. Both should be equal and need to be fixed in future
+		if(indexLegOnRoute < getRouteLegCount() - 1){
+			return new Movement(Arrays.asList(new Edge[]{getRouteLeg(indexLegOnRoute).edge, getRouteLeg(indexLegOnRoute + 1).edge}));
+		}
+		return null;
 	}
 
 	public class IntersectionDecision{

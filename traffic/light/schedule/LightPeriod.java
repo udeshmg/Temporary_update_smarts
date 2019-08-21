@@ -1,9 +1,7 @@
-package traffic.light;
+package traffic.light.schedule;
 
-import traffic.road.Edge;
-
-import java.util.ArrayList;
-import java.util.List;
+import traffic.light.LightColor;
+import traffic.light.Phase;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -24,27 +22,60 @@ import java.util.List;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 8/9/2019
+ * Created by tmuthugama on 8/20/2019
  */
-public class Phase {
+public class LightPeriod {
 
-    private List<Movement> movements;
+    private Long id;
+    private Phase phase;
+    private LightColor color;
+    private double start;
+    private double end;
+    private double dur;
 
-    public Phase() {
-        this.movements = new ArrayList<>();
+    public LightPeriod(Phase phase, LightColor color, double start, double end) {
+        this.phase = phase;
+        this.color = color;
+        this.start = start;
+        this.end = end;
+        this.dur = end - start;
     }
 
-    public List<Movement> getMovements() {
-        return movements;
+    public LightColor getColor() {
+        return color;
     }
 
-    public void addMovement(Movement movement){
-        this.movements.add(movement);
+    public double getStart() {
+        return start;
     }
 
-    public boolean hasMovement(Movement movement){
-        return  movements.contains(movement);
+    public double getEnd() {
+        return end;
     }
 
+    public void addDur(double dur){
+        this.end += dur;
+        this.dur += dur;
+    }
 
+    public void shift(double dur){
+        this.start += dur;
+        this.end += dur;
+    }
+
+    public double getDur() {
+        return dur;
+    }
+
+    public Phase getPhase() {
+        return phase;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

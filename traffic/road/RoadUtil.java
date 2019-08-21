@@ -9,12 +9,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 import common.Settings;
 import traffic.light.LightColor;
+import traffic.light.Movement;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleType;
 
@@ -148,11 +147,13 @@ public class RoadUtil {
 		final ArrayList<Edge> inwardEdgesL = findInwardEdgesOnLeft(e1, e2);
 		final ArrayList<Edge> outwardEdgesL = findOutwardEdgesOnLeft(e1, e2);
 		final ArrayList<Edge> outwardEdgesR = findOutwardEdgesOnRight(e1, e2);
+		Edge e1Adjacent = e1.endNode.getOutwardEdge(e1.startNode);
 
 		if (Settings.isDriveOnLeft) {
 			// Drive on LEFT
 			for (final Edge eR : inwardEdgesR) {
-				if ((eR.lightColor == LightColor.GYR_R) || (eR.lightColor == LightColor.KEEP_RED)) {
+				List<Edge> eROutList = findOutwardEdgesOnRight(eR, e1Adjacent);
+				if (isCrossingMovementsRed(eR, eROutList)) {
 					continue;
 				}
 				if (eR.isRoundabout) {
@@ -177,14 +178,15 @@ public class RoadUtil {
 			}
 
 			for (final Edge eL : inwardEdgesL) {
-				if (e1.isRoundabout || (eL.lightColor == LightColor.GYR_R) || (eL.lightColor == LightColor.KEEP_RED)
+				List<Edge> eLOutList = findOutwardEdgesOnRight(eL, e2);
+				if (e1.isRoundabout || isCrossingMovementsRed(eL, eLOutList)
 						/*|| (eL.startNode == e2.endNode)*/) {
 					continue;
 				}
 				if (eL.type.priority > e1.type.priority) {
 					conflictEdges.add(eL);
 				}else if (eL.type.priority == e1.type.priority && eL.name.equals(e1.name)
-						&& e1.lightColor == LightColor.GYR_G) {
+						&& isIncomingTrafficCrossingGreen(e1,e2)) {
 						// Consider vehicle from opposite direction on same road when turning right under green light
 					conflictEdges.add(eL);
 				}
@@ -192,7 +194,8 @@ public class RoadUtil {
 		} else {
 			// Drive on RIGHT
 			for (final Edge eL : inwardEdgesL) {
-				if ((eL.lightColor == LightColor.GYR_R) || (eL.lightColor == LightColor.KEEP_RED)) {
+				List<Edge> eLOutList = findOutwardEdgesOnLeft(eL, e1Adjacent);
+				if (isCrossingMovementsRed(eL, eLOutList)) {
 					continue;
 				}
 				if (eL.isRoundabout) {
@@ -216,14 +219,15 @@ public class RoadUtil {
 			}
 
 			for (final Edge eR : inwardEdgesR) {
-				if (e1.isRoundabout || (eR.lightColor == LightColor.GYR_R) || (eR.lightColor == LightColor.KEEP_RED)
+				List<Edge> eROutList = findOutwardEdgesOnRight(eR, e2);
+				if (e1.isRoundabout || isCrossingMovementsRed(eR, eROutList)
 						/*|| (eR.startNode == e2.endNode)*/) {
 					continue;
 				}
 				if (eR.type.priority > e1.type.priority) {
 					conflictEdges.add(eR);
 				}else if (eR.type.priority == e1.type.priority && eR.name.equals(e1.name)
-						&& e1.lightColor == LightColor.GYR_G) {
+						&& isIncomingTrafficCrossingGreen(e1,e2)) {
 					// Consider vehicle from opposite direction on same road when turning left under green light
 					conflictEdges.add(eR);
 
@@ -232,6 +236,26 @@ public class RoadUtil {
 		}
 
 		return conflictEdges;
+	}
+
+	public static boolean isIncomingTrafficCrossingGreen(Edge inwardEdge, Edge outwardEdge){
+		Movement movement = new Movement(Arrays.asList(new Edge[]{inwardEdge, outwardEdge}));
+		LightColor color = inwardEdge.getMovementLight(movement);
+		if(color == LightColor.GYR_G){
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean isCrossingMovementsRed(Edge inwardEdge, List<Edge> outwardEdges){
+		for (Edge outwardEdge : outwardEdges) {
+			Movement movement = new Movement(Arrays.asList(new Edge[]{inwardEdge, outwardEdge}));
+			LightColor color = inwardEdge.getMovementLight(movement);
+			if(!(color == LightColor.GYR_R || color == LightColor.KEEP_RED)){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
