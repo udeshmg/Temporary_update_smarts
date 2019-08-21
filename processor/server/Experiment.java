@@ -339,7 +339,7 @@ public class Experiment {
                 setOutputForegroundTravelTime(Boolean.parseBoolean(value));
                 break;
             }
-            case "outputForegroundTrajectory": {
+            case "outputTrajectory": {
                 setOutputTrajectory(Boolean.parseBoolean(value));
                 break;
             }
