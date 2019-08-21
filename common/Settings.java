@@ -138,7 +138,7 @@ public class Settings {
 	public static String odDistributor = "Random";
 	public static String temporalDistributor = "Uniform";
 	public static String vehicleTypeDistributor = "Default";
-	public static double safetyHeadwayMultiplier = 2;
+	public static double safetyHeadwayMultiplier = 1;
 	public static String defaultDownloadDirectory = "download";
 	public static String defaultTestName = null;
 	public static int defaultRunIndex = 1;
