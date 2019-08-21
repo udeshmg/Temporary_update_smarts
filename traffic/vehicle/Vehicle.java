@@ -280,7 +280,6 @@ public class Vehicle {
 		while (indexLegOnRouteBeingChecked < (routeLegs.size() - 1)) {
 			final Edge e1 = routeLegs.get(indexLegOnRouteBeingChecked).edge;
 			final Edge e2 = routeLegs.get(indexLegOnRouteBeingChecked + 1).edge;
-
 			if (e1.startNode == e2.endNode) {
 				// Vehicle is going to make U-turn
 				edgeBeforeTurnRight = e1;
@@ -795,6 +794,27 @@ public class Vehicle {
 		return displacement;
 	}
 
+	public double getDistanceToNode(Node node){
+		int index = -1;
+		for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
+			Edge edge = routeLegs.get(i).edge;
+			if(edge.endNode == node){
+				index = i;
+			}
+		}
+		double dist = 0;
+		if(index > 0){
+			for (int i = indexLegOnRoute; i <= index; i++) {
+				Edge edge = routeLegs.get(i).edge;
+				if(i == indexLegOnRoute){
+					dist += edge.length - headPosition;
+				}else{
+					dist += edge.length;
+				}
+			}
+		}
+		return dist;
+	}
 
 	public Movement getCurrentMovement(){
 		//TODO There is a conflict between light group movements and this. Both should be equal and need to be fixed in future
