@@ -1,8 +1,4 @@
-package traffic.light.schedule;
-
-import traffic.light.LightColor;
-import traffic.light.Movement;
-import traffic.road.Edge;
+package traffic.light;
 
 import java.util.*;
 
@@ -78,7 +74,7 @@ public class TLSchedule {
         period.addDur(delta);
         for (Long key : schedule.keySet()) {
             if(key > period.getId()){
-                period.shift(delta);
+                schedule.get(key).shift(delta);
             }
         }
     }

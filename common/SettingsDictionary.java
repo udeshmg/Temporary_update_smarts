@@ -1,9 +1,9 @@
 package common;
 
 import processor.SimulationListener;
-import traffic.light.schedule.SimpleDynamicTLScheduler;
-import traffic.light.schedule.SimpleFixedTLScheduler;
-import traffic.light.schedule.TLScheduler;
+import traffic.light.manager.DynamicTwoPhaseTLManager;
+import traffic.light.manager.FixedTwoPhaseTLManager;
+import traffic.light.manager.TLManager;
 import traffic.network.*;
 import traffic.routing.Routing;
 
@@ -38,7 +38,7 @@ public class SettingsDictionary {
     private Map<String, TemporalDistributor> temporalDistributorMap;
     private Map<String, VehicleTypeDistributor> vehicleTypeDistributorMap;
     private Map<String, Routing> routingAlgoMap;
-    private Map<String, TLScheduler> lightSchedulerMap;
+    private Map<String, TLManager> lightSchedulerMap;
 
     public SettingsDictionary() {
         this.listenerMap = new HashMap<>();
@@ -50,8 +50,8 @@ public class SettingsDictionary {
         addVehicleTypeDistributor("Default", new DefaultVehicleTypeDistributor());
         this.routingAlgoMap = new HashMap<>();
         this.lightSchedulerMap = new HashMap<>();
-        addTLScheduler("FIXED", new SimpleFixedTLScheduler());
-        addTLScheduler("DYNAMIC", new SimpleDynamicTLScheduler());
+        addTLScheduler("FIXED", new FixedTwoPhaseTLManager());
+        addTLScheduler("DYNAMIC", new DynamicTwoPhaseTLManager());
     }
 
     public void addSimulationListener(String key, SimulationListener listener){
@@ -88,11 +88,11 @@ public class SettingsDictionary {
 
     public VehicleTypeDistributor getVehicleTypeDistributor(String key) {return  vehicleTypeDistributorMap.get(key);}
 
-    public void addTLScheduler(String key, TLScheduler tlScheduler){
-        lightSchedulerMap.put(key, tlScheduler);
+    public void addTLScheduler(String key, TLManager tlManager){
+        lightSchedulerMap.put(key, tlManager);
     }
 
-    public TLScheduler getTLScheduler(String key){
+    public TLManager getTLScheduler(String key){
         return lightSchedulerMap.get(key);
     }
 }

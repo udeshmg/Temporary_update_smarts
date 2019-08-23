@@ -1,9 +1,7 @@
-package traffic.light.schedule;
-
-import traffic.TrafficNetwork;
-import traffic.light.TrafficLightCluster;
+package traffic.light.manager.schic;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -24,18 +22,20 @@ import java.util.List;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 8/11/2019
+ * Created by tmuthugama on 8/13/2019
  */
-public abstract class TLScheduler {
-    private List<TrafficLightCluster> clusters;
+public class StateGroup {
 
-    public List<TrafficLightCluster> getClusters() {
-        return clusters;
+    private Map<Integer, Integer> status;
+    private int s;
+    private List<ValueRow> valueRows;
+
+    public int getValueRowCount(){
+        return valueRows.size();
     }
 
-    public void init(List<TrafficLightCluster> clusters){
-        this.clusters = clusters;
+    public ValueRow getValueRow(int y){
+        return valueRows.get(y);
     }
 
-    public abstract void schedule(TrafficNetwork trafficNetwork, double timeNow);
 }

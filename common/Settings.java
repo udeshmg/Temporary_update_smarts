@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import processor.SimulationListener;
-import traffic.light.schedule.TLScheduler;
+import traffic.light.manager.TLManager;
 import traffic.network.*;
 import traffic.light.TrafficLightTiming;
 import traffic.routing.Routing;
@@ -169,7 +169,7 @@ public class Settings {
 		return dictionary.getSimulationListener(simulationListener);
 	}
 
-	public static TLScheduler getLightScheduler(){
+	public static TLManager getLightScheduler(){
 		return dictionary.getTLScheduler(trafficLightTiming.name());
 	}
 }

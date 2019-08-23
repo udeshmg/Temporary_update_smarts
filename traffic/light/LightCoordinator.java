@@ -5,7 +5,7 @@ import java.util.*;
 import common.Settings;
 import processor.communication.message.SerializableInt;
 import traffic.TrafficNetwork;
-import traffic.light.schedule.TLScheduler;
+import traffic.light.manager.TLManager;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.road.RoadUtil;
@@ -25,7 +25,7 @@ public class LightCoordinator {
 	 */
 	public Map<Edge, TrafficLightCluster> clusterMap = new HashMap<>();
 	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
-	private TLScheduler tlScheduler;
+	private TLManager tlManager;
 
 	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
 			final List<SerializableInt> indexNodesToRemoveLight) {
@@ -159,15 +159,16 @@ public class LightCoordinator {
 		groupInwardEdges();
 		System.out.println("Divided lights in each light group based on street names.");
 
-		tlScheduler = Settings.getLightScheduler();
-		if(tlScheduler != null){
-			tlScheduler.init(lightClusters);
+		tlManager = Settings.getLightScheduler();
+		if(tlManager != null){
+			tlManager.setClusters(lightClusters);
+			tlManager.init();
 		}
 	}
 
 	public void scheduleLights(TrafficNetwork trafficNetwork, double timeNow){
-		if(tlScheduler != null){
-			tlScheduler.schedule(trafficNetwork, timeNow);
+		if(tlManager != null){
+			tlManager.schedule(trafficNetwork, timeNow);
 		}
 	}
 

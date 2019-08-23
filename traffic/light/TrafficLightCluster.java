@@ -1,12 +1,6 @@
 package traffic.light;
 
-import common.Settings;
-import traffic.light.schedule.TLSchedule;
-import traffic.road.Edge;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.

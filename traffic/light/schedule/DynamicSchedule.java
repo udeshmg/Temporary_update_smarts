@@ -1,17 +1,12 @@
 package traffic.light.schedule;
 
-import common.Settings;
-import traffic.TrafficNetwork;
-import traffic.light.LightColor;
-import traffic.light.Movement;
-import traffic.light.Phase;
-import traffic.light.TrafficLightCluster;
-import traffic.road.Edge;
+import traffic.light.*;
+import traffic.light.phase.TLPhaseHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -32,64 +27,39 @@ import java.util.Map;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 8/9/2019
+ * Created by tmuthugama on 8/22/2019
  */
-public class SimpleDynamicTLScheduler extends TLScheduler{
+public class DynamicSchedule extends TLScheduleHandler{
 
-    private Map<LightColor, Double> fixedPeriods;
-    private double horizon = 90;
-    private Map<TrafficLightCluster, List<Phase>> fixedPhases;
+    private TreeMap<LightColor, Double> fixedPeriods;
     private double maxGreenTime;
 
-    public SimpleDynamicTLScheduler(){
-        fixedPeriods = new HashMap<>();
+    public DynamicSchedule() {
+        fixedPeriods = new TreeMap<>();
         fixedPeriods.put(LightColor.GYR_G, 10.0);
         fixedPeriods.put(LightColor.GYR_Y, 10.0);
         fixedPeriods.put(LightColor.GYR_R, 5.0);
-        fixedPeriods.put(LightColor.KEEP_RED, 0.0);
-        fixedPhases = new HashMap<>();
         maxGreenTime = 180.0;
     }
 
     @Override
-    public void init(List<TrafficLightCluster> clusters) {
-        super.init(clusters);
-        for (TrafficLightCluster cluster : getClusters()) {
-            Map<String, Phase> groups = new HashMap<>();
-            for (Movement movement : cluster.getMovements()) {
-                String groupName = movement.getControlEdge().name;
-                if(!groups.containsKey(groupName)){
-                    groups.put(groupName, new Phase());
-                }
-                groups.get(groupName).addMovement(movement);
-            }
-            fixedPhases.put(cluster, new ArrayList<>(groups.values()));
-
-            updateSchedule(cluster,  0);
-            cluster.updateLights(0);
+    public void update(List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
+        for (TrafficLightCluster cluster : clusters) {
+            extendPhase(phaseHandler, cluster, timeNow);
+            updateSchedule(phaseHandler, cluster, horizon, timeNow);
         }
     }
 
-    @Override
-    public void schedule(TrafficNetwork trafficNetwork, double timeNow) {
-
-        for (TrafficLightCluster cluster : getClusters()) {
-//            if (cluster.hasInactivePhasePriorityVehicles() && !cluster.hasActivePhasePriorityVehicles()) {
-//                // Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
-//                cluster.setActivePhase(cluster.getInactivePhaseWithPriorityVehicles());
-//                setGYR(LightColor.GYR_G);
-//            }
-//            if (!cluster.hasInactivePhasePriorityVehicles() && cluster.hasActivePhasePriorityVehicles()) {
-//                // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
-//                setGYR(LightColor.GYR_G);
-//            }
-            extendPhase(cluster, timeNow);
-            updateSchedule(cluster, timeNow);
-
-        }
-    }
-
-    public void extendPhase(TrafficLightCluster cluster, double timeNow){
+    public void extendPhase(TLPhaseHandler phaseHandler, TrafficLightCluster cluster, double timeNow){
+        //if (cluster.hasInactivePhasePriorityVehicles() && !cluster.hasActivePhasePriorityVehicles()) {
+        //Grant green light to an inactive approach it has priority vehicle and the current active approach does not have one
+        //                cluster.setActivePhase(cluster.getInactivePhaseWithPriorityVehicles());
+        //                setGYR(LightColor.GYR_G);
+        //            }
+        //            if (!cluster.hasInactivePhasePriorityVehicles() && cluster.hasActivePhasePriorityVehicles()) {
+        //                // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
+        //                setGYR(LightColor.GYR_G);
+        //            }
         TLSchedule schedule = cluster.getLightSchedule();
         LightPeriod current = schedule.getCurrentPeriod();
         if(current != null){
@@ -100,17 +70,17 @@ public class SimpleDynamicTLScheduler extends TLScheduler{
             }
         }
         // Reset vehicle detection flag at all edges
-        for (Phase phase : fixedPhases.get(cluster)) {
+        for (Phase phase : phaseHandler.getPhaseList(cluster, timeNow)) {
             for (Movement m : phase.getMovements()) {
                 m.getControlEdge().isDetectedVehicleForLight = false;
             }
         }
     }
 
-    public void updateSchedule(TrafficLightCluster cluster, double timeNow){
+    public void updateSchedule(TLPhaseHandler phaseHandler, TrafficLightCluster cluster, double horizon, double timeNow) {
         TLSchedule existing = cluster.getLightSchedule();
         LightPeriod end = existing.getEndPeriod();
-        List<Phase> phases = fixedPhases.get(cluster);
+        List<Phase> phases = phaseHandler.getPhaseList(cluster, timeNow);
         double scheduleRemainder = 0;
         if(end != null){
             scheduleRemainder = end.getEnd() - timeNow;
@@ -160,6 +130,4 @@ public class SimpleDynamicTLScheduler extends TLScheduler{
         }
         return false;
     }
-
-
 }

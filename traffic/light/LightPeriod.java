@@ -1,4 +1,4 @@
-package traffic.light.schedule;
+package traffic.light;
 
 import traffic.light.LightColor;
 import traffic.light.Phase;
