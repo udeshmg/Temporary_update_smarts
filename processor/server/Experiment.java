@@ -40,6 +40,7 @@ public class Experiment {
     String vehicleTypeDistributor;
     boolean stopsAtMaxSteps;
     int updateStepInterval;
+    String tlManager;
 
     public void setExperimentId(String experimentId) {
         this.experimentId = experimentId;
@@ -297,6 +298,14 @@ public class Experiment {
         this.updateStepInterval = updateStepInterval;
     }
 
+    public String getTlManager() {
+        return tlManager;
+    }
+
+    public void setTlManager(String tlManager) {
+        this.tlManager = tlManager;
+    }
+
     public void setValues(String key, String value){
         switch (key) {
             case "driveOnLeft": {
@@ -374,6 +383,10 @@ public class Experiment {
                 } catch (Exception e) {
                     System.out.println("Traffic light timing value is invalid.");
                 }
+                break;
+            }
+            case "tlManager": {
+                setTlManager(value);
                 break;
             }
             case "routingAlgorithm": {
@@ -456,6 +469,7 @@ public class Experiment {
         experiment.setServerBased(serverBased);
         experiment.setOsmMapFile(osmMapFile);
         experiment.setTrafficLightTiming(trafficLightTiming);
+        experiment.setTlManager(tlManager);
         experiment.setRoutingAlgorithm(routingAlgorithm);
         experiment.setTrafficReportStepGapInServerlessMode(trafficReportStepGapInServerlessMode);
         experiment.setAllowReroute(allowReroute);

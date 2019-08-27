@@ -3,6 +3,7 @@ package traffic.light;
 import java.util.*;
 
 import common.Settings;
+import processor.SimulationListener;
 import processor.communication.message.SerializableInt;
 import traffic.TrafficNetwork;
 import traffic.light.manager.TLManager;
@@ -23,7 +24,7 @@ public class LightCoordinator {
 	 * Groups of traffic lights. Lights in the same group are within a certain
 	 * distance to each other.
 	 */
-	public Map<Edge, TrafficLightCluster> clusterMap = new HashMap<>();
+	public Map<Node, TrafficLightCluster> clusterMap = new HashMap<>();
 	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
 	private TLManager tlManager;
 
@@ -101,10 +102,8 @@ public class LightCoordinator {
 			List<Movement> moveList = findMovementsInsideNodeGroup(nodeGroup);
 
 			TrafficLightCluster cluster = new TrafficLightCluster(moveList);
-			for (Movement movement : cluster.getMovements()) {
-				for (Edge edge : movement.getEdges()) {
-					clusterMap.put(edge, cluster);
-				}
+			for (Node node : nodeGroup) {
+				clusterMap.put(node, cluster);
 			}
 			lightClusters.add(cluster);
 
@@ -146,7 +145,7 @@ public class LightCoordinator {
 	 * first street gets green light and other streets get red lights.
 	 *
 	 */
-	public void init(final List<Node> mapNodes, final List<SerializableInt> indexNodesToAddLight,
+	public void init(TrafficNetwork trafficNetwork, final List<Node> mapNodes, final List<SerializableInt> indexNodesToAddLight,
 			final List<SerializableInt> indexNodesToRemoveLight) {
 		// Add or remove lights
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
@@ -162,13 +161,13 @@ public class LightCoordinator {
 		tlManager = Settings.getLightScheduler();
 		if(tlManager != null){
 			tlManager.setClusters(lightClusters);
-			tlManager.init();
+			tlManager.init(trafficNetwork);
 		}
 	}
 
-	public void scheduleLights(TrafficNetwork trafficNetwork, double timeNow){
+	public void scheduleLights(double timeNow){
 		if(tlManager != null){
-			tlManager.schedule(trafficNetwork, timeNow);
+			tlManager.schedule(timeNow);
 		}
 	}
 
@@ -182,4 +181,7 @@ public class LightCoordinator {
 		}
 	}
 
+	public TLManager getTlManager() {
+		return tlManager;
+	}
 }

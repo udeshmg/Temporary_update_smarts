@@ -356,6 +356,7 @@ public class SimServerData {
         Settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
         Settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
         Settings.updateStepInterval = experiment.getUpdateStepInterval();
+        Settings.tlManager = experiment.getTlManager();
 
         return isNewMap;
     }

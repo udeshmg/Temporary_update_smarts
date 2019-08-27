@@ -1,6 +1,7 @@
 package processor;
 
 import traffic.TrafficNetwork;
+import traffic.light.manager.TLManager;
 import traffic.vehicle.Vehicle;
 
 import java.util.List;

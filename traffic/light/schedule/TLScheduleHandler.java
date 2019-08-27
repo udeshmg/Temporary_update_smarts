@@ -1,5 +1,6 @@
 package traffic.light.schedule;
 
+import traffic.TrafficNetwork;
 import traffic.light.TrafficLightCluster;
 import traffic.light.phase.TLPhaseHandler;
 
@@ -28,5 +29,5 @@ import java.util.List;
  */
 public abstract class TLScheduleHandler {
 
-    public abstract void update(List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow);
+    public abstract void update(TrafficNetwork trafficNetwork, List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow);
 }

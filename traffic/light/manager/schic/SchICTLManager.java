@@ -38,7 +38,7 @@ public class SchICTLManager extends TLManager {
     }
 
     @Override
-    public void schedule(TrafficNetwork trafficNetwork, double timeNow) {
+    public void schedule(double timeNow) {
 
     }
 

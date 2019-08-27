@@ -1,5 +1,6 @@
 package traffic.light.schedule;
 
+import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.light.phase.TLPhaseHandler;
 
@@ -39,34 +40,38 @@ public class FixedSchedule extends TLScheduleHandler{
     }
 
     @Override
-    public void update(List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
+    public void update(TrafficNetwork trafficNetwork, List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
         for (TrafficLightCluster cluster : clusters) {
             TLSchedule existing = cluster.getLightSchedule();
-            LightPeriod end = existing.getEndPeriod();
             List<Phase> phases = phaseHandler.getPhaseList(cluster, timeNow);
-            double scheduleRemainder = 0;
+            updateSchedule(existing, phases, timeNow, horizon);
+        }
+    }
+
+    public void updateSchedule(TLSchedule existing, List<Phase> phases, double timeNow, double horizon){
+        LightPeriod end = existing.getEndPeriod();
+        double scheduleRemainder = 0;
+        if (end != null) {
+            scheduleRemainder = end.getEnd() - timeNow;
+        }
+        while (horizon - scheduleRemainder > 0) {
+            Phase phase;
+            double t;
             if (end != null) {
-                scheduleRemainder = end.getEnd() - timeNow;
+                int i = phases.indexOf(end.getPhase());
+                phase = phases.get((i + 1) % phases.size());
+                t = end.getEnd();
+            } else {
+                phase = phases.get(0);
+                t = 0;
             }
-            while (horizon - scheduleRemainder > 0) {
-                Phase phase;
-                double t;
-                if (end != null) {
-                    int i = phases.indexOf(end.getPhase());
-                    phase = phases.get((i + 1) % phases.size());
-                    t = end.getEnd();
-                } else {
-                    phase = phases.get(0);
-                    t = 0;
-                }
-                for (LightColor color : fixedPeriods.keySet()) {
-                    double dur = fixedPeriods.get(color);
-                    existing.addLightPeriod(new LightPeriod(phase, color, t, t + dur));
-                    t = t + dur;
-                }
-                end = existing.getEndPeriod();
-                scheduleRemainder = end.getEnd() - timeNow;
+            for (LightColor color : fixedPeriods.keySet()) {
+                double dur = fixedPeriods.get(color);
+                existing.addLightPeriod(new LightPeriod(phase, color, t, t + dur));
+                t = t + dur;
             }
+            end = existing.getEndPeriod();
+            scheduleRemainder = end.getEnd() - timeNow;
         }
     }
 }

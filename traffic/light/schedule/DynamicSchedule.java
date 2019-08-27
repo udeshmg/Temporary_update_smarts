@@ -1,5 +1,6 @@
 package traffic.light.schedule;
 
+import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.light.phase.TLPhaseHandler;
 
@@ -43,7 +44,7 @@ public class DynamicSchedule extends TLScheduleHandler{
     }
 
     @Override
-    public void update(List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
+    public void update(TrafficNetwork trafficNetwork, List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
         for (TrafficLightCluster cluster : clusters) {
             extendPhase(phaseHandler, cluster, timeNow);
             updateSchedule(phaseHandler, cluster, horizon, timeNow);

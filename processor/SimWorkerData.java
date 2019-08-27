@@ -103,13 +103,13 @@ public class SimWorkerData {
 
     public void initTrafficLightCoordinator(ArrayList<SerializableInt> indexNodesToAddLight, ArrayList<SerializableInt> indexNodesToRemoveLight, ArrayList<Node> lightNodes){
         if ((indexNodesToAddLight.size() > 0) || (indexNodesToRemoveLight.size() > 0)) {
-            trafficNetwork.lightCoordinator.init(lightNodes, indexNodesToAddLight, indexNodesToRemoveLight);
+            trafficNetwork.lightCoordinator.init(trafficNetwork, lightNodes, indexNodesToAddLight, indexNodesToRemoveLight);
         }
     }
 
     public void resetLights(ArrayList<Node> lightNodes){
         // Reset lights
-        trafficNetwork.lightCoordinator.init(lightNodes, new ArrayList<SerializableInt>(), new ArrayList<SerializableInt>());
+        trafficNetwork.lightCoordinator.init(trafficNetwork, lightNodes, new ArrayList<SerializableInt>(), new ArrayList<SerializableInt>());
     }
 
     public void addTransferredVehicle(Vehicle vehicle){

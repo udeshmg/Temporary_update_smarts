@@ -152,6 +152,7 @@ public class Settings {
 	public static double startPosOffset = 0.0;
 	public static boolean stopsAtMaxSteps = true;
 	public static int gridlockDetectionTime = 600;
+	public static String tlManager = "";
 
 	public static ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);
@@ -170,6 +171,11 @@ public class Settings {
 	}
 
 	public static TLManager getLightScheduler(){
+		if(tlManager != null && !tlManager.isEmpty()) {
+			return dictionary.getTLScheduler(tlManager);
+		}
 		return dictionary.getTLScheduler(trafficLightTiming.name());
 	}
+
+
 }

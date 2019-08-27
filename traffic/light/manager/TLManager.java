@@ -29,6 +29,8 @@ import java.util.List;
  * Created by tmuthugama on 8/11/2019
  */
 public abstract class TLManager {
+
+    private TrafficNetwork trafficNetwork;
     private List<TrafficLightCluster> clusters;
     private TLScheduleHandler scheduleHandler;
     private TLPhaseHandler phaseHandler;
@@ -66,17 +68,22 @@ public abstract class TLManager {
         this.phaseHandler = phaseHandler;
     }
 
-    public void init(){
+    public void init(TrafficNetwork trafficNetwork){
+        this.trafficNetwork = trafficNetwork;
         setHandlers();
-        scheduleHandler.update(clusters, phaseHandler, horizon, 0);
+        scheduleHandler.update(trafficNetwork, clusters, phaseHandler, horizon, 0);
         for (TrafficLightCluster cluster : clusters) {
             cluster.updateLights(0);
         }
     }
 
+    public TrafficNetwork getTrafficNetwork() {
+        return trafficNetwork;
+    }
+
     public abstract void setHandlers();
 
-    public void schedule(TrafficNetwork trafficNetwork, double timeNow){
-        scheduleHandler.update(clusters, phaseHandler, horizon, timeNow);
+    public void schedule(double timeNow){
+        scheduleHandler.update(trafficNetwork, clusters, phaseHandler, horizon, timeNow);
     }
 }
