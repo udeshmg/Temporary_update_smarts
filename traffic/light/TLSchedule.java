@@ -31,6 +31,10 @@ public class TLSchedule {
         this.schedule = new TreeMap<>();
     }
 
+    public TLSchedule(TreeMap<Long, LightPeriod> schedule) {
+        this.schedule = schedule;
+    }
+
     public LightColor getLight(Movement movement, double time){
         Map.Entry<Long, LightPeriod> e = schedule.firstEntry();
         Long index = e.getKey();
@@ -87,5 +91,19 @@ public class TLSchedule {
             }
         }
         return periods;
+    }
+
+    public List<LightPeriod> getGreenPeriods(){
+        List<LightPeriod> periods = new ArrayList<>();
+        for (LightPeriod lightPeriod : schedule.values()) {
+            if(lightPeriod.getColor() == LightColor.GYR_G){
+                periods.add(lightPeriod);
+            }
+        }
+        return periods;
+    }
+
+    public TreeMap<Long, LightPeriod> getSchedule() {
+        return schedule;
     }
 }
