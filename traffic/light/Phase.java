@@ -43,7 +43,16 @@ public class Phase {
     }
 
     public boolean hasMovement(Movement movement){
-        return  movements.contains(movement);
+        if(movement.getEdges().size() == 1){
+            for (Movement mv : movements) {
+                if(movement.getControlEdge().index == mv.getControlEdge().index){
+                    return true;
+                }
+            }
+            return false;
+        }else {
+            return movements.contains(movement);
+        }
     }
 
 
