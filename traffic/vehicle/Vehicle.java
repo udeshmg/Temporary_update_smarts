@@ -331,6 +331,8 @@ public class Vehicle {
 			isAffectedByPriorityVehicle = false;
 			// Update information regarding turning
 			findEdgeBeforeNextTurn();
+			//Update headway if there is a guidance on safety
+			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			// Update vehicle speed, which must be between 0 and free-flow speed
@@ -375,6 +377,22 @@ public class Vehicle {
 				timeTravel = timeNow - timeRouteStart;
 			}
 		}
+	}
+
+	public void updateHeadway(){
+		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
+		setHeadWayMultiplier(routeLeg.getHeadwayMultiplier(headPosition));
+	}
+
+	public double getInstructedAcc(double timeNow){
+		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
+		double deltaT = 1/Settings.numStepsPerSecond;
+		double s = routeLeg.getTargetPosition(timeNow + deltaT);
+		if(s < 0){
+			return Double.POSITIVE_INFINITY;
+		}
+		double deltaS = s - headPosition;
+		return (2 * (deltaS - speed * deltaT))/Math.pow(deltaT, 2);
 	}
 
 	public void updateLaneChangeConflictData(){
