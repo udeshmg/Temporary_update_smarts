@@ -707,7 +707,7 @@ public class TrafficNetwork extends RoadNetwork {
 	 * time of the vehicle.
 	 *
 	 */
-	public void releaseVehicleFromParking(final double timeNow) {
+	public void releaseVehicleFromParking(final double timeNow,SimulationListener listener) {
 		for (Edge edge : edges) {
 			Vehicle next = edge.getVehicleToGetIntoTheLane();
 			if(next == null) {
@@ -715,7 +715,9 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 			edge.setNextVehicleToGetIntoTheLane(next);
 			if(next != null){
-				next.startFromParking();
+				if(next.startFromParking()){
+					listener.onVehicleStartMoving(vehicles, (int) (timeNow*Settings.numStepsPerSecond), this);
+				}
 			}
 		}
 	}

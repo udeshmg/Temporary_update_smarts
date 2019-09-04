@@ -39,6 +39,10 @@ public abstract class TMS implements SimulationListener{
 
     public abstract void getRoute(Vehicle vehicle, TrafficNetwork trafficNetwork);
 
+    public void getSchedule(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork){
+
+    }
+
     @Override
     public void onStart(TrafficNetwork trafficNetwork, int maxNoSteps, int noOfStepsPerSecond) {
         startTMS(trafficNetwork, maxNoSteps, noOfStepsPerSecond);
@@ -69,5 +73,10 @@ public abstract class TMS implements SimulationListener{
     @Override
     public void onVehicleRemove(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork) {
 
+    }
+
+    @Override
+    public void onVehicleStartMoving(List<Vehicle> vehicles, int step, TrafficNetwork trafficNetwork) {
+        getSchedule(vehicles, step, trafficNetwork);
     }
 }

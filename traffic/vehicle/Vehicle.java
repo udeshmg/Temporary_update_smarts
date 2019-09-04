@@ -197,7 +197,7 @@ public class Vehicle {
 	/**
 	 * Moves vehicle from parking area onto roads.
 	 */
-	public void startFromParking() {
+	public boolean startFromParking() {
 		final RouteLeg leg = routeLegs.get(indexLegOnRoute);
 		final Edge edge = leg.edge;
 		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
@@ -209,7 +209,9 @@ public class Vehicle {
 			speed = 0;
 			lane.addVehicleToLane(this);
 			edge.setNextVehicleToGetIntoTheLane(null);
+			return true;
 		}
+		return false;
 	}
 
 	public boolean isStartFromParking(double timeNow){

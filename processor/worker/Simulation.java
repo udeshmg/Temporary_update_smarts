@@ -139,7 +139,7 @@ public class Simulation {
 		trafficNetwork.updateTrafficLights(timeNow);
 		trafficNetwork.updateTramStopTimers();
 		trafficNetwork.releaseTripMakingVehicles(timeNow, simulationListener);
-		trafficNetwork.releaseVehicleFromParking(timeNow);
+		trafficNetwork.releaseVehicleFromParking(timeNow, simulationListener);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
 		trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
