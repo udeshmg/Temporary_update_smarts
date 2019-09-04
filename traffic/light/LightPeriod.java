@@ -63,6 +63,11 @@ public class LightPeriod {
         this.end += dur;
     }
 
+    public void reduceDurStart(double dur){
+        this.start += dur;
+        this.dur -= dur;
+    }
+
     public double getDur() {
         return dur;
     }

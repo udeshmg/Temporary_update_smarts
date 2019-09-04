@@ -83,6 +83,16 @@ public class TLSchedule {
         }
     }
 
+    public void adjustDuration(LightPeriod start, LightPeriod end, double delta){
+        start.addDur(delta);
+        for (Long key : schedule.keySet()) {
+            if(key > start.getId() && key < end.getId()){
+                schedule.get(key).shift(delta);
+            }
+        }
+        end.reduceDurStart(delta);
+    }
+
     public List<LightPeriod> getGreenPeriods(Movement movement){
         List<LightPeriod> periods = new ArrayList<>();
         for (LightPeriod lightPeriod : schedule.values()) {
@@ -104,6 +114,35 @@ public class TLSchedule {
     }
 
     public TreeMap<Long, LightPeriod> getSchedule() {
+        return schedule;
+    }
+
+    public Collection<LightPeriod> getPeriods(){
+        return schedule.values();
+    }
+
+    public TreeMap<Long, LightPeriod> getOngoingSchedule() {
+        if(!schedule.isEmpty()) {
+            Map.Entry<Long, LightPeriod> first = schedule.firstEntry();
+            Long key = first.getKey();
+            Long bound = key;
+            if(first.getValue().getColor() == LightColor.GYR_G){
+                bound = key + 3;
+            }else if(first.getValue().getColor() == LightColor.GYR_Y){
+                bound = key + 2;
+            }else if(first.getValue().getColor() == LightColor.GYR_R){
+                bound = key + 1;
+            }
+
+            TreeMap<Long, LightPeriod> onGoing = new TreeMap<>();
+            for (Long k : schedule.keySet()) {
+                if(k < bound){
+                    onGoing.put(k, schedule.get(k));
+                }else{
+                    return onGoing;
+                }
+            }
+        }
         return schedule;
     }
 }
