@@ -1,6 +1,6 @@
 package traffic.light;
 
-import traffic.light.schedule.TLSchedule;
+import traffic.light.schedule.TrafficLightSchedule;
 
 import java.util.List;
 
@@ -33,30 +33,27 @@ import java.util.List;
 public class TrafficLightCluster {
 
     private List<Movement> movements;
-    private TLSchedule lightSchedule;
+    private TrafficLightSchedule lightSchedule;
 
     public TrafficLightCluster(List<Movement> movements) {
         this.movements = movements;
-        lightSchedule = new TLSchedule();
+        lightSchedule = new TrafficLightSchedule();
     }
 
     public List<Movement> getMovements() {
         return movements;
     }
 
-    public void setLightSchedule(TLSchedule lightSchedule) {
+    public void setLightSchedule(TrafficLightSchedule lightSchedule) {
         this.lightSchedule = lightSchedule;
     }
 
-    public TLSchedule getLightSchedule() {
+    public TrafficLightSchedule getLightSchedule() {
         return lightSchedule;
     }
 
     public void updateLights(double timeNow){
-        for (Movement movement : movements) {
-            LightColor color = lightSchedule.getLight(movement, timeNow);
-            movement.getControlEdge().setMovementLight(movement, color);
-        }
+        lightSchedule.updateDisplays(movements, timeNow);
     }
 
     /*public int getInactivePhaseWithPriorityVehicles() {

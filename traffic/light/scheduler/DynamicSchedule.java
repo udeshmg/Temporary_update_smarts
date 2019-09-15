@@ -3,7 +3,7 @@ package traffic.light.scheduler;
 import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.light.phasehandler.TLPhaseHandler;
-import traffic.light.schedule.TLSchedule;
+import traffic.light.schedule.TrafficLightSchedule;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -60,7 +60,7 @@ public class DynamicSchedule extends TLScheduleHandler{
         //                // Grant green light to current active approach if it has a priority vehicle and inactive approaches do not have priority vehicle
         //                setGYR(LightColor.GYR_G);
         //            }
-        TLSchedule schedule = cluster.getLightSchedule();
+        TrafficLightSchedule schedule = cluster.getLightSchedule();
         LightPeriod current = schedule.getCurrentPeriod();
         if(current != null){
             if(current.getColor() == LightColor.GYR_G && timeNow >= current.getEnd()){
@@ -78,7 +78,7 @@ public class DynamicSchedule extends TLScheduleHandler{
     }
 
     public void updateSchedule(TLPhaseHandler phaseHandler, TrafficLightCluster cluster, double horizon, double timeNow) {
-        TLSchedule existing = cluster.getLightSchedule();
+        TrafficLightSchedule existing = cluster.getLightSchedule();
         LightPeriod end = existing.getEndPeriod();
         List<Phase> phases = phaseHandler.getPhaseList(cluster, timeNow);
         double scheduleRemainder = 0;

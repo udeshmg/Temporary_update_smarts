@@ -1,5 +1,10 @@
 package traffic.light.schedule;
 
+import traffic.light.Movement;
+import traffic.vehicle.Vehicle;
+
+import java.util.List;
+
 /**
  * Copyright (c) 2019, The University of Melbourne.
  * All rights reserved.
@@ -22,4 +27,7 @@ package traffic.light.schedule;
  * Created by tmuthugama on 9/15/2019
  */
 public interface IntersectionControlSchedule {
+
+    void updateDisplays(List<Movement> movementList, double timeNow);
+    boolean isAllowedToPass(Vehicle vehicle);
 }

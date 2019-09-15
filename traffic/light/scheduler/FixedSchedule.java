@@ -3,7 +3,7 @@ package traffic.light.scheduler;
 import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.light.phasehandler.TLPhaseHandler;
-import traffic.light.schedule.TLSchedule;
+import traffic.light.schedule.TrafficLightSchedule;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -43,13 +43,13 @@ public class FixedSchedule extends TLScheduleHandler{
     @Override
     public void update(TrafficNetwork trafficNetwork, List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow) {
         for (TrafficLightCluster cluster : clusters) {
-            TLSchedule existing = cluster.getLightSchedule();
+            TrafficLightSchedule existing = cluster.getLightSchedule();
             List<Phase> phases = phaseHandler.getPhaseList(cluster, timeNow);
             updateSchedule(existing, phases, timeNow, horizon);
         }
     }
 
-    public void updateSchedule(TLSchedule existing, List<Phase> phases, double timeNow, double horizon){
+    public void updateSchedule(TrafficLightSchedule existing, List<Phase> phases, double timeNow, double horizon){
         LightPeriod end = existing.getEndPeriod();
         double scheduleRemainder = 0;
         if (end != null) {

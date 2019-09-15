@@ -3,6 +3,7 @@ package traffic.light.schedule;
 import traffic.light.LightColor;
 import traffic.light.LightPeriod;
 import traffic.light.Movement;
+import traffic.vehicle.Vehicle;
 
 import java.util.*;
 
@@ -27,19 +28,27 @@ import java.util.*;
  * <p>
  * Created by tmuthugama on 8/20/2019
  */
-public class TLSchedule {
+public class TrafficLightSchedule implements IntersectionControlSchedule{
 
     private LinkedList<LightPeriod> schedule;
 
-    public TLSchedule() {
+    public TrafficLightSchedule() {
         this.schedule = new LinkedList<>();
     }
 
-    public TLSchedule(LinkedList<LightPeriod> schedule) {
+    public TrafficLightSchedule(LinkedList<LightPeriod> schedule) {
         this.schedule = schedule;
     }
 
-    public LightColor getLight(Movement movement, double time){
+    @Override
+    public void updateDisplays(List<Movement> movementList, double timeNow) {
+        for (Movement movement : movementList) {
+            LightColor color = getLight(movement, timeNow);
+            movement.getControlEdge().setMovementLight(movement, color);
+        }
+    }
+
+    protected LightColor getLight(Movement movement, double time){
         LightPeriod first = schedule.getFirst();
         if(first.getEnd() < time){
             schedule.remove();
@@ -51,6 +60,13 @@ public class TLSchedule {
             return LightColor.KEEP_RED;
         }
     }
+
+    @Override
+    public boolean isAllowedToPass(Vehicle vehicle) {
+        return false;
+    }
+
+
 
     public LightPeriod getCurrentPeriod(){
         if(!schedule.isEmpty()) {
