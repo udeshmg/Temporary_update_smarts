@@ -391,14 +391,14 @@ public class IDM {
 	 */
 	void updateImpedingObject_Light(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
 									final ImpedingObject slowdownObj) {
-		if (vehicle.type == VehicleType.PRIORITY) {
-			// Priority vehicle ignores any traffic light
-			return;
-		}
 		/*
 		 * Checks traffic light at the end of the target lane's edge.
 		 */
 		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+			if (vehicle.type == VehicleType.PRIORITY) {
+				// Priority vehicle ignores any traffic light
+				return;
+			}
 		    if(vehicle.headPosition > targetEdge.length - targetEdge.getEndIntersectionSize()){
 		        return;
             }
