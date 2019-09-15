@@ -1,4 +1,8 @@
-package traffic.light;
+package traffic.light.schedule;
+
+import traffic.light.LightColor;
+import traffic.light.LightPeriod;
+import traffic.light.Movement;
 
 import java.util.*;
 
@@ -25,26 +29,24 @@ import java.util.*;
  */
 public class TLSchedule {
 
-    private TreeMap<Long, LightPeriod> schedule;
+    private LinkedList<LightPeriod> schedule;
 
     public TLSchedule() {
-        this.schedule = new TreeMap<>();
+        this.schedule = new LinkedList<>();
     }
 
-    public TLSchedule(TreeMap<Long, LightPeriod> schedule) {
+    public TLSchedule(LinkedList<LightPeriod> schedule) {
         this.schedule = schedule;
     }
 
     public LightColor getLight(Movement movement, double time){
-        Map.Entry<Long, LightPeriod> e = schedule.firstEntry();
-        Long index = e.getKey();
-        LightPeriod period = e.getValue();
-        if(period.getEnd() < time){
-            period = schedule.get(index + 1);
-            schedule.remove(index);
+        LightPeriod first = schedule.getFirst();
+        if(first.getEnd() < time){
+            schedule.remove();
+            first = schedule.getFirst();
         }
-        if(period.getPhase().hasMovement(movement)){
-            return period.getColor();
+        if(first.getPhase().hasMovement(movement)){
+            return first.getColor();
         }else{
             return LightColor.KEEP_RED;
         }
@@ -52,50 +54,43 @@ public class TLSchedule {
 
     public LightPeriod getCurrentPeriod(){
         if(!schedule.isEmpty()) {
-            return schedule.firstEntry().getValue();
+            return schedule.getFirst();
         }
         return null;
     }
 
     public LightPeriod getEndPeriod(){
         if(!schedule.isEmpty()) {
-            return schedule.lastEntry().getValue();
+            return schedule.getLast();
         }
         return null;
     }
 
     public void addLightPeriod(LightPeriod period){
-        if(schedule.isEmpty()) {
-            period.setId((long) 0);
-            schedule.put(period.getId(), period);
-        }else{
-            period.setId(schedule.lastKey() + 1);
-            schedule.put(period.getId(), period);
-        }
+        schedule.add(period);
     }
 
     public void extendDuration(LightPeriod period, double delta){
         period.addDur(delta);
-        for (Long key : schedule.keySet()) {
-            if(key > period.getId()){
-                schedule.get(key).shift(delta);
-            }
+        int next = schedule.indexOf(period) + 1;
+        for (int i = next; i < schedule.size() - 1; i++) {
+            schedule.get(i).shift(delta);
         }
     }
 
     public void adjustDuration(LightPeriod start, LightPeriod end, double delta){
         start.addDur(delta);
-        for (Long key : schedule.keySet()) {
-            if(key > start.getId() && key < end.getId()){
-                schedule.get(key).shift(delta);
-            }
+        int s =  schedule.indexOf(start) + 1;
+        int e =  schedule.indexOf(end);
+        for (int i = s; i < e; i++) {
+            schedule.get(i).shift(delta);
         }
         end.reduceDurStart(delta);
     }
 
     public List<LightPeriod> getGreenPeriods(Movement movement){
         List<LightPeriod> periods = new ArrayList<>();
-        for (LightPeriod lightPeriod : schedule.values()) {
+        for (LightPeriod lightPeriod : schedule) {
             if(lightPeriod.getColor() == LightColor.GYR_G && lightPeriod.getPhase().hasMovement(movement)){
                 periods.add(lightPeriod);
             }
@@ -105,7 +100,7 @@ public class TLSchedule {
 
     public List<LightPeriod> getGreenPeriods(){
         List<LightPeriod> periods = new ArrayList<>();
-        for (LightPeriod lightPeriod : schedule.values()) {
+        for (LightPeriod lightPeriod : schedule) {
             if(lightPeriod.getColor() == LightColor.GYR_G){
                 periods.add(lightPeriod);
             }
@@ -113,36 +108,26 @@ public class TLSchedule {
         return periods;
     }
 
-    public TreeMap<Long, LightPeriod> getSchedule() {
+    public LinkedList<LightPeriod> getSchedule() {
         return schedule;
     }
 
-    public Collection<LightPeriod> getPeriods(){
-        return schedule.values();
-    }
-
-    public TreeMap<Long, LightPeriod> getOngoingSchedule() {
+    public LinkedList<LightPeriod>  getOngoingSchedule() {
         if(!schedule.isEmpty()) {
-            Map.Entry<Long, LightPeriod> first = schedule.firstEntry();
-            Long key = first.getKey();
-            Long bound = key;
-            if(first.getValue().getColor() == LightColor.GYR_G){
-                bound = key + 3;
-            }else if(first.getValue().getColor() == LightColor.GYR_Y){
-                bound = key + 2;
-            }else if(first.getValue().getColor() == LightColor.GYR_R){
-                bound = key + 1;
+            LightPeriod first = schedule.getFirst();
+            int bound = 0;
+            if(first.getColor() == LightColor.GYR_G){
+                bound += 3;
+            }else if(first.getColor() == LightColor.GYR_Y){
+                bound += 2;
+            }else if(first.getColor() == LightColor.GYR_R){
+                bound += 1;
             }
 
-            TreeMap<Long, LightPeriod> onGoing = new TreeMap<>();
-            for (Long k : schedule.keySet()) {
-                if(k < bound){
-                    onGoing.put(k, schedule.get(k));
-                }else{
-                    return onGoing;
-                }
-            }
+            LinkedList onGoing = new LinkedList();
+            onGoing.addAll(schedule.subList(0,bound));
+            return onGoing;
         }
-        return schedule;
+        return null;
     }
 }

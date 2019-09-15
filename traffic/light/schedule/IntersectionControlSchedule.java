@@ -1,7 +1,4 @@
-package traffic.light.manager;
-
-import traffic.light.phasehandler.FixedDefaultFourPhase;
-import traffic.light.scheduler.FixedSchedule;
+package traffic.light.schedule;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -22,16 +19,7 @@ import traffic.light.scheduler.FixedSchedule;
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * <p>
- * Created by tmuthugama on 8/9/2019
+ * Created by tmuthugama on 9/15/2019
  */
-public class FixedTwoPhaseTLManager extends TLManager {
-
-
-    @Override
-    public void setHandlers() {
-        setHorizon(90);
-//        setPhaseHandler(new FixedDefaultTwoPhase(getClusters()));
-        setPhaseHandler(new FixedDefaultFourPhase(getClusters()));
-        setScheduleHandler(new FixedSchedule());
-    }
+public interface IntersectionControlSchedule {
 }

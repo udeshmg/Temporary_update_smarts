@@ -1,4 +1,4 @@
-package traffic.light.phase;
+package traffic.light.phasehandler;
 
 import traffic.light.Phase;
 import traffic.light.TrafficLightCluster;

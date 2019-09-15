@@ -52,7 +52,7 @@ public class SchICTLManager extends TLManager {
 
     /**
      * Algorithm 2 in SchIC paper
-     * @param s - last phase of state
+     * @param s - last phasehandler of state
      * @param t - time of state
      * @param d - delay of state
      * @param c - cluster to add
@@ -75,10 +75,10 @@ public class SchICTLManager extends TLManager {
 
     /**
      * Min Switch in SchIC paper
-     * @param a - start phase
-     * @param b - end phase
+     * @param a - start phasehandler
+     * @param b - end phasehandler
      * @param phases - phases
-     * @return - minimum switching time from phase a to b
+     * @return - minimum switching time from phasehandler a to b
      */
     public double minSwitch(int a, int b, List<Phase> phases){
         if(b < a){
@@ -111,8 +111,8 @@ public class SchICTLManager extends TLManager {
         for (int k = 0; k < clusterCount; k++) {
             /*Set<ScheduleStatus> statusSet = stateGroups.get(k);
             for (ScheduleStatus status : statusSet) {
-                for (Phase phase : phases) {
-                    if(status.getX(phase) > 0){
+                for (Phase phasehandler : phases) {
+                    if(status.getX(phasehandler) > 0){
 
                     }
                 }

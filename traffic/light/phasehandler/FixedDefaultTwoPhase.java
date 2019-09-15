@@ -1,4 +1,4 @@
-package traffic.light.phase;
+package traffic.light.phasehandler;
 
 import traffic.light.Movement;
 import traffic.light.Phase;
@@ -30,11 +30,11 @@ import java.util.Map;
  * <p>
  * Created by tmuthugama on 8/22/2019
  */
-public class FixedDefaultFourPhase extends TLPhaseHandler {
+public class FixedDefaultTwoPhase extends TLPhaseHandler {
 
     private Map<TrafficLightCluster, List<Phase>> fixedPhases;
 
-    public FixedDefaultFourPhase(List<TrafficLightCluster> clusters) {
+    public FixedDefaultTwoPhase(List<TrafficLightCluster> clusters) {
         this.fixedPhases = new HashMap<>();
         createFixedPhases(clusters);
     }
@@ -43,7 +43,7 @@ public class FixedDefaultFourPhase extends TLPhaseHandler {
         for (TrafficLightCluster cluster : clusters) {
             Map<String, Phase> groups = new HashMap<>();
             for (Movement movement : cluster.getMovements()) {
-                String groupName = String.valueOf(movement.getControlEdge().index);
+                String groupName = movement.getControlEdge().name;
                 if(!groups.containsKey(groupName)){
                     groups.put(groupName, new Phase());
                 }

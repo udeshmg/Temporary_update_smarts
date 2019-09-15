@@ -1,21 +1,7 @@
 package traffic.light.manager;
 
-import traffic.TrafficNetwork;
-import traffic.light.LightColor;
-import traffic.light.Movement;
-import traffic.light.Phase;
-import traffic.light.TrafficLightCluster;
-import traffic.light.phase.FixedDefaultFourPhase;
-import traffic.light.phase.FixedDefaultTwoPhase;
-import traffic.light.phase.TLPhaseHandler;
-import traffic.light.LightPeriod;
-import traffic.light.TLSchedule;
-import traffic.light.schedule.DynamicSchedule;
-import traffic.light.schedule.FixedSchedule;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import traffic.light.phasehandler.FixedDefaultFourPhase;
+import traffic.light.scheduler.DynamicSchedule;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.

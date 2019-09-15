@@ -2,8 +2,8 @@ package traffic.light.manager;
 
 import traffic.TrafficNetwork;
 import traffic.light.TrafficLightCluster;
-import traffic.light.phase.TLPhaseHandler;
-import traffic.light.schedule.TLScheduleHandler;
+import traffic.light.phasehandler.TLPhaseHandler;
+import traffic.light.scheduler.TLScheduleHandler;
 
 import java.util.List;
 

@@ -1,13 +1,10 @@
-package traffic.light.phase;
+package traffic.light.scheduler;
 
-import traffic.light.Movement;
-import traffic.light.Phase;
+import traffic.TrafficNetwork;
 import traffic.light.TrafficLightCluster;
+import traffic.light.phasehandler.TLPhaseHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -30,31 +27,7 @@ import java.util.Map;
  * <p>
  * Created by tmuthugama on 8/22/2019
  */
-public class FixedDefaultTwoPhase extends TLPhaseHandler {
+public abstract class TLScheduleHandler {
 
-    private Map<TrafficLightCluster, List<Phase>> fixedPhases;
-
-    public FixedDefaultTwoPhase(List<TrafficLightCluster> clusters) {
-        this.fixedPhases = new HashMap<>();
-        createFixedPhases(clusters);
-    }
-
-    private void createFixedPhases(List<TrafficLightCluster> clusters) {
-        for (TrafficLightCluster cluster : clusters) {
-            Map<String, Phase> groups = new HashMap<>();
-            for (Movement movement : cluster.getMovements()) {
-                String groupName = movement.getControlEdge().name;
-                if(!groups.containsKey(groupName)){
-                    groups.put(groupName, new Phase());
-                }
-                groups.get(groupName).addMovement(movement);
-            }
-            fixedPhases.put(cluster, new ArrayList<>(groups.values()));
-        }
-    }
-
-    @Override
-    public List<Phase> getPhaseList(TrafficLightCluster cluster, double timeNow) {
-        return fixedPhases.get(cluster);
-    }
+    public abstract void update(TrafficNetwork trafficNetwork, List<TrafficLightCluster> clusters, TLPhaseHandler phaseHandler, double horizon, double timeNow);
 }

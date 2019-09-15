@@ -1,5 +1,7 @@
 package traffic.light;
 
+import traffic.light.schedule.TLSchedule;
+
 import java.util.List;
 
 /**
@@ -26,7 +28,7 @@ import java.util.List;
 
 /**
  * A cluster of lights consists of one or more phases.  At any time, only one of the phases
- * is in a green-yellow-red cycle. This phase is called the active phase. All other phases remain in red color.
+ * is in a green-yellow-red cycle. This phasehandler is called the active phasehandler. All other phases remain in red color.
  */
 public class TrafficLightCluster {
 

@@ -1,12 +1,11 @@
-package traffic.light.schedule;
+package traffic.light.scheduler;
 
 import traffic.TrafficNetwork;
 import traffic.light.*;
-import traffic.light.phase.TLPhaseHandler;
+import traffic.light.phasehandler.TLPhaseHandler;
+import traffic.light.schedule.TLSchedule;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
