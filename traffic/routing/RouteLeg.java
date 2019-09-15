@@ -65,6 +65,14 @@ public class RouteLeg {
 		return 1/y;
 	}
 
+	public void setStartH(double startH) {
+		this.startH = startH;
+	}
+
+	public void setEndH(double endH) {
+		this.endH = endH;
+	}
+
 	public double getTargetPosition(double time){
 		return (time-p0.getY())*(p3.getX()-p0.getX())/(p3.getY() - p0.getY()) + p0.getX();
 	}
