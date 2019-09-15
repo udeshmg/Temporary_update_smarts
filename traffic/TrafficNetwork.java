@@ -714,8 +714,8 @@ public class TrafficNetwork extends RoadNetwork {
 				next = edge.getNextParkedVehicle(timeNow);
 			}
 			edge.setNextVehicleToGetIntoTheLane(next);
-			if(next != null){
-				if(next.startFromParking()){
+			if(next != null && next.startFromParking()){
+				if(listener != null){
 					listener.onVehicleStartMoving(vehicles, (int) (timeNow*Settings.numStepsPerSecond), this);
 				}
 			}
