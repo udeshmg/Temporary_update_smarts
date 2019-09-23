@@ -36,29 +36,29 @@ public class Message_WS_TrafficReport {
 
 	}
 
-	public Message_WS_TrafficReport(final String workerName, final ArrayList<Vehicle> vehiclesOnRoad,
+	public Message_WS_TrafficReport(Settings settings, final String workerName, final ArrayList<Vehicle> vehiclesOnRoad,
 									final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport,
 									List<Vehicle> vehiclesFinished,final int step,
 									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses) {
 		this.workerName = workerName;
-		if (Settings.isVisualize || Settings.isOutputTrajectory) {
+		if (settings.isVisualize || settings.isOutputTrajectory) {
 			vehicleList = getDetailOfActiveVehiclesOnRoad(vehiclesOnRoad);
 		}
-		if (Settings.isVisualize && Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+		if (settings.isVisualize && settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			lightList = getDetailOfLights(lightCoordinator);
 		}
-		if (Settings.isOutputInitialRoutes) {
+		if (settings.isOutputInitialRoutes) {
 			randomRoutes = getInitialRouteList(newVehiclesSinceLastReport);
 		}
-		this.finishedList = new ArrayList<>(getFinishedListFromVehicles(vehiclesFinished, step/ Settings.numStepsPerSecond));
+		this.finishedList = new ArrayList<>(getFinishedListFromVehicles(vehiclesFinished, step/ settings.numStepsPerSecond));
 		this.step = step;
 		this.numInternalNonPubVehicles = numInternalNonPubVehicles;
 		this.numInternalTrams = numInternalTrams;
 		this.numInternalBuses = numInternalBuses;
 	}
 
-	public Message_WS_TrafficReport(final String workerName, final int step, final TrafficNetwork trafficNetwork){
-		this(workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
+	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork){
+		this(settings, workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
 				trafficNetwork.newVehiclesSinceLastReport, trafficNetwork.getFinishedVehicles(), step,
 				trafficNetwork.numInternalNonPublicVehicle,
 				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus);

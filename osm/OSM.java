@@ -99,15 +99,18 @@ public class OSM {
 	 */
 	public static void main(final String[] args) {
 		final OSM osm = new OSM();
+		Settings settings = new Settings();
+		String inputOpenStreetMapFile = null;
 		if (args.length > 0) {
-			Settings.inputOpenStreetMapFile = args[0];
+			inputOpenStreetMapFile = args[0];
 		} else {
-			if (Settings.inputOpenStreetMapFile.length() == 0) {
+			if (inputOpenStreetMapFile.length() == 0) {
 				System.out.println("You need to specify the path of the file for processing.");
 				return;
 			}
 		}
-		osm.processOSM(Settings.inputOpenStreetMapFile, false);
+		settings.inputOpenStreetMapFile = inputOpenStreetMapFile;
+		osm.processOSM(inputOpenStreetMapFile, false, settings);
 	}
 
 	FileOutputStream fosOutputFile;
@@ -477,9 +480,9 @@ public class OSM {
 	 *            file on disk
 	 * @return
 	 */
-	public void processOSM(final String inputFilePath, final boolean isToMemory) {
-		System.out.println("Building road network graph based on OSM file: " + Settings.inputOpenStreetMapFile);
-		if (scanXML(inputFilePath)) {
+	public void processOSM(final String inputFilePath, final boolean isToMemory, Settings settings) {
+		System.out.println("Building road network graph based on OSM file: " + settings.inputOpenStreetMapFile);
+		if (scanXML(inputFilePath, settings)) {
 			Collections.sort(elements_node, new XMLElementIdComparator());
 			Collections.sort(elements_way, new XMLElementIdComparator());
 			attachRouteRefToWays();
@@ -489,7 +492,7 @@ public class OSM {
 			getBoundingBox();
 
 			if (isToMemory) {
-				Settings.roadGraph = outputMapToString();
+				settings.roadGraph = outputMapToString();
 			} else {
 				initOutputFile();
 				outputStringToFile(outputMapToString());
@@ -502,7 +505,7 @@ public class OSM {
 	/*
 	 * Scans the XML file to get the lists of nodes, ways and relations.
 	 */
-	boolean scanXML(final String filePath) {
+	boolean scanXML(final String filePath, Settings settings) {
 		try {
 
 			final SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -674,7 +677,7 @@ public class OSM {
 								e_way.setAttribute("roundabout", "true");
 							}
 							// Number of lanes
-							if ((Settings.numLanesPerEdge == 0) && k.equals("lanes")) {
+							if ((settings.numLanesPerEdge == 0) && k.equals("lanes")) {
 								try {
 									final int numLanes = Integer.parseInt(v);
 									if (numLanes > 0) {
@@ -723,10 +726,10 @@ public class OSM {
 									e_way.setAttribute("roundabout", "false");
 								}
 								if (!e_way.hasAttribute("lanes")) {
-									if (Settings.numLanesPerEdge == 0) {
+									if (settings.numLanesPerEdge == 0) {
 										e_way.setAttribute("lanes", String.valueOf(type.numLanes));
 									} else {
-										e_way.setAttribute("lanes", String.valueOf(Settings.numLanesPerEdge));
+										e_way.setAttribute("lanes", String.valueOf(settings.numLanesPerEdge));
 									}
 								}
 								if (!e_way.hasAttribute("rightLanes")) {

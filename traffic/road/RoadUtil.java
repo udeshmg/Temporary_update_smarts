@@ -21,17 +21,19 @@ public class RoadUtil {
 
 	static class NodeAngleComparator implements Comparator<Node> {
 		Node node;
+		double lonVsLat;
 
-		public NodeAngleComparator(final Node node) {
+		public NodeAngleComparator(final Node node, double lonVsLat) {
 			super();
 			this.node = node;
+			this.lonVsLat = lonVsLat;
 		}
 
 		@Override
 		public int compare(final Node n1, final Node n2) {
 
-			final double n1Angle = Math.atan2((node.lat - n1.lat) * Settings.lonVsLat, node.lon - n1.lon);
-			final double n2Angle = Math.atan2((node.lat - n2.lat) * Settings.lonVsLat, node.lon - n2.lon);
+			final double n1Angle = Math.atan2((node.lat - n1.lat) * lonVsLat, node.lon - n1.lon);
+			final double n2Angle = Math.atan2((node.lat - n2.lat) * lonVsLat, node.lon - n2.lon);
 
 			return n1Angle < n2Angle ? -1 : n1Angle == n2Angle ? 0 : 1;
 		}
@@ -141,7 +143,7 @@ public class RoadUtil {
 	 * Get the edges with potential conflicting traffic when a vehicle needs to
 	 * turn onto e2 from e1
 	 */
-	public static ArrayList<Edge> getConflictingEdges(final Edge e1, final Edge e2) {
+	public static ArrayList<Edge> getConflictingEdges(final Edge e1, final Edge e2, boolean isDriveOnLeft) {
 		final ArrayList<Edge> conflictEdges = new ArrayList<>();
 		final ArrayList<Edge> inwardEdgesR = findInwardEdgesOnRight(e1, e2);
 		final ArrayList<Edge> inwardEdgesL = findInwardEdgesOnLeft(e1, e2);
@@ -149,7 +151,7 @@ public class RoadUtil {
 		final ArrayList<Edge> outwardEdgesR = findOutwardEdgesOnRight(e1, e2);
 		Edge e1Adjacent = e1.endNode.getOutwardEdge(e1.startNode);
 
-		if (Settings.isDriveOnLeft) {
+		if (isDriveOnLeft) {
 			// Drive on LEFT
 			for (final Edge eR : inwardEdgesR) {
 				List<Edge> eROutList = findOutwardEdgesOnRight(eR, e1Adjacent);
@@ -291,11 +293,11 @@ public class RoadUtil {
 	/**
 	 * Calculate GPS coordinates of the start point and the end point of a lane.
 	 */
-	public static double[] getLaneGPS(final Lane lane) {
+	public static double[] getLaneGPS(final Lane lane, boolean isDriveOnLeft, double laneWidthInMeters, double lonVsLat) {
 		final Edge edge = lane.edge;
 		final double[] points = new double[4];
 		double rotateDegree = 90;
-		if (!Settings.isDriveOnLeft) {
+		if (!isDriveOnLeft) {
 			rotateDegree = -90;
 		}
 
@@ -303,19 +305,19 @@ public class RoadUtil {
 		double extendedEdgeStartToEdgeRatio = 1;
 		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber))
-					* Settings.laneWidthInMeters) / edge.length;
+					* laneWidthInMeters) / edge.length;
 		} else {
 			extendedEdgeStartToEdgeRatio = ((-0.5 + ((lane.edge.getLaneCount() / 2.0) - lane.laneNumber))
-					* Settings.laneWidthInMeters) / edge.length;
+					* laneWidthInMeters) / edge.length;
 		}
 		final double lonExtendedEdgeStart = edge.startNode.lon
 				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeStartToEdgeRatio);
 		final double latExtendedEdgeStart = (edge.startNode.lat
-				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeStartToEdgeRatio)) * Settings.lonVsLat;
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeStartToEdgeRatio)) * lonVsLat;
 		final double[] ptStart = { lonExtendedEdgeStart, latExtendedEdgeStart };
 		AffineTransform.getRotateInstance(Math.toRadians(rotateDegree), edge.startNode.lon,
-				edge.startNode.lat * Settings.lonVsLat).transform(ptStart, 0, ptStart, 0, 1);
-		ptStart[1] = ptStart[1] / Settings.lonVsLat;
+				edge.startNode.lat * lonVsLat).transform(ptStart, 0, ptStart, 0, 1);
+		ptStart[1] = ptStart[1] / lonVsLat;
 		points[0] = ptStart[0];
 		points[1] = ptStart[1];
 
@@ -323,23 +325,23 @@ public class RoadUtil {
 		double extendedEdgeEndToEdgeRatio = 1;
 		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + (lane.edge.getLaneCount() - lane.laneNumber)) * laneWidthInMeters)
 							/ edge.length);
 		} else {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - lane.laneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - lane.laneNumber)) * laneWidthInMeters)
 							/ edge.length);
 		}
 
 		final Double lonExtendedEdgeEnd = edge.startNode.lon
 				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeEndToEdgeRatio);
 		final double latExtendedEdgeEnd = (edge.startNode.lat
-				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeEndToEdgeRatio)) * Settings.lonVsLat;
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeEndToEdgeRatio)) * lonVsLat;
 		final double[] ptEnd = { lonExtendedEdgeEnd, latExtendedEdgeEnd };
 		AffineTransform
-				.getRotateInstance(Math.toRadians(rotateDegree), edge.endNode.lon, edge.endNode.lat * Settings.lonVsLat)
+				.getRotateInstance(Math.toRadians(rotateDegree), edge.endNode.lon, edge.endNode.lat * lonVsLat)
 				.transform(ptEnd, 0, ptEnd, 0, 1);
-		ptEnd[1] = ptEnd[1] / Settings.lonVsLat;
+		ptEnd[1] = ptEnd[1] / lonVsLat;
 		points[2] = ptEnd[0];
 		points[3] = ptEnd[1];
 
@@ -349,37 +351,38 @@ public class RoadUtil {
 	/**
 	 * Calculate GPS coordinates of the start point and the end point of a lane.
 	 */
-	public static Line2D getPavementGPS(final Lane lane) {
+	public static Line2D getPavementGPS(final Lane lane, boolean isDriveOnLeft, double laneWidthInMeters,
+										double lonVsLat, double pavementLineRatio) {
 		final Edge edge = lane.edge;
 		final double[] points = new double[4];
 		double rotateDegree = 90;
-		if (!Settings.isDriveOnLeft) {
+		if (!isDriveOnLeft) {
 			rotateDegree = -90;
 		}
 		double pavementLaneNumber;
 		if(lane.laneNumber == 0) {
-			pavementLaneNumber = lane.laneNumber - Settings.pavementLineRatio;
+			pavementLaneNumber = lane.laneNumber - pavementLineRatio;
 		}else{
-			pavementLaneNumber = lane.laneNumber + Settings.pavementLineRatio;
+			pavementLaneNumber = lane.laneNumber + pavementLineRatio;
 		}
 
 		// GPS of start point of lane
 		double extendedEdgeStartToEdgeRatio = 1;
 		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeStartToEdgeRatio = ((-0.5 + (lane.edge.getLaneCount() - pavementLaneNumber))
-					* Settings.laneWidthInMeters) / edge.length;
+					* laneWidthInMeters) / edge.length;
 		} else {
 			extendedEdgeStartToEdgeRatio = ((-0.5 + ((lane.edge.getLaneCount() / 2.0) - pavementLaneNumber))
-					* Settings.laneWidthInMeters) / edge.length;
+					* laneWidthInMeters) / edge.length;
 		}
 		final double lonExtendedEdgeStart = edge.startNode.lon
 				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeStartToEdgeRatio);
 		final double latExtendedEdgeStart = (edge.startNode.lat
-				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeStartToEdgeRatio)) * Settings.lonVsLat;
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeStartToEdgeRatio)) * lonVsLat;
 		final double[] ptStart = { lonExtendedEdgeStart, latExtendedEdgeStart };
 		AffineTransform.getRotateInstance(Math.toRadians(rotateDegree), edge.startNode.lon,
-				edge.startNode.lat * Settings.lonVsLat).transform(ptStart, 0, ptStart, 0, 1);
-		ptStart[1] = ptStart[1] / Settings.lonVsLat;
+				edge.startNode.lat * lonVsLat).transform(ptStart, 0, ptStart, 0, 1);
+		ptStart[1] = ptStart[1] / lonVsLat;
 		points[0] = ptStart[0];
 		points[1] = ptStart[1];
 
@@ -387,23 +390,23 @@ public class RoadUtil {
 		double extendedEdgeEndToEdgeRatio = 1;
 		if (edge.isOnTwoWayRoad()) {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + (lane.edge.getLaneCount() - pavementLaneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + (lane.edge.getLaneCount() - pavementLaneNumber)) * laneWidthInMeters)
 					/ edge.length);
 		} else {
 			extendedEdgeEndToEdgeRatio = 1
-					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - pavementLaneNumber)) * Settings.laneWidthInMeters)
+					+ (((-0.5 + ((lane.edge.getLaneCount() / 2.0) - pavementLaneNumber)) * laneWidthInMeters)
 					/ edge.length);
 		}
 
 		final Double lonExtendedEdgeEnd = edge.startNode.lon
 				+ ((edge.endNode.lon - edge.startNode.lon) * extendedEdgeEndToEdgeRatio);
 		final double latExtendedEdgeEnd = (edge.startNode.lat
-				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeEndToEdgeRatio)) * Settings.lonVsLat;
+				+ ((edge.endNode.lat - edge.startNode.lat) * extendedEdgeEndToEdgeRatio)) * lonVsLat;
 		final double[] ptEnd = { lonExtendedEdgeEnd, latExtendedEdgeEnd };
 		AffineTransform
-				.getRotateInstance(Math.toRadians(rotateDegree), edge.endNode.lon, edge.endNode.lat * Settings.lonVsLat)
+				.getRotateInstance(Math.toRadians(rotateDegree), edge.endNode.lon, edge.endNode.lat * lonVsLat)
 				.transform(ptEnd, 0, ptEnd, 0, 1);
-		ptEnd[1] = ptEnd[1] / Settings.lonVsLat;
+		ptEnd[1] = ptEnd[1] / lonVsLat;
 		points[2] = ptEnd[0];
 		points[3] = ptEnd[1];
 		Line2D l = new Line2D.Double(new Point2D.Double(points[0], points[1]), new Point2D.Double(points[2], points[3]));
@@ -435,9 +438,9 @@ public class RoadUtil {
 		return false;
 	}
 
-	public static String importBuiltinRoadGraphFile() {
+	public static String importBuiltinRoadGraphFile(String inputBuiltinRoadGraph) {
 		try {
-			final InputStream inputStream = RoadUtil.class.getResourceAsStream(Settings.inputBuiltinRoadGraph);
+			final InputStream inputStream = RoadUtil.class.getResourceAsStream(inputBuiltinRoadGraph);
 			final Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 			final StringBuilder sb = new StringBuilder();
 			int numChars = -1;
@@ -460,8 +463,8 @@ public class RoadUtil {
 	}
 
 
-	public static ArrayList<Node> sortEdgesBasedOnAngle(final Node node) {
-		final NodeAngleComparator nodeAngleComparator = new NodeAngleComparator(node);
+	public static ArrayList<Node> sortEdgesBasedOnAngle(final Node node, double lonVsLat) {
+		final NodeAngleComparator nodeAngleComparator = new NodeAngleComparator(node, lonVsLat);
 		final ArrayList<Node> connectedNodes = new ArrayList<>();
 		for (final Edge e : node.outwardEdges) {
 			connectedNodes.add(e.endNode);

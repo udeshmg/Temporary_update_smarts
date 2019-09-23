@@ -3,6 +3,7 @@ package traffic.routing;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Node;
@@ -15,9 +16,11 @@ public abstract class Routing {
 	}
 
 	TrafficNetwork trafficNetwork;
+	protected Settings settings;
 
     public Routing(final TrafficNetwork trafficNetwork) {
 		this.trafficNetwork = trafficNetwork;
+		this.settings = trafficNetwork.getSettings();
 	}
 
 	public abstract ArrayList<RouteLeg> createCompleteRoute(Node start, Node end, VehicleType type);

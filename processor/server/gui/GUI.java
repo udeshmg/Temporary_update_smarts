@@ -37,6 +37,7 @@ public class GUI extends JFrame {
 	int lastVisualizedStep = 0;
 	long lastSpeedUpUpdateTimeStamp = 0;
 	double lastSpeedUp = 0;
+	private Settings settings;
 
 	enum VehicleDetailType {
 		Type, Remaining_Links, ID_Worker, Driver_Profile, Slowdown_Factor, HeadwayMultiplier
@@ -45,10 +46,9 @@ public class GUI extends JFrame {
 	private final HashMap<String, ArrayList<Serializable_GUI_Vehicle>> guiVehicleList = new HashMap<>();
 	private final HashMap<String, ArrayList<Serializable_GUI_Light>> guiLightList = new HashMap<>();
 
-	public GUI() {
-	}
 
 	public GUI(SimulationProcessor processor) {
+		this.settings = processor.getSettings();
 		setTitle("SMARTS Traffic Simulator");
 		computeFrameDimension();
 		setSize(new Dimension(frameWidth, frameHeight));
@@ -106,8 +106,8 @@ public class GUI extends JFrame {
 	void computeFrameDimension() {
 		final int maxWidthMonitorPanel = 3840;
 		final int maxHeightMonitorPanel = 2160;
-		final int maxWidthWholeFrame = maxWidthMonitorPanel + Settings.controlPanelWidth
-				+ Settings.controlPanelGapToRight;
+		final int maxWidthWholeFrame = maxWidthMonitorPanel + settings.controlPanelWidth
+				+ settings.controlPanelGapToRight;
 		frameWidth = GuiUtil.getWorkingScreenWidth() > maxWidthWholeFrame ? maxWidthWholeFrame
 				: GuiUtil.getWorkingScreenWidth();
 		frameHeight = GuiUtil.getWorkingScreenHeight() > maxHeightMonitorPanel ? maxHeightMonitorPanel
@@ -121,7 +121,7 @@ public class GUI extends JFrame {
 	 *
 	 */
 	int getMonitorPanelWidth() {
-		int width = frameWidth - Settings.controlPanelWidth - Settings.controlPanelGapToRight;
+		int width = frameWidth - settings.controlPanelWidth - settings.controlPanelGapToRight;
 		if ((width % 2) != 0) {
 			width -= 1;
 		}
@@ -198,12 +198,12 @@ public class GUI extends JFrame {
 				double realTimeFactor = lastSpeedUp;
 				if (timeGapToLastSpeedUpUpdate > 1) {
 					final int stepGap = this.stepToDraw - lastVisualizedStep;
-					realTimeFactor = stepGap / Settings.numStepsPerSecond / timeGapToLastSpeedUpUpdate;
+					realTimeFactor = stepGap / settings.numStepsPerSecond / timeGapToLastSpeedUpUpdate;
 					lastSpeedUpUpdateTimeStamp = System.currentTimeMillis();
 					lastSpeedUp = realTimeFactor;
 					lastVisualizedStep = this.stepToDraw;
 				}
-				monitorPanel.update(guiVehicleList, guiLightList, lastSpeedUp);
+				monitorPanel.update(guiVehicleList, guiLightList, lastSpeedUp, settings.numStepsPerSecond);
 				clearObjectData();
 			}
 		}

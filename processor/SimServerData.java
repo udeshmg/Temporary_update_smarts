@@ -40,7 +40,7 @@ public class SimServerData {
     private GUI gui;
     private ConsoleUI consoleUI;
     private ScriptLoader scriptLoader = new ScriptLoader();
-    private FileOutput fileOutput = new FileOutput();
+    private FileOutput fileOutput;
     private double simulationWallTime = 0;//Total time length spent on simulation
     private int totalNumWwCommChannels = 0;//Total number of communication channels between workers. A worker has two channels with a neighbor worker, one for sending and one for receiving.
     private ArrayList<SerializableRouteDump> allRoutes = new ArrayList<SerializableRouteDump>();
@@ -61,24 +61,30 @@ public class SimServerData {
     private int runIndex = 0;
     private int lastVehicleFinishedStep = 0;
     private int notFinishedVehicles = 0;
+    private Settings settings;
+
+    public SimServerData(Settings settings) {
+        this.settings = settings;
+        this.fileOutput = new FileOutput(settings);
+    }
 
     public void showNumberOfConnectedWorkers(int number) {
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.updateNumConnectedWorkers(number);
         } else {
-            System.out.println(number + "/" + Settings.numWorkers + " workers connected.");
+            System.out.println(number + "/" + settings.numWorkers + " workers connected.");
         }
     }
 
     public void initRoadNetwork() {
         // Load default road network
-        Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-        roadNetwork = new RoadNetwork();
+        settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
+        roadNetwork = new RoadNetwork(settings);
     }
 
     public void initUIs(SimulationProcessor processor) {
         // Start GUI or load simulation configuration without GUI
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             if (gui != null) {
                 gui.dispose();
             }
@@ -92,7 +98,7 @@ public class SimServerData {
     }
 
     public void prepareForSetup() {
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.getReadyToSetup();
         } else {
             consoleUI.acceptSimScriptFromConsole();// Let user input simulation script path
@@ -101,7 +107,7 @@ public class SimServerData {
 
     public void prepareForSetupAgain() {
         updateExperimentIndices();
-        if ((Settings.isVisualize)) {
+        if ((settings.isVisualize)) {
             gui.getReadyToSetup();
             if (experiments != null && experiments.size() != experimentIndex) {
                 System.out.println("Loading configuration of new simulation...");
@@ -122,13 +128,13 @@ public class SimServerData {
                                  ArrayList<Serializable_Finished_Vehicle> finished, int numInternalNonPubVehicles,
                                  int numInternalTrams, int numInternalBuses) {
         // Update GUI
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.updateObjectData(vehicleList, lightList, workerName, numWorkers, step);
         }
         // Add new vehicle position to its trajectory
-        double timeStamp = step / Settings.numStepsPerSecond;
+        double timeStamp = step / settings.numStepsPerSecond;
         notFinishedVehicles = vehicleList.size();
-        if (Settings.isOutputTrajectory) {
+        if (settings.isOutputTrajectory) {
             for (Serializable_GUI_Vehicle vehicle : vehicleList) {
                 if (!allTrajectories.containsKey(vehicle.id)) {
                     allTrajectories.put(vehicle.id, new TreeMap<Double, double[]>());
@@ -144,7 +150,7 @@ public class SimServerData {
         }
         trjOutput.outputTrajData(step, vehicleList);
         // Store routes of new vehicles created since last report
-        if (Settings.isOutputInitialRoutes) {
+        if (settings.isOutputInitialRoutes) {
             allRoutes.addAll(randomRoutes);
         }
         // Increment vehicle counts
@@ -154,13 +160,13 @@ public class SimServerData {
     }
 
     public void startSimulationInUI() {
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.startSimulation();
         }
     }
 
     public void resetStepInUI() {
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.stepToDraw = 0;
         }
     }
@@ -172,7 +178,7 @@ public class SimServerData {
             createdVehicleRatio = 1;
         }
 
-        if (Settings.isVisualize) {
+        if (settings.isVisualize) {
             gui.updateSetupProgress(createdVehicleRatio);
         }
     }
@@ -182,39 +188,39 @@ public class SimServerData {
     }
 
     public void changeMap() {
-        Settings.listRouteSourceWindowForInternalVehicle.clear();
-        Settings.listRouteDestinationWindowForInternalVehicle.clear();
-        Settings.listRouteSourceDestinationWindowForInternalVehicle.clear();
-        Settings.isNewEnvironment = true;
+        settings.listRouteSourceWindowForInternalVehicle.clear();
+        settings.listRouteDestinationWindowForInternalVehicle.clear();
+        settings.listRouteSourceDestinationWindowForInternalVehicle.clear();
+        settings.isNewEnvironment = true;
 
-        if (Settings.inputOpenStreetMapFile.length() > 0) {
+        if (settings.inputOpenStreetMapFile.length() > 0) {
             final OSM osm = new OSM();
-            osm.processOSM(Settings.inputOpenStreetMapFile, true);
-            Settings.isBuiltinRoadGraph = false;
+            osm.processOSM(settings.inputOpenStreetMapFile, true, settings);
+            settings.isBuiltinRoadGraph = false;
             // Revert to built-in map if there was an error when converting new map
-            if (Settings.roadGraph.length() == 0) {
-                Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-                Settings.isBuiltinRoadGraph = true;
+            if (settings.roadGraph.length() == 0) {
+                settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
+                settings.isBuiltinRoadGraph = true;
             }
         } else {
-            Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
-            Settings.isBuiltinRoadGraph = true;
+            settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
+            settings.isBuiltinRoadGraph = true;
         }
 
-        roadNetwork = new RoadNetwork();//Build road network based on new road graph
+        roadNetwork = new RoadNetwork(settings);//Build road network based on new road graph
     }
 
     public void initFileOutput() {
         // Initialize output
         fileOutput.init();
-        trjOutput = new TrjOutput(fileOutput.getTrjFos(), Settings.numWorkers, (int) Settings.numStepsPerSecond, Settings.maxNumSteps,
+        trjOutput = new TrjOutput(fileOutput.getTrjFos(), settings.numWorkers, (int) settings.numStepsPerSecond, settings.maxNumSteps,
                 roadNetwork.minLon, roadNetwork.minLat, roadNetwork.mapWidth, roadNetwork.mapHeight);
         trjOutput.outputMapData();
         vdOutput = new VehicleDataOutput(fileOutput.getVdFos());
     }
 
     public void writeOutputFiles(int step) {
-        fileOutput.outputSimLog(step, simulationWallTime, totalNumWwCommChannels);
+        fileOutput.outputSimLog(step, simulationWallTime, totalNumWwCommChannels, (int) settings.numStepsPerSecond);
         fileOutput.outputRoutes(allRoutes);
         fileOutput.outputBestTTData(allRoutes);
         allRoutes.clear();
@@ -235,9 +241,9 @@ public class SimServerData {
     }
 
     public boolean[] updateVehicleCounts() {
-        boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < Settings.numGlobalRandomPrivateVehicles;
-        boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < Settings.numGlobalRandomTrams;
-        boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < Settings.numGlobalRandomBuses;
+        boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < settings.numGlobalRandomPrivateVehicles;
+        boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < settings.numGlobalRandomTrams;
+        boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < settings.numGlobalRandomBuses;
 
         // Clear vehicle counts from last step
         numInternalNonPubVehiclesAtAllWorkers = 0;
@@ -282,8 +288,8 @@ public class SimServerData {
 
     public void updateNoOfVehiclesNeededAtStart(int vehiclesInRouteLoader) {
         // Get number of vehicles needed
-        numVehiclesNeededAtStart = vehiclesInRouteLoader + Settings.numGlobalRandomPrivateVehicles
-                + Settings.numGlobalRandomTrams + Settings.numGlobalRandomBuses;
+        numVehiclesNeededAtStart = vehiclesInRouteLoader + settings.numGlobalRandomPrivateVehicles
+                + settings.numGlobalRandomTrams + settings.numGlobalRandomBuses;
     }
 
     public ArrayList<Node> getNodesToAddLight() {
@@ -314,49 +320,49 @@ public class SimServerData {
     public boolean setupForExperimentSimulation(Experiment experiment) {
         boolean isNewMap = false;
 
-        Settings.isDriveOnLeft = experiment.isDriveOnLeft();
-        Settings.maxNumSteps = experiment.getMaxNumSteps();
-        Settings.numGlobalRandomPrivateVehicles = experiment.getNumRandomPrivateVehicles();
-        Settings.numGlobalRandomTrams = experiment.getNumRandomTrams();
-        Settings.numGlobalRandomBuses = experiment.getNumRandomBusses();
+        settings.isDriveOnLeft = experiment.isDriveOnLeft();
+        settings.maxNumSteps = experiment.getMaxNumSteps();
+        settings.numGlobalRandomPrivateVehicles = experiment.getNumRandomPrivateVehicles();
+        settings.numGlobalRandomTrams = experiment.getNumRandomTrams();
+        settings.numGlobalRandomBuses = experiment.getNumRandomBusses();
         if (experiment.getForegroundVehicleFile() != null && !experiment.getForegroundVehicleFile().equals("-")) {
-            Settings.inputForegroundVehicleFile = experiment.getForegroundVehicleFile();
+            settings.inputForegroundVehicleFile = experiment.getForegroundVehicleFile();
         } else {
-            Settings.inputForegroundVehicleFile = "";
+            settings.inputForegroundVehicleFile = "";
         }
-        Settings.inputOnlyODPairsOfForegroundVehicleFile = experiment.isLoadOnlyODPairs();
+        settings.inputOnlyODPairsOfForegroundVehicleFile = experiment.isLoadOnlyODPairs();
         if (experiment.getBackgroundVehicleFile() != null && !experiment.getBackgroundVehicleFile().equals("-")) {
-            Settings.inputBackgroundVehicleFile = experiment.getBackgroundVehicleFile();
+            settings.inputBackgroundVehicleFile = experiment.getBackgroundVehicleFile();
         } else {
-            Settings.inputBackgroundVehicleFile = "";
+            settings.inputBackgroundVehicleFile = "";
         }
-        Settings.isOutputSimulationLog = experiment.isOutputSimulationLog();
-//		Settings.isOutputForegroundTravelTime = experiment.isOutputForegroundTravelTime();
-        Settings.isOutputTrajectory = experiment.isOutputTrajectory();
-        Settings.isOutputInitialRoutes = experiment.isOutputInitialRoute();
-        Settings.lookAheadDistance = experiment.getLookAheadDistance();
-        Settings.numStepsPerSecond = experiment.getNumStepsPerSecond();
-        Settings.isServerBased = experiment.isServerBased();
+        settings.isOutputSimulationLog = experiment.isOutputSimulationLog();
+//		settings.isOutputForegroundTravelTime = experiment.isOutputForegroundTravelTime();
+        settings.isOutputTrajectory = experiment.isOutputTrajectory();
+        settings.isOutputInitialRoutes = experiment.isOutputInitialRoute();
+        settings.lookAheadDistance = experiment.getLookAheadDistance();
+        settings.numStepsPerSecond = experiment.getNumStepsPerSecond();
+        settings.isServerBased = experiment.isServerBased();
         if (experiment.getOsmMapFile() != null && !experiment.getOsmMapFile().equals("-")) {
-            Settings.inputOpenStreetMapFile = experiment.getOsmMapFile();
+            settings.inputOpenStreetMapFile = experiment.getOsmMapFile();
             isNewMap = true;
         } else {
-            Settings.inputOpenStreetMapFile = "";
+            settings.inputOpenStreetMapFile = "";
         }
-        Settings.trafficLightTiming = experiment.getTrafficLightTiming();
-        Settings.routingAlgorithm = experiment.getRoutingAlgorithm();
-        Settings.trafficReportStepGapInServerlessMode = experiment.getTrafficReportStepGapInServerlessMode();
-        Settings.isAllowReroute = experiment.isAllowReroute();
-        Settings.downloadDirectory = experiment.getDownLoadDirectory();
-        Settings.testName = experiment.getTestName();
-        Settings.odDistributor = experiment.getOdDistributor();
-        Settings.temporalDistributor = experiment.getTemporalDistributor();
-        Settings.simulationListener = experiment.getSimulationListener();
-        Settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
-        Settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
-        Settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
-        Settings.updateStepInterval = experiment.getUpdateStepInterval();
-        Settings.tlManager = experiment.getTlManager();
+        settings.trafficLightTiming = experiment.getTrafficLightTiming();
+        settings.routingAlgorithm = experiment.getRoutingAlgorithm();
+        settings.trafficReportStepGapInServerlessMode = experiment.getTrafficReportStepGapInServerlessMode();
+        settings.isAllowReroute = experiment.isAllowReroute();
+        settings.downloadDirectory = experiment.getDownLoadDirectory();
+        settings.testName = experiment.getTestName();
+        settings.odDistributor = experiment.getOdDistributor();
+        settings.temporalDistributor = experiment.getTemporalDistributor();
+        settings.simulationListener = experiment.getSimulationListener();
+        settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
+        settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
+        settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
+        settings.updateStepInterval = experiment.getUpdateStepInterval();
+        settings.tlManager = experiment.getTlManager();
 
         return isNewMap;
     }
@@ -370,7 +376,7 @@ public class SimServerData {
     }
 
     public void startMultipleExperimentRunning() {
-        scriptLoader.loadScriptFile();
+        scriptLoader.loadScriptFile(settings.inputSimulationScript);
         experiments = scriptLoader.getExperiments();
         experimentIndex = 0;
         runIndex = 1;
@@ -394,10 +400,10 @@ public class SimServerData {
     }
 
     public void resetVariablesEndOfExperiment(){
-        Settings.testName = Settings.defaultTestName;
-        Settings.downloadDirectory = Settings.defaultDownloadDirectory;
+        settings.testName = settings.defaultTestName;
+        settings.downloadDirectory = settings.defaultDownloadDirectory;
         experimentIndex = 0;
-        runIndex = Settings.defaultRunIndex;
+        runIndex = settings.defaultRunIndex;
         experiments = null;
     }
 
@@ -422,23 +428,23 @@ public class SimServerData {
     }
 
     public boolean loadScript() {
-        return scriptLoader.loadScriptFile();
+        return scriptLoader.loadScriptFile(settings.inputSimulationScript);
     }
 
 
     public boolean isSimulationStopReached(){
-        if(getStep() < Settings.maxNumSteps){
+        if(getStep() < settings.maxNumSteps){
             return false;
         }else{
-            if(Settings.stopsAtMaxSteps) {
+            if(settings.stopsAtMaxSteps) {
                 return true;
             }else{
                 if (notFinishedVehicles > 0) {
-                    if ((getStep() - lastVehicleFinishedStep) > Settings.gridlockDetectionTime * Settings.numStepsPerSecond) {
+                    if ((getStep() - lastVehicleFinishedStep) > settings.gridlockDetectionTime * settings.numStepsPerSecond) {
                         System.out.println("Deadlock Reached at step " + getStep());
                         return true;
                     } else {
-                        Settings.maxNumSteps += 100;
+                        settings.maxNumSteps += 100;
                         System.out.println("Max step count extended at step " + getStep());
                         return false;
                     }

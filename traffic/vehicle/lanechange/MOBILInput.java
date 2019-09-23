@@ -41,8 +41,10 @@ public class MOBILInput {
     private int towardsRoadSideOnlyLanes;
     private int awayFromRoadSideOnlyLanes;
     private VehicleType type;
+    private Settings settings;
 
-    public MOBILInput(Lane lane, List<RouteLeg> routeLookAhead, VehicleType type) {
+    public MOBILInput(Settings settings, Lane lane, List<RouteLeg> routeLookAhead, VehicleType type) {
+        this.settings = settings;
         this.lane = lane;
         this.routeLookAhead = routeLookAhead;
         this.aboutToTurnTowardsRoadSide = false;
@@ -78,10 +80,10 @@ public class MOBILInput {
                 // Vehicle is going to make U-turn
                 aboutToTurnAwayFromRoadSide = true;
             } else if (!e1.name.equals(e2.name) || (e1.type != e2.type)) {
-                final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * Settings.lonVsLat,
-                        e1.endNode.lon, e1.endNode.lat * Settings.lonVsLat);
-                final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * Settings.lonVsLat);
-                if(Settings.isDriveOnLeft) {
+                final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * settings.lonVsLat,
+                        e1.endNode.lon, e1.endNode.lat * settings.lonVsLat);
+                final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * settings.lonVsLat);
+                if(settings.isDriveOnLeft) {
                     if (ccw < 0) {
                         aboutToTurnTowardsRoadSide = true;
                     } else if (ccw > 0) {
@@ -99,7 +101,7 @@ public class MOBILInput {
     }
 
     public void updateLanes(){
-        if(Settings.isDriveOnLeft){
+        if(settings.isDriveOnLeft){
             towardsRoadSideOnlyLanes = lane.edge.numLeftOnlyLanes;
             awayFromRoadSideOnlyLanes = lane.edge.numRightOnlyLanes;
         }else{
@@ -142,7 +144,7 @@ public class MOBILInput {
 
     public boolean isEncouragedToGiveWayToPriorityVehicles(){
         return lane.edge.isEdgeOnPathOfPriorityVehicle() && (type != VehicleType.PRIORITY)
-                && (Settings.emergencyStrategy != EmergencyStrategy.Flexible);
+                && (settings.emergencyStrategy != EmergencyStrategy.Flexible);
     }
 
     public boolean isALaneChangingVehicle(){

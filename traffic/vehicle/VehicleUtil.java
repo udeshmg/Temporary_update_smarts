@@ -78,11 +78,11 @@ public class VehicleUtil {
 	 * Check whether a vehicle can travel from one node to another through an
 	 * edge
 	 */
-	public static boolean canGoThrough(final Node nodeStart, final Node nodeEnd, final VehicleType vehicleType) {
+	public static boolean canGoThrough(final Node nodeStart, final Node nodeEnd, final VehicleType vehicleType, boolean isAllowPriorityVehicleUseTramTrack) {
 		for (final Edge e : nodeStart.outwardEdges) {
 			if (e.endNode == nodeEnd) {
 				if (e.type == RoadType.tram) {
-					if ((vehicleType == VehicleType.PRIORITY) && !Settings.isAllowPriorityVehicleUseTramTrack) {
+					if ((vehicleType == VehicleType.PRIORITY) && !isAllowPriorityVehicleUseTramTrack) {
 						return false;
 					} else if ((vehicleType != VehicleType.PRIORITY) && (vehicleType != VehicleType.TRAM)) {
 						return false;
@@ -105,28 +105,28 @@ public class VehicleUtil {
 	}
 
 
-	public static boolean isNeedLaneChangeForTurn(Edge edgeBeingChecked, Vehicle vehicle){
+	public static boolean isNeedLaneChangeForTurn(Edge edgeBeingChecked, Vehicle vehicle, boolean isDriveOnLeft){
         int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,
                 vehicle.lane.laneNumber);
         boolean isNeedToBlock = false;
-        if (Settings.isDriveOnLeft) {
+        if (isDriveOnLeft) {
             if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
                     && laneNumberBeingChecked >= edgeBeingChecked.numLeftLanes
-                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
+                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked, isDriveOnLeft)) {
                 isNeedToBlock = true;
             } else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
                     && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numRightLanes
-                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
+                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked, isDriveOnLeft)) {
                 isNeedToBlock = true;
             }
         } else {
             if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
                     && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numLeftLanes
-                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked)) {
+                    && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked, isDriveOnLeft)) {
                 isNeedToBlock = true;
             } else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
                     && laneNumberBeingChecked >= edgeBeingChecked.numRightLanes
-                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked)) {
+                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked, isDriveOnLeft)) {
                 isNeedToBlock = true;
             }
         }

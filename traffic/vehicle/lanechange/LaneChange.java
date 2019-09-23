@@ -1,5 +1,6 @@
 package traffic.vehicle.lanechange;
 
+import common.Settings;
 import traffic.vehicle.Vehicle;
 
 /**
@@ -12,9 +13,9 @@ public class LaneChange {
 	//MOBIL mobil;
 	MOBIL_OLD mobil;
 
-	public LaneChange() {
+	public LaneChange(Settings settings) {
 		//mobil = new MOBIL();
-		mobil = new MOBIL_OLD();
+		mobil = new MOBIL_OLD(settings);
 	}
 
 	/**

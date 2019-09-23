@@ -42,13 +42,13 @@ public class LightCoordinator {
 	 * Group nodes with traffic signals. Nodes in the same group are within
 	 * certain distance to each other.
 	 */
-	void groupAdjacentNodes(final List<Node> lightNodes) {
+	void groupAdjacentNodes(final List<Node> lightNodes, TrafficLightTiming trafficLightTiming, double maxLightGroupRadius) {
 		nodeGroups.clear();
 
 		for (final Node node : lightNodes) {
 			node.idLightNodeGroup = 0;
 		}
-		if (Settings.trafficLightTiming == TrafficLightTiming.NONE) {
+		if (trafficLightTiming == TrafficLightTiming.NONE) {
 			return;
 		}
 		/*
@@ -73,7 +73,7 @@ public class LightCoordinator {
 					continue;
 				}
 				if (RoadUtil.getDistInMeters(node.lat, node.lon, otherNode.lat,
-						otherNode.lon) < Settings.maxLightGroupRadius) {
+						otherNode.lon) < maxLightGroupRadius) {
 					nodeGroup.add(otherNode);
 					otherNode.idLightNodeGroup = idNodeGroup;
 
@@ -87,9 +87,9 @@ public class LightCoordinator {
 	/**
 	 * Group inward edges based on the street names in node groups.
 	 */
-	void groupInwardEdges() {
+	void groupInwardEdges(TrafficLightTiming trafficLightTiming) {
 		lightClusters.clear();
-		if (Settings.trafficLightTiming == TrafficLightTiming.NONE) {
+		if (trafficLightTiming == TrafficLightTiming.NONE) {
 			return;
 		}
 
@@ -151,14 +151,14 @@ public class LightCoordinator {
 		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
 
 		// Groups adjacent nodes with traffic lights based on distance.
-		groupAdjacentNodes(mapNodes);
+		groupAdjacentNodes(mapNodes, trafficNetwork.getSettings().trafficLightTiming, trafficNetwork.getSettings().maxLightGroupRadius);
 		System.out.println("Grouped adjacent traffic lights.");
 
 		// Groups inward edges of the grouped nodes.
-		groupInwardEdges();
+		groupInwardEdges(trafficNetwork.getSettings().trafficLightTiming);
 		System.out.println("Divided lights in each light group based on street names.");
 
-		tlManager = Settings.getLightScheduler();
+		tlManager = trafficNetwork.getSettings().getLightScheduler();
 		if(tlManager != null){
 			tlManager.setClusters(lightClusters);
 			tlManager.init(trafficNetwork);

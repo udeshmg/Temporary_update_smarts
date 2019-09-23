@@ -1,5 +1,6 @@
 package processor;
 
+import common.Settings;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
 
@@ -38,4 +39,5 @@ public interface SimulationProcessor {
     void setupNewSim();
     void setupMultipleSim();
     boolean loadScript();
+    Settings getSettings();
 }

@@ -105,13 +105,18 @@ public class Worker implements MessageHandler, Runnable {
 	boolean isPausingServerlessSim;
 	Thread singleWorkerServerlessThread = new Thread();//Used when this worker is the only worker in server-less mode
 	protected int numVehicleCreatedSinceLastSetupProgressReport = 0;
-	protected SimWorkerData data = new SimWorkerData();
+	protected SimWorkerData data;
+	Settings settings;
 
+	public Worker(){
+		settings = new Settings();
+		data = new SimWorkerData(settings);
+	}
 	
 	void buildThreadForSingleWorkerServerlessSimulation() {
 		singleWorkerServerlessThread = new Thread() {
 			public void run() {
-				while (data.getStep() < Settings.maxNumSteps) {
+				while (data.getStep() < settings.maxNumSteps) {
 					if (!isDuringServerlessSim) {
 						break;
 					}
@@ -134,8 +139,8 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	public void sendTrafficReportInServerlessMode() {
-		if ((data.getStep() + 1) % Settings.trafficReportStepGapInServerlessMode == 0) {
-			senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
+		if ((data.getStep() + 1) % settings.trafficReportStepGapInServerlessMode == 0) {
+			senderForServer.send(new Message_WS_TrafficReport(settings, name, data.getStep(), data.getTrafficNetwork()));
 			data.clearReportedTrafficData();
 		}
 	}
@@ -159,7 +164,7 @@ public class Worker implements MessageHandler, Runnable {
 		for (final Fellow fellow : fellowWorkers) {
 			for (final Edge e : fellow.inwardEdgesAcrossBorder) {
 				edgeSet.add(e);
-				edgeSet.addAll(findInwardEdgesWithinCertainDistance(e.startNode, 0, 28.0 / Settings.numStepsPerSecond,
+				edgeSet.addAll(findInwardEdgesWithinCertainDistance(e.startNode, 0, 28.0 / settings.numStepsPerSecond,
 						edgeSet));
 			}
 		}
@@ -222,10 +227,10 @@ public class Worker implements MessageHandler, Runnable {
 	 */
 	void join() {
 		// Get IP address
-		address = SysUtil.getMyIpV4Addres();
+		address = SysUtil.getMyIpV4Addres(settings.isSharedJVM);
 		// Find an available port
-		listeningPort = Settings.serverListeningPortForWorkers + 1
-				+ (new Random()).nextInt(65535 - Settings.serverListeningPortForWorkers);
+		listeningPort = settings.serverListeningPortForWorkers + 1
+				+ (new Random()).nextInt(65535 - settings.serverListeningPortForWorkers);
 		while (true) {
 			try {
 				final ServerSocket ss = new ServerSocket(listeningPort);
@@ -238,7 +243,7 @@ public class Worker implements MessageHandler, Runnable {
 		}
 		connectionBuilder = new IncomingConnectionBuilder(listeningPort, this);
 		connectionBuilder.start();
-		senderForServer = new MessageSender(Settings.serverAddress, Settings.serverListeningPortForWorkers);
+		senderForServer = new MessageSender(settings.serverAddress, settings.serverListeningPortForWorkers);
 		name = SysUtil.getRandomID(4);
 		workarea = new Workarea(name, null);
 		senderForServer.send(new Message_WS_Join(name, address, listeningPort));
@@ -249,13 +254,13 @@ public class Worker implements MessageHandler, Runnable {
 		processCachedReceivedTraffic();
 
 		if (isAllFellowsAtState(FellowState.SHARED)) {
-			if (Settings.isServerBased) {
+			if (settings.isServerBased) {
 				senderForServer.send(new Message_WS_ServerBased_SharedMyTrafficWithNeighbor(name));
 			} else if (isDuringServerlessSim) {
 				sendTrafficReportInServerlessMode();
 
 				// Proceed to next step or finish
-				if (data.getStep() >= Settings.maxNumSteps) {
+				if (data.getStep() >= settings.maxNumSteps) {
 					senderForServer
 							.send(new Message_WS_Serverless_Complete(name, data.getStep(), data.getTrafficNetwork().getVehicleCount()));
 					resetTraffic();
@@ -346,7 +351,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	void processReceivedSimulationConfiguration(final Message_SW_Setup received) {
-		received.setupFromMessage();
+		received.setupFromMessage(settings);
 		data.setStep(received.startStep);
 		data.resetVariables(received.numRandomPrivateVehicles, received.numRandomTrams, received.numRandomBuses);
 
@@ -444,7 +449,7 @@ public class Worker implements MessageHandler, Runnable {
 		};
 		final Timer progressTimer = new Timer();
 		final Random random = new Random();
-		if (Settings.isVisualize) {
+		if (settings.isVisualize) {
 			progressTimer.scheduleAtFixedRate(progressTimerTask, 500, random.nextInt(1000) + 1);
 		}
 		data.createVehicles(msg.externalRoutes);
@@ -480,7 +485,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	public void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
 		data.simulateOneStep(this, msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
-		senderForServer.send(new Message_WS_TrafficReport(name, data.getStep(), data.getTrafficNetwork()));
+		senderForServer.send(new Message_WS_TrafficReport(settings, name, data.getStep(), data.getTrafficNetwork()));
 		data.clearReportedTrafficData();
 	}
 
@@ -528,7 +533,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	private void onSWChangeSpeed(Message_SW_ChangeSpeed msg){
-		Settings.pauseTimeBetweenStepsInMilliseconds = msg.pauseTimeBetweenStepsInMilliseconds;
+		settings.pauseTimeBetweenStepsInMilliseconds = msg.pauseTimeBetweenStepsInMilliseconds;
 	}
 
 	private void onSWBlockLane(Message_SW_BlockLane msg){

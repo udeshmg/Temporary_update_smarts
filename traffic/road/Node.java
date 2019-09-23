@@ -1,5 +1,6 @@
 package traffic.road;
 
+import common.Settings;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.carfollow.SimpleCurve;
 
@@ -79,10 +80,12 @@ public class Node {
 	private Map<Node, Line2D> leftPavement = new HashMap<>();
 	private Map<Node, Line2D> rightPavement = new HashMap<>();
 	private Map<String, SimpleCurve> curveMap = new HashMap<>();
+	private Settings settings;
 
-	public Node(final long osmId, final String name, final double lat, final double lon, final boolean light,
+	public Node(Settings settings, final long osmId, final String name, final double lat, final double lon, final boolean light,
 			final boolean tram_stop, final boolean bus_stop) {
 		super();
+		this.settings = settings;
 		this.osmId = osmId;
 		this.name = name;
 		this.lat = lat;
@@ -194,10 +197,12 @@ public class Node {
 			Line2D pavement = null;
 			Line2D directionCorrected = null;
 			if (inwardEdge != null) {
-				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(0));
+				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(0), settings.isDriveOnLeft,
+						settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
 			} else {
-				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(outwardEdge.getLaneCount() - 1));
+				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(outwardEdge.getLaneCount() - 1),
+						settings.isDriveOnLeft, settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = pavement;
 			}
 			leftPavement.put(node, directionCorrected);
@@ -212,10 +217,12 @@ public class Node {
 			Line2D pavement = null;
 			Line2D directionCorrected = null;
 			if (outwardEdge != null) {
-				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(0));
+				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(0),
+						settings.isDriveOnLeft, settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = pavement;
 			} else {
-				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(inwardEdge.getLaneCount() - 1));
+				pavement = RoadUtil.getPavementGPS(inwardEdge.getLane(inwardEdge.getLaneCount() - 1),
+						settings.isDriveOnLeft, settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
 			}
 			rightPavement.put(node, directionCorrected);

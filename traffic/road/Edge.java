@@ -179,8 +179,8 @@ public class Edge {
 		return null;
 	}
 
-	public boolean isAllLanesOnLeftBlocked(int laneNumber){
-		if (Settings.isDriveOnLeft) {
+	public boolean isAllLanesOnLeftBlocked(int laneNumber, boolean isDriveOnLeft){
+		if (isDriveOnLeft) {
 			for (int num = laneNumber - 1; num >= 0; num--) {
 				if (!lanes.get(num).isBlocked) {
 					return false;
@@ -196,8 +196,8 @@ public class Edge {
 		return true;
 	}
 
-	public boolean isAllLanesOnRightBlocked(int laneNumber) {
-		if (Settings.isDriveOnLeft) {
+	public boolean isAllLanesOnRightBlocked(int laneNumber, boolean isDriveOnLeft) {
+		if (isDriveOnLeft) {
 			for (int num = laneNumber + 1; num < lanes.size(); num++) {
 				if (!lanes.get(num).isBlocked) {
 					return false;
@@ -247,13 +247,13 @@ public class Edge {
 		return null;
 	}
 
-	public boolean isSuitableForRouteEndOfInternalVehicle() {
-		return  !(length < Settings.minLengthOfRouteStartEndEdge) && !isRoundabout;
+	public boolean isSuitableForRouteEndOfInternalVehicle(double minLengthOfRouteStartEndEdge) {
+		return  !(length < minLengthOfRouteStartEndEdge) && !isRoundabout;
 	}
 
-	public boolean isSuitableForRouteStartOfInternalVehicle(List<GridCell> workareaCells) {
+	public boolean isSuitableForRouteStartOfInternalVehicle(List<GridCell> workareaCells, double minLengthOfRouteStartEndEdge) {
 		// Note: route cannot start from cross-border edge at the starting side of the edge. This is to prevent problem in transferring of vehicle.
-		return  !(length < Settings.minLengthOfRouteStartEndEdge) && !isRoundabout && workareaCells.contains(endNode.gridCell);
+		return  !(length < minLengthOfRouteStartEndEdge) && !isRoundabout && workareaCells.contains(endNode.gridCell);
 	}
 
 	public boolean isOnTwoWayRoad() {
@@ -371,9 +371,9 @@ public class Edge {
 		return getLaneChangeWaitingPos() - v.driverProfile.IDM_s0 - v.length - v.driverProfile.IDM_s0 - 0.0001;
 	}
 
-	public double getBeforeTurnLaneChangePos(Vehicle vehicle){
+	public double getBeforeTurnLaneChangePos(Vehicle vehicle, boolean isDriveOnLeft){
 	    if(!laneChangePositions.containsKey(vehicle) && vehicle.lane.edge == this){
-			updateLaneChangeConflicts();
+			updateLaneChangeConflicts(isDriveOnLeft);
 		}
 		Double val = laneChangePositions.get(vehicle);
 	    if(val != null){
@@ -384,11 +384,11 @@ public class Edge {
 		}
     }
 
-	public List<Vehicle> laneChangeNeedVehicles(){
+	public List<Vehicle> laneChangeNeedVehicles(boolean isDriveOnLeft){
 		List<Vehicle> vehicles = new ArrayList<>();
 		for (Lane lane : lanes) {
 			for (Vehicle v: lane.getVehicles()) {
-				if(!v.isWithinLaneChangeProhibitedArea() && VehicleUtil.isNeedLaneChangeForTurn(this, v)){
+				if(!v.isWithinLaneChangeProhibitedArea() && VehicleUtil.isNeedLaneChangeForTurn(this, v, isDriveOnLeft)){
 					vehicles.add(v);
 				}
 			}
@@ -408,11 +408,11 @@ public class Edge {
 		return vehicles;
 	}
 
-	public void updateLaneChangeConflicts(){
+	public void updateLaneChangeConflicts(boolean isDriveOnLeft){
 		laneChangePositions.clear();
 		currentVehicleInBeforeTurnLaneChangePos = null;
 		chanceGivingVehicles.clear();
-		List<Vehicle> vehicles = laneChangeNeedVehicles();
+		List<Vehicle> vehicles = laneChangeNeedVehicles(isDriveOnLeft);
 		for (int i = 0; i < vehicles.size(); i++) {
 			Vehicle current = vehicles.get(i);
 			if(i == 0){
@@ -425,11 +425,11 @@ public class Edge {
 		}
 	}
 
-	public void findChanceGivingVehicle(){
+	public void findChanceGivingVehicle(boolean isDriveOnLeft){
 		for (Lane lane : lanes) {
 			for (Vehicle vehicle : lane.getVehicles()) {
 				Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
-				if(vehicle != v && vehicle.headPosition < getLaneChangeGiveChancePos() && VehicleUtil.isNeedLaneChangeForTurn(lane.edge, vehicle)){
+				if(vehicle != v && vehicle.headPosition < getLaneChangeGiveChancePos() && VehicleUtil.isNeedLaneChangeForTurn(lane.edge, vehicle,isDriveOnLeft)){
 					chanceGivingVehicles.add(vehicle);
 				}
 				if(vehicle.headPosition < getLaneChangeGiveChancePos() - vehicle.speed * (vehicle.driverProfile.IDM_T*vehicle.getHeadWayMultiplier())) {
@@ -447,11 +447,11 @@ public class Edge {
 		return false;
 	}
 
-	public boolean hasSpaceForAvehicleInBack(Lane lane, Vehicle vehicle){
+	public boolean hasSpaceForAvehicleInBack(Lane lane, Vehicle vehicle, double minTimeSafeToCrossIntersection){
 		Vehicle last = lane.getLastVehicleInLane();
 		double startPos = lane.edge.length - lane.edge.getEndIntersectionSize();
 		if(last != null){
-			startPos = last.headPosition - last.length + last.speed * Settings.minTimeSafeToCrossIntersection;
+			startPos = last.headPosition - last.length + last.speed * minTimeSafeToCrossIntersection;
 		}
 		double expectedFill = 0;
 		for (Vehicle v : lane.vehiclesStartedMovingTowards(vehicle)) {

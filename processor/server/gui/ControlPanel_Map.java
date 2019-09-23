@@ -49,9 +49,11 @@ public class ControlPanel_Map extends JPanel {
 	public final JLabel lblSelectablePlaces;
 
 	private final GUI gui;
+	private Settings settings;
 
-	public ControlPanel_Map(final GUI gui) {
+	public ControlPanel_Map(final GUI gui, Settings settings) {
 		this.gui = gui;
+		this.settings = settings;
 		setPreferredSize(new Dimension(450, 466));
 
 		// Set default directory of file chooser
@@ -67,7 +69,7 @@ public class ControlPanel_Map extends JPanel {
 
 		btnLoadOpenstreetmapFile = new JButton("Import roads from OpenStreetMap file");
 		btnLoadOpenstreetmapFile.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		loadRegionCentroids();
+		loadRegionCentroids(settings.inputBuiltinAdministrativeRegionCentroid);
 		fillCountryNameToList();
 
 		lblSelectablePlaces = new JLabel("Road map areas");
@@ -148,7 +150,7 @@ public class ControlPanel_Map extends JPanel {
 				final int returnVal = fc.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					final File file = fc.getSelectedFile();
-					Settings.inputOpenStreetMapFile = file.getPath();
+					settings.inputOpenStreetMapFile = file.getPath();
 					gui.changeMap();
 				}
 			}
@@ -178,10 +180,10 @@ public class ControlPanel_Map extends JPanel {
 		listCountryName.setModel(listModel);
 	}
 
-	void loadRegionCentroids() {
+	void loadRegionCentroids(String inputBuiltinAdministrativeRegionCentroid) {
 		try {
 			final InputStream inputStream = getClass()
-					.getResourceAsStream(Settings.inputBuiltinAdministrativeRegionCentroid);
+					.getResourceAsStream(inputBuiltinAdministrativeRegionCentroid);
 			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 			String line = bufferedReader.readLine();// Skip first line
 			while ((line = bufferedReader.readLine()) != null) {

@@ -58,9 +58,9 @@ public class Vehicle {
 
 	public Edge edgeBeforeTurnRight = null;
 	public Edge edgeBeforeTurnLeft = null;
-	private LaneChange laneChange = new LaneChange();
-	private CarFollow carFollow = new CarFollow();
-	private LaneDecider laneDecider = Settings.getLaneDecider();
+	private LaneChange laneChange;
+	private CarFollow carFollow;
+	private LaneDecider laneDecider;
 	private boolean finished = false;
 	private boolean reachedFellow = false;
 
@@ -73,6 +73,14 @@ public class Vehicle {
 	private Lane laneBeforeChange = null;
 	private Node start;
 	private Node end;
+	private Settings settings;
+
+	public Vehicle(Settings settings){
+		this.settings = settings;
+		this.carFollow = new CarFollow(settings);
+		this.laneChange = new LaneChange(settings);
+		this.laneDecider = settings.getLaneDecider();
+	}
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -138,7 +146,7 @@ public class Vehicle {
 			// Pick a random position within a random gap
 			final double[] gap = validGaps.get(random.nextInt(validGaps.size()));
 
-			final double pos = gap[1] + (random.nextDouble() * (gap[0] - gap[1]) * Settings.startPosOffset);
+			final double pos = gap[1] + (random.nextDouble() * (gap[0] - gap[1]) * settings.startPosOffset);
 			return pos;
 		}
 	}
@@ -172,7 +180,7 @@ public class Vehicle {
 		double effectiveLength = laneLength - minGapBack - minGapFront;
 		List<double[]> validGaps = new ArrayList<>();
 		for (double[] gap : gaps) {
-			if (gap[1] <= (minGapBack) + (Settings.startGapOffset) * effectiveLength) {
+			if (gap[1] <= (minGapBack) + (settings.startGapOffset) * effectiveLength) {
 				validGaps.add(gap);
 			}
 		}
@@ -230,7 +238,7 @@ public class Vehicle {
 				|| ((timeNow - timeOfLastLaneChange) < driverProfile.minLaneChangeTimeGap))) {
 
 			LaneChangeDirection laneChangeDecision = LaneChangeDirection.SAME;
-			MOBILInput mobilInput = new MOBILInput(lane, getRouteInLookAheadDistance(), type);
+			MOBILInput mobilInput = new MOBILInput(settings, lane, getRouteInLookAheadDistance(), type);
 			laneChangeDecision = laneChange.decideLaneChange(mobilInput, this);
 
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
@@ -267,7 +275,7 @@ public class Vehicle {
 			}
 			examinedDist += routeLegs.get(indexLegOnRouteBeingChecked).edge.length;
 			// Proceeds to the next leg on route if look-ahead distance is not exhausted
-			if (((examinedDist - headPosition) < Settings.lookAheadDistance)
+			if (((examinedDist - headPosition) < settings.lookAheadDistance)
 					&& (indexLegOnRouteBeingChecked < (routeLegs.size() - 1))) {
 				indexLegOnRouteBeingChecked++;
 			} else {
@@ -289,9 +297,9 @@ public class Vehicle {
 				// Vehicle is going to make U-turn
 				edgeBeforeTurnRight = e1;
 			} else if (!e1.name.equals(e2.name) || (e1.type != e2.type)) {
-				final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * Settings.lonVsLat,
-						e1.endNode.lon, e1.endNode.lat * Settings.lonVsLat);
-				final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * Settings.lonVsLat);
+				final Line2D.Double e1Seg = new Line2D.Double(e1.startNode.lon, e1.startNode.lat * settings.lonVsLat,
+						e1.endNode.lon, e1.endNode.lat * settings.lonVsLat);
+				final int ccw = e1Seg.relativeCCW(e2.endNode.lon, e2.endNode.lat * settings.lonVsLat);
 				if (ccw < 0) {
 					edgeBeforeTurnLeft = e1;
 				} else if (ccw > 0) {
@@ -304,7 +312,7 @@ public class Vehicle {
 			}
 
 			examinedDist += e1.length;
-			if (((examinedDist - headPosition) < Settings.lookAheadDistance)
+			if (((examinedDist - headPosition) < settings.lookAheadDistance)
 					&& (indexLegOnRouteBeingChecked < (routeLegs.size() - 1))) {
 				indexLegOnRouteBeingChecked++;
 			} else {
@@ -319,7 +327,7 @@ public class Vehicle {
 		for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
 			final Edge e1 = routeLegs.get(i).edge;
 			examinedDist += e1.length;
-			if((examinedDist - headPosition) < Settings.lookAheadDistance){
+			if((examinedDist - headPosition) < settings.lookAheadDistance){
 				legsAhead.add(routeLegs.get(i));
 			}else{
 				break;
@@ -339,7 +347,7 @@ public class Vehicle {
 			// Find impeding objects and compute acceleration based on the objects
 			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			// Update vehicle speed, which must be between 0 and free-flow speed
-			speed += acceleration / Settings.numStepsPerSecond;
+			speed += acceleration / settings.numStepsPerSecond;
 			if (speed > lane.edge.freeFlowSpeed) {
 				speed = lane.edge.freeFlowSpeed;
 			}
@@ -348,7 +356,7 @@ public class Vehicle {
 			}
 			// Vehicle cannot collide with its impeding object
 			final double distToImpedingObjectAtNextStep = distToImpedingObject
-					+ ((spdOfImpedingObject - speed) / Settings.numStepsPerSecond);
+					+ ((spdOfImpedingObject - speed) / settings.numStepsPerSecond);
 			if (distToImpedingObjectAtNextStep < driverProfile.IDM_s0) {
 				speed = 0;
 				acceleration = 0;
@@ -357,7 +365,7 @@ public class Vehicle {
 			/*
 			 * Move forward in the current lane
 			 */
-			headPosition += speed / Settings.numStepsPerSecond;
+			headPosition += speed / settings.numStepsPerSecond;
 
 			if(speed > 0){
 				lastSpeedChangeTime = timeNow;
@@ -366,7 +374,7 @@ public class Vehicle {
 			/*
 			 * Reset jam start time if vehicle is not in jam
 			 */
-			if (speed > Settings.congestionSpeedThreshold) {
+			if (speed > settings.congestionSpeedThreshold) {
 				timeJamStart = timeNow;
 			}
 
@@ -384,12 +392,12 @@ public class Vehicle {
 
 	public void updateHeadway(){
 		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
-		setHeadWayMultiplier(routeLeg.getHeadwayMultiplier(headPosition));
+		setHeadWayMultiplier(routeLeg.getHeadwayMultiplier(headPosition, settings.safetyHeadwayMultiplier));
 	}
 
 	public double getInstructedAcc(double timeNow){
 		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
-		double deltaT = 1/Settings.numStepsPerSecond;
+		double deltaT = 1/settings.numStepsPerSecond;
 		double s = routeLeg.getTargetPosition(timeNow + deltaT);
 		if(s < 0){
 			return Double.POSITIVE_INFINITY;
@@ -403,9 +411,9 @@ public class Vehicle {
 			if(laneBeforeChange != lane || headPosition > lane.edge.getEndIntersectionLaneChangeProhibitedPos()){
 				//The vehicle has changed the lane or gone beyond the waiting position
 				laneBeforeChange = null;
-				lane.edge.updateLaneChangeConflicts();
+				lane.edge.updateLaneChangeConflicts(settings.isDriveOnLeft);
 			}else if(headPosition > lane.edge.getLaneChangeGiveChancePos()){
-				lane.edge.findChanceGivingVehicle();
+				lane.edge.findChanceGivingVehicle(settings.isDriveOnLeft);
 			}
 		}
 	}
@@ -441,10 +449,10 @@ public class Vehicle {
 				if (edge.endNode.tramStop && ((examinedDist - headPosition) < (2 * brakingDist))
 						&& ((examinedDist - headPosition) > brakingDist) && (edge.timeNoTramStopping <= 0)
 						&& (edge.timeTramStopping <= 0)) {
-					edge.timeTramStopping = Settings.periodOfTrafficWaitForTramAtStop;
+					edge.timeTramStopping = settings.periodOfTrafficWaitForTramAtStop;
 					break;
 				}
-				if ((examinedDist - headPosition) > Settings.lookAheadDistance) {
+				if ((examinedDist - headPosition) > settings.lookAheadDistance) {
 					break;
 				}
 			}
@@ -469,7 +477,7 @@ public class Vehicle {
 			double examinedDist = 0;
 			int laneNumber = lane.laneNumber;
 			Edge edge = lane.edge;
-			while ((examinedDist < Settings.lookAheadDistance) && (indexLegOnRoute < (routeLegs.size() - 1))) {
+			while ((examinedDist < settings.lookAheadDistance) && (indexLegOnRoute < (routeLegs.size() - 1))) {
 				final Edge targetEdge = routeLegs.get(indexLegOnRoute).edge;
 				if (!isPriority) {
 					// Cancel priority status for all the lanes in the edge
@@ -543,7 +551,7 @@ public class Vehicle {
 		/*
 		 * Re-route vehicle in certain situations
 		 */
-		if ((type != VehicleType.TRAM) && (Settings.isAllowReroute)) {
+		if ((type != VehicleType.TRAM) && (settings.isAllowReroute)) {
 			boolean reRoute = false;
 			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
 			if (indexLegOnRoute < (getRouteLegs().size() - 1)) {
@@ -564,7 +572,7 @@ public class Vehicle {
 				// Increment reroute count
 				numReRoute++;
 				// Limit number of re-route for internal vehicle
-				if ((numReRoute > Settings.maxNumReRouteOfInternalVehicle) && !isExternal) {
+				if ((numReRoute > settings.maxNumReRouteOfInternalVehicle) && !isExternal) {
 					markAsFinished();
 				}
 			}

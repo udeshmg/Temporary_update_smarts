@@ -66,8 +66,10 @@ public class ControlPanel_MiscConfig extends JPanel {
     private JTextField txt_runMultipleSimulations;
     private JButton btn_changeMultipleSimulationFile;
     private JButton btn_runMultipleSimulation;
+    private Settings settings;
 
-	public ControlPanel_MiscConfig(final GUI gui) {
+	public ControlPanel_MiscConfig(Settings settings, final GUI gui) {
+		this.settings = settings;
 		this.gui = gui;
 		setPreferredSize(new Dimension(428, 641));
 
@@ -87,12 +89,12 @@ public class ControlPanel_MiscConfig extends JPanel {
 				final int returnVal = fc.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					final File file = fc.getSelectedFile();
-					Settings.inputSimulationScript = file.getPath();
+					settings.inputSimulationScript = file.getPath();
 				}
 				if (returnVal == JFileChooser.CANCEL_OPTION) {
-					Settings.inputSimulationScript = "";
+					settings.inputSimulationScript = "";
 				}
-				txt_runMultipleSimulations.setText(Settings.inputSimulationScript);
+				txt_runMultipleSimulations.setText(settings.inputSimulationScript);
 			}
 		});
 		btn_runMultipleSimulation = new JButton("Run Multiple Simulation");
@@ -111,10 +113,10 @@ public class ControlPanel_MiscConfig extends JPanel {
 				final int returnVal = fc.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					final File file = fc.getSelectedFile();
-					Settings.inputForegroundVehicleFile = file.getPath();
+					settings.inputForegroundVehicleFile = file.getPath();
 				}
 				if (returnVal == JFileChooser.CANCEL_OPTION) {
-					Settings.inputForegroundVehicleFile = "";
+					settings.inputForegroundVehicleFile = "";
 				}
 				refreshFileLabels();
 			}
@@ -134,10 +136,10 @@ public class ControlPanel_MiscConfig extends JPanel {
 				final int returnVal = fc.showOpenDialog(null);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					final File file = fc.getSelectedFile();
-					Settings.inputBackgroundVehicleFile = file.getPath();
+					settings.inputBackgroundVehicleFile = file.getPath();
 				}
 				if (returnVal == JFileChooser.CANCEL_OPTION) {
-					Settings.inputBackgroundVehicleFile = "";
+					settings.inputBackgroundVehicleFile = "";
 				}
 				refreshFileLabels();
 			}
@@ -236,7 +238,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		chckbxOutputTrajectory = new JCheckBox("Output vehicle trajectories");
 		chckbxOutputTrajectory.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent arg0) {
-				Settings.isOutputTrajectory = chckbxOutputTrajectory.isSelected();
+				settings.isOutputTrajectory = chckbxOutputTrajectory.isSelected();
 			}
 		});
 		chckbxOutputTrajectory.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -244,7 +246,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		chckbxDumpInitialRoutes = new JCheckBox("Output initial routes of vehicles");
 		chckbxDumpInitialRoutes.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent arg0) {
-				Settings.isOutputInitialRoutes = chckbxDumpInitialRoutes.isSelected();
+				settings.isOutputInitialRoutes = chckbxDumpInitialRoutes.isSelected();
 			}
 		});
 
@@ -254,7 +256,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		chckbxServerbased.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent arg0) {
-				Settings.isServerBased = chckbxServerbased.isSelected();
+				settings.isServerBased = chckbxServerbased.isSelected();
 
 			}
 		});
@@ -273,7 +275,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		chckbxOutputLog.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				Settings.isOutputSimulationLog = chckbxOutputLog.isSelected();
+				settings.isOutputSimulationLog = chckbxOutputLog.isSelected();
 			}
 		});
 
@@ -293,7 +295,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		chckbxExternalReroute.addActionListener(new ActionListener() {
 
 			public void actionPerformed(final ActionEvent e) {
-				Settings.isAllowReroute = chckbxExternalReroute.isSelected();
+				settings.isAllowReroute = chckbxExternalReroute.isSelected();
 			}
 		});
 		chckbxExternalReroute.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -303,8 +305,8 @@ public class ControlPanel_MiscConfig extends JPanel {
 		rdbtnLeftDrive.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				if (rdbtnLeftDrive.isSelected()) {
-					if (!Settings.isDriveOnLeft) {
-						Settings.isDriveOnLeft = true;
+					if (!settings.isDriveOnLeft) {
+						settings.isDriveOnLeft = true;
 						gui.changeMap();
 					}
 					rdbtnRightDrive.setSelected(false);
@@ -318,8 +320,8 @@ public class ControlPanel_MiscConfig extends JPanel {
 		rdbtnRightDrive.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				if (rdbtnRightDrive.isSelected()) {
-					if (Settings.isDriveOnLeft) {
-						Settings.isDriveOnLeft = false;
+					if (settings.isDriveOnLeft) {
+						settings.isDriveOnLeft = false;
 						gui.changeMap();
 					}
 					rdbtnLeftDrive.setSelected(false);
@@ -563,8 +565,8 @@ public class ControlPanel_MiscConfig extends JPanel {
 	}
 
 	void refreshFileLabels() {
-		textField_ForegroundRouteFile.setText(Settings.inputForegroundVehicleFile);
-		textField_BackgroundRouteFile.setText(Settings.inputBackgroundVehicleFile);
+		textField_ForegroundRouteFile.setText(settings.inputForegroundVehicleFile);
+		textField_BackgroundRouteFile.setText(settings.inputBackgroundVehicleFile);
 	}
 
 	boolean verifyParameterInput() {
@@ -623,37 +625,37 @@ public class ControlPanel_MiscConfig extends JPanel {
 		// Disable setup panel
 		GuiUtil.setEnabledStatusOfComponents(this, false);
 
-		Settings.numGlobalRandomPrivateVehicles = Integer.parseInt(textField_numRandomPrivateVehicles.getText());
-		Settings.numGlobalRandomTrams = Integer.parseInt(textField_numRandomTrams.getText());
-		Settings.numGlobalRandomBuses = Integer.parseInt(textField_numRandomBuses.getText());
-		Settings.maxNumSteps = Integer.parseInt(textField_TotalNumSteps.getText());
-		Settings.numStepsPerSecond = Double.parseDouble(textField_NumStepsPerSec.getText());
-		Settings.lookAheadDistance = Double.parseDouble(textField_lookAheadDist.getText());
-		Settings.trafficLightTiming = LightUtil.getLightTypeFromString((String) comboBoxTrafficLight.getSelectedItem());
-		Settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString((String) comboBoxRouting.getSelectedItem());
+		settings.numGlobalRandomPrivateVehicles = Integer.parseInt(textField_numRandomPrivateVehicles.getText());
+		settings.numGlobalRandomTrams = Integer.parseInt(textField_numRandomTrams.getText());
+		settings.numGlobalRandomBuses = Integer.parseInt(textField_numRandomBuses.getText());
+		settings.maxNumSteps = Integer.parseInt(textField_TotalNumSteps.getText());
+		settings.numStepsPerSecond = Double.parseDouble(textField_NumStepsPerSec.getText());
+		settings.lookAheadDistance = Double.parseDouble(textField_lookAheadDist.getText());
+		settings.trafficLightTiming = LightUtil.getLightTypeFromString((String) comboBoxTrafficLight.getSelectedItem());
+		settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString((String) comboBoxRouting.getSelectedItem());
 
 		gui.processor.setupNewSim();
 		monitor.startSetupProgress();
 	}
 
 	void updateGuiComps(){
-		rdbtnLeftDrive.setSelected(Settings.isDriveOnLeft);
-		rdbtnRightDrive.setSelected(!Settings.isDriveOnLeft);
-		textField_ForegroundRouteFile.setText(Settings.inputForegroundVehicleFile);
+		rdbtnLeftDrive.setSelected(settings.isDriveOnLeft);
+		rdbtnRightDrive.setSelected(!settings.isDriveOnLeft);
+		textField_ForegroundRouteFile.setText(settings.inputForegroundVehicleFile);
 		//chckbxLoadOnlyPreviousODPairForegroundVehicles.setSelected(Settings.inputOnlyODPairsOfForegroundVehicleFile);
-		textField_BackgroundRouteFile.setText(Settings.inputBackgroundVehicleFile);
-		textField_numRandomPrivateVehicles.setText(String.valueOf(Settings.numGlobalRandomPrivateVehicles));
-		textField_numRandomBuses.setText(String.valueOf(Settings.numGlobalRandomBuses));
-		textField_numRandomTrams.setText(String.valueOf(Settings.numGlobalRandomTrams));
-		textField_TotalNumSteps.setText(String.valueOf(Settings.maxNumSteps));
-		textField_NumStepsPerSec.setText(String.valueOf(Settings.numStepsPerSecond));
-		textField_lookAheadDist.setText(String.valueOf((int)Settings.lookAheadDistance));
-		comboBoxTrafficLight.setSelectedItem(Settings.trafficLightTiming.name());
-		comboBoxRouting.setSelectedItem(Settings.routingAlgorithm.name());
-		chckbxServerbased.setSelected(Settings.isServerBased);
-		chckbxDumpInitialRoutes.setSelected(Settings.isOutputInitialRoutes);
-		chckbxOutputTrajectory.setSelected(Settings.isOutputTrajectory);
-		chckbxExternalReroute.setSelected(Settings.isAllowReroute);
+		textField_BackgroundRouteFile.setText(settings.inputBackgroundVehicleFile);
+		textField_numRandomPrivateVehicles.setText(String.valueOf(settings.numGlobalRandomPrivateVehicles));
+		textField_numRandomBuses.setText(String.valueOf(settings.numGlobalRandomBuses));
+		textField_numRandomTrams.setText(String.valueOf(settings.numGlobalRandomTrams));
+		textField_TotalNumSteps.setText(String.valueOf(settings.maxNumSteps));
+		textField_NumStepsPerSec.setText(String.valueOf(settings.numStepsPerSecond));
+		textField_lookAheadDist.setText(String.valueOf((int)settings.lookAheadDistance));
+		comboBoxTrafficLight.setSelectedItem(settings.trafficLightTiming.name());
+		comboBoxRouting.setSelectedItem(settings.routingAlgorithm.name());
+		chckbxServerbased.setSelected(settings.isServerBased);
+		chckbxDumpInitialRoutes.setSelected(settings.isOutputInitialRoutes);
+		chckbxOutputTrajectory.setSelected(settings.isOutputTrajectory);
+		chckbxExternalReroute.setSelected(settings.isAllowReroute);
 	}
 
 	public JButton getBtnSetupWorkers() {

@@ -367,11 +367,13 @@ public class MonitorPanel extends JPanel {
 	JLabel lblSetupProgress;
 
 	Random random = new Random();
+	private Settings settings;
 
 	public MonitorPanel(SimulationProcessor processor, final GUI gui, final GuiStatistic qDialog,
 						final Dimension displayPanelDimension) {
 		setBackground(Color.WHITE);
 		this.processor = processor;
+		this.settings = processor.getSettings();
 		this.gui = gui;
 		this.guiStatistic = qDialog;
 		RoadNetwork roadNetwork = processor.getRoadNetwork();
@@ -399,7 +401,7 @@ public class MonitorPanel extends JPanel {
 		 * Map area dimension
 		 */
 		mapWidthInLonDegree = Math.abs(maxLon - minLon);
-		mapHeightInLonDegree = Math.abs(maxLat - minLat) * Settings.lonVsLat;
+		mapHeightInLonDegree = Math.abs(maxLat - minLat) * settings.lonVsLat;
 		/*
 		 * Size of map area in pixels
 		 */
@@ -462,7 +464,7 @@ public class MonitorPanel extends JPanel {
 		btnMapZoomIn.setContentAreaFilled(false);
 		btnMapZoomIn.setBorderPainted(false);
 		btnMapZoomIn
-				.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "Zoom-In.png")));
+				.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "Zoom-In.png")));
 		btnMapZoomIn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -478,7 +480,7 @@ public class MonitorPanel extends JPanel {
 		btnMapZoomOut.setContentAreaFilled(false);
 		btnMapZoomOut.setBorderPainted(false);
 		btnMapZoomOut
-				.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "Zoom-Out.png")));
+				.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "Zoom-Out.png")));
 		btnMapZoomOut.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -493,7 +495,7 @@ public class MonitorPanel extends JPanel {
 		btnMapUp.setOpaque(false);
 		btnMapUp.setContentAreaFilled(false);
 		btnMapUp.setBorderPainted(false);
-		btnMapUp.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "up.png")));
+		btnMapUp.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "up.png")));
 		btnMapUp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -508,7 +510,7 @@ public class MonitorPanel extends JPanel {
 		btnMapDown.setOpaque(false);
 		btnMapDown.setContentAreaFilled(false);
 		btnMapDown.setBorderPainted(false);
-		btnMapDown.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "down.png")));
+		btnMapDown.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "down.png")));
 		btnMapDown.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -523,7 +525,7 @@ public class MonitorPanel extends JPanel {
 		btnMapLeft.setOpaque(false);
 		btnMapLeft.setContentAreaFilled(false);
 		btnMapLeft.setBorderPainted(false);
-		btnMapLeft.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "left.png")));
+		btnMapLeft.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "left.png")));
 		btnMapLeft.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -538,7 +540,7 @@ public class MonitorPanel extends JPanel {
 		btnMapRight.setOpaque(false);
 		btnMapRight.setContentAreaFilled(false);
 		btnMapRight.setBorderPainted(false);
-		btnMapRight.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "right.png")));
+		btnMapRight.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "right.png")));
 		btnMapRight.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -553,7 +555,7 @@ public class MonitorPanel extends JPanel {
 		btnResetMap.setOpaque(false);
 		btnResetMap.setContentAreaFilled(false);
 		btnResetMap.setBorderPainted(false);
-		btnResetMap.setIcon(new ImageIcon(MonitorPanel.class.getResource(Settings.inputBuiltinResource + "reset.png")));
+		btnResetMap.setIcon(new ImageIcon(MonitorPanel.class.getResource(settings.inputBuiltinResource + "reset.png")));
 		btnResetMap.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent arg0) {
@@ -770,7 +772,7 @@ public class MonitorPanel extends JPanel {
 	 * Convert latitude to Y.
 	 */
 	int convertLatToY(final double latitude) {
-		return (int) (((((maxLat - latitude) * Settings.lonVsLat) / mapHeightInLonDegree) * mapAreaHeightInPixels)
+		return (int) (((((maxLat - latitude) * settings.lonVsLat) / mapHeightInLonDegree) * mapAreaHeightInPixels)
 				+ offset_MapAreaToDisplayPanel_TopLeftY);
 	}
 
@@ -794,7 +796,7 @@ public class MonitorPanel extends JPanel {
 	 */
 	double convertYToLat(final double y) {
 		return maxLat - ((((y - offset_MapAreaToDisplayPanel_TopLeftY) / mapAreaHeightInPixels) * mapHeightInLonDegree)
-				/ Settings.lonVsLat);
+				/ settings.lonVsLat);
 	}
 
 	/**
@@ -1054,12 +1056,12 @@ public class MonitorPanel extends JPanel {
 	}
 
 	public double[] getSourceDestinationWindowAtPoint(final double lat, final double lon) {
-		double[] windowFound = getWindowAtPoint(Settings.guiSourceWindowsForInternalVehicle, lon, lat);
+		double[] windowFound = getWindowAtPoint(settings.guiSourceWindowsForInternalVehicle, lon, lat);
 		if (windowFound == null) {
-			windowFound = getWindowAtPoint(Settings.guiDestinationWindowsForInternalVehicle, lon, lat);
+			windowFound = getWindowAtPoint(settings.guiDestinationWindowsForInternalVehicle, lon, lat);
 		}
 		if (windowFound == null) {
-			windowFound = getWindowAtPoint(Settings.guiSourceDestinationWindowsForInternalVehicle, lon, lat);
+			windowFound = getWindowAtPoint(settings.guiSourceDestinationWindowsForInternalVehicle, lon, lat);
 		}
 		return windowFound;
 	}
@@ -1153,12 +1155,12 @@ public class MonitorPanel extends JPanel {
 		try {
 			for (int i = 0; i < 4; i++) {
 				final BufferedImage img = ImageIO
-						.read(getClass().getResourceAsStream(Settings.inputBuiltinResource + "Car" + i + ".png"));
+						.read(getClass().getResourceAsStream(settings.inputBuiltinResource + "Car" + i + ".png"));
 				imageCars.add(img);
 			}
-			imageAlert = ImageIO.read(getClass().getResourceAsStream((Settings.inputBuiltinResource + "alert.png")));
+			imageAlert = ImageIO.read(getClass().getResourceAsStream((settings.inputBuiltinResource + "alert.png")));
 			imageEmergencyVehicle = ImageIO
-					.read(getClass().getResourceAsStream((Settings.inputBuiltinResource + "pilot.png")));
+					.read(getClass().getResourceAsStream((settings.inputBuiltinResource + "pilot.png")));
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1349,15 +1351,15 @@ public class MonitorPanel extends JPanel {
 		g2d.setColor(Color.magenta);
 		final float dash[] = { 4.0f };
 		g2d.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
-		for (final double[] window : Settings.guiSourceWindowsForInternalVehicle) {
+		for (final double[] window : settings.guiSourceWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("S", convertLonToX(window[0]) - 20, convertLatToY(window[1]) + 20);
 		}
-		for (final double[] window : Settings.guiDestinationWindowsForInternalVehicle) {
+		for (final double[] window : settings.guiDestinationWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("D", convertLonToX(window[0]) - 20, convertLatToY(window[1]) + 20);
 		}
-		for (final double[] window : Settings.guiSourceDestinationWindowsForInternalVehicle) {
+		for (final double[] window : settings.guiSourceDestinationWindowsForInternalVehicle) {
 			drawQueryRectangle(g2d, window[0], window[1], window[2], window[3]);
 			g2d.drawString("S/D", convertLonToX(window[0]) - 40, convertLatToY(window[1]) + 20);
 		}
@@ -1426,7 +1428,7 @@ public class MonitorPanel extends JPanel {
 				BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2d = roadNetworkImage.createGraphics();
 		g2d.setColor(new Color(224, 224, 235, 255));
-		int laneWidthPixel = (int) Math.round((Settings.laneWidthInMeters/getMetersPerPixel())*0.95);
+		int laneWidthPixel = (int) Math.round((settings.laneWidthInMeters/getMetersPerPixel())*0.95);
 		final Rectangle actualDrawingArea = new Rectangle(displayPanelDimension.width, displayPanelDimension.height);
 		g2d.setStroke(new BasicStroke(laneWidthPixel, BasicStroke.CAP_ROUND,
 				BasicStroke.JOIN_ROUND));
@@ -1529,7 +1531,7 @@ public class MonitorPanel extends JPanel {
 										g.dispose();
 									} else {
 										BufferedImage in = ImageIO.read(getClass()
-												.getResourceAsStream((Settings.inputBuiltinResource + "osmZoom.png")));
+												.getResourceAsStream((settings.inputBuiltinResource + "osmZoom.png")));
 										final Graphics2D g = staticMapImage.createGraphics();
 										g.drawImage(in, xInPanel, yInPanel, null);
 										g.dispose();
@@ -1551,9 +1553,9 @@ public class MonitorPanel extends JPanel {
 	}
 
 	void removeSourceDestinationWindow(final double[] windowToRemove) {
-		removeWindow(Settings.guiSourceWindowsForInternalVehicle, windowToRemove);
-		removeWindow(Settings.guiDestinationWindowsForInternalVehicle, windowToRemove);
-		removeWindow(Settings.guiSourceDestinationWindowsForInternalVehicle, windowToRemove);
+		removeWindow(settings.guiSourceWindowsForInternalVehicle, windowToRemove);
+		removeWindow(settings.guiDestinationWindowsForInternalVehicle, windowToRemove);
+		removeWindow(settings.guiSourceDestinationWindowsForInternalVehicle, windowToRemove);
 	}
 
 	void removeWindow(final List<double[]> windowList, final double[] windowToRemove) {
@@ -1581,7 +1583,7 @@ public class MonitorPanel extends JPanel {
 		mousePoint.y = (int) (0.5 * displayPanelDimension.height);
 		currentZoom = 16;
 		mapWidthInLonDegree = Math.abs(maxLon - minLon);
-		mapHeightInLonDegree = Math.abs(maxLat - minLat) * Settings.lonVsLat;
+		mapHeightInLonDegree = Math.abs(maxLat - minLat) * settings.lonVsLat;
 		updateMapAreaDimension();
 		updateOffsetMapAreaToDisplayPanel(mousePoint, 0.5, 0.5);
 		staticMapImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -1688,19 +1690,19 @@ public class MonitorPanel extends JPanel {
 				final ActionListener menuListener = new ActionListener() {
 					public void actionPerformed(final ActionEvent event) {
 						if (event.getActionCommand().equalsIgnoreCase("Set as source")) {
-							Settings.guiSourceWindowsForInternalVehicle.add(getCoordOfQueryWindow());
+							settings.guiSourceWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Set as destination")) {
-							Settings.guiDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
+							settings.guiDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Set as source and destination")) {
-							Settings.guiSourceDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
+							settings.guiSourceDestinationWindowsForInternalVehicle.add(getCoordOfQueryWindow());
 							// Overlay image
 							prepareOverlayImage();
 						} else if (event.getActionCommand().equalsIgnoreCase("Download road network")) {
-							new GuiUtil.OSMDownloader(MonitorPanel.this, gui).execute();
+							new GuiUtil.OSMDownloader(MonitorPanel.this, gui, settings).execute();
 						} else if (event.getActionCommand().equalsIgnoreCase("Remove source/destination window")) {
 							removeSourceDestinationWindow(windowSelected);
 							// Overlay image
@@ -1785,7 +1787,7 @@ public class MonitorPanel extends JPanel {
 	 *
 	 */
 	public void update(final HashMap<String, ArrayList<Serializable_GUI_Vehicle>> guiVehicleList,
-			final HashMap<String, ArrayList<Serializable_GUI_Light>> guiLightList, final double realTimeFactor) {
+			final HashMap<String, ArrayList<Serializable_GUI_Light>> guiLightList, final double realTimeFactor, double resolution) {
 		if (isComposingObjectImage) {
 			return;
 		}
@@ -1825,7 +1827,7 @@ public class MonitorPanel extends JPanel {
 		/*
 		 * Update time label
 		 */
-		updateTimeLabel(false, gui.stepToDraw, realTimeFactor);
+		updateTimeLabel(false, gui.stepToDraw, realTimeFactor,resolution);
 		/*
 		 * Re-draw
 		 */
@@ -1878,11 +1880,11 @@ public class MonitorPanel extends JPanel {
 	 *
 	 * @param realTimeFactor
 	 */
-	void updateTimeLabel(final boolean reset, final int stepCurrent, final double realTimeFactor) {
+	void updateTimeLabel(final boolean reset, final int stepCurrent, final double realTimeFactor, double resolution) {
 		if (reset) {
 			statusLabel.setText("");
 		} else {
-			final long totalSeconds = (long) (stepCurrent / Settings.numStepsPerSecond);
+			final long totalSeconds = (long) (stepCurrent / resolution);
 			final long s = totalSeconds % 60;
 			final long m = (totalSeconds / 60) % 60;
 			final long h = (totalSeconds / (60 * 60)) % 24;

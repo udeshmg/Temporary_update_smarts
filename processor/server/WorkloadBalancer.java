@@ -15,12 +15,12 @@ import traffic.road.RoadNetwork;
 public class WorkloadBalancer {
 	static Random random = new Random();
 
-	static void assignNumInternalVehiclesToWorkers(final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
-		if ((Settings.listRouteSourceWindowForInternalVehicle.size() == 0)
-				&& (Settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0)) {
-			assignNumInternalVehiclesToWorkersBasedOnWorkarea(workers);
+	static void assignNumInternalVehiclesToWorkers(Settings settings, final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
+		if ((settings.listRouteSourceWindowForInternalVehicle.size() == 0)
+				&& (settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0)) {
+			assignNumInternalVehiclesToWorkersBasedOnWorkarea(settings, workers);
 		} else {
-			assignNumInternalVehiclesToWorkersBasedOnSourceWindow(workers, roadNetwork);
+			assignNumInternalVehiclesToWorkersBasedOnSourceWindow(settings, workers, roadNetwork);
 		}
 	}
 
@@ -33,13 +33,13 @@ public class WorkloadBalancer {
 	 * maintain a higher number of vehicles.
 	 *
 	 */
-	static void assignNumInternalVehiclesToWorkersBasedOnSourceWindow(final ArrayList<WorkerMeta> workers,
+	static void assignNumInternalVehiclesToWorkersBasedOnSourceWindow(Settings settings, final ArrayList<WorkerMeta> workers,
 			final RoadNetwork roadNetwork) {
 		final ArrayList<double[]> windows = new ArrayList<>();
-		windows.addAll(Settings.listRouteSourceDestinationWindowForInternalVehicle);
-		windows.addAll(Settings.listRouteSourceWindowForInternalVehicle);
-		final double latPerRow = (Math.abs(roadNetwork.maxLat - roadNetwork.minLat) / Settings.numGridRows) + 0.0000001;
-		final double lonPerCol = (Math.abs(roadNetwork.maxLon - roadNetwork.minLon) / Settings.numGridCols) + 0.0000001;
+		windows.addAll(settings.listRouteSourceDestinationWindowForInternalVehicle);
+		windows.addAll(settings.listRouteSourceWindowForInternalVehicle);
+		final double latPerRow = (Math.abs(roadNetwork.maxLat - roadNetwork.minLat) / settings.numGridRows) + 0.0000001;
+		final double lonPerCol = (Math.abs(roadNetwork.maxLon - roadNetwork.minLon) / settings.numGridCols) + 0.0000001;
 		final ArrayList<GridCell> cellsInWindows = new ArrayList<>();
 		for (final double[] window : windows) {
 			final int minCol = (int) Math.floor(Math.abs(window[0] - roadNetwork.minLon) / lonPerCol);
@@ -49,7 +49,7 @@ public class WorkloadBalancer {
 
 			for (int row = minRow; row <= maxRow; row++) {
 				for (int col = minCol; col <= maxCol; col++) {
-					if (row < 0 || col < 0 || row >= Settings.numGridRows || col >= Settings.numGridCols) {
+					if (row < 0 || col < 0 || row >= settings.numGridRows || col >= settings.numGridCols) {
 						continue;
 					}
 					if (!cellsInWindows.contains(roadNetwork.grid[row][col])) {
@@ -67,9 +67,9 @@ public class WorkloadBalancer {
 				}
 			}
 			final double ratio = (double) numWorkerareaCellsInWindows / cellsInWindows.size();
-			worker.numRandomPrivateVehicles = (int) (Settings.numGlobalRandomPrivateVehicles * ratio);
-			worker.numRandomTrams = (int) (Settings.numGlobalRandomTrams * ratio);
-			worker.numRandomBuses = (int) (Settings.numGlobalRandomBuses * ratio);
+			worker.numRandomPrivateVehicles = (int) (settings.numGlobalRandomPrivateVehicles * ratio);
+			worker.numRandomTrams = (int) (settings.numGlobalRandomTrams * ratio);
+			worker.numRandomBuses = (int) (settings.numGlobalRandomBuses * ratio);
 
 		}
 	}
@@ -80,7 +80,7 @@ public class WorkloadBalancer {
 	 * at each worker is roughly the same.
 	 *
 	 */
-	static void assignNumInternalVehiclesToWorkersBasedOnWorkarea(final ArrayList<WorkerMeta> workers) {
+	static void assignNumInternalVehiclesToWorkersBasedOnWorkarea(Settings settings, final ArrayList<WorkerMeta> workers) {
 		int totalNumAssignedPrivateVehicles = 0;
 		int totalNumAssignedTrams = 0;
 		int totalNumAssignedBuses = 0;
@@ -88,20 +88,20 @@ public class WorkloadBalancer {
 		// Assign numbers to workers except the last one
 		for (int i = 0; i < (workers.size() - 1); i++) {
 			workers.get(i).numRandomPrivateVehicles = (int) (workers.get(i).laneLengthRatioAgainstWholeMap
-					* Settings.numGlobalRandomPrivateVehicles);
+					* settings.numGlobalRandomPrivateVehicles);
 			totalNumAssignedPrivateVehicles += workers.get(i).numRandomPrivateVehicles;
 			workers.get(
-					i).numRandomTrams = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * Settings.numGlobalRandomTrams);
+					i).numRandomTrams = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * settings.numGlobalRandomTrams);
 			totalNumAssignedTrams += workers.get(i).numRandomTrams;
 			workers.get(
-					i).numRandomBuses = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * Settings.numGlobalRandomBuses);
+					i).numRandomBuses = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * settings.numGlobalRandomBuses);
 			totalNumAssignedBuses += workers.get(i).numRandomBuses;
 		}
 		// Assign numbers to the last worker
-		workers.get(workers.size() - 1).numRandomPrivateVehicles = Settings.numGlobalRandomPrivateVehicles
+		workers.get(workers.size() - 1).numRandomPrivateVehicles = settings.numGlobalRandomPrivateVehicles
 				- totalNumAssignedPrivateVehicles;
-		workers.get(workers.size() - 1).numRandomTrams = Settings.numGlobalRandomTrams - totalNumAssignedTrams;
-		workers.get(workers.size() - 1).numRandomBuses = Settings.numGlobalRandomBuses - totalNumAssignedBuses;
+		workers.get(workers.size() - 1).numRandomTrams = settings.numGlobalRandomTrams - totalNumAssignedTrams;
+		workers.get(workers.size() - 1).numRandomBuses = settings.numGlobalRandomBuses - totalNumAssignedBuses;
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class WorkloadBalancer {
 	 * cells. The total lane length of a worker area is similar to that of
 	 * another work area.
 	 */
-	public static void partitionGridCells(final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
+	public static void partitionGridCells(Settings settings, final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
 
 		// Clear existing grid cells in the work area of each worker
 		for (final WorkerMeta worker : workers) {
@@ -119,22 +119,22 @@ public class WorkloadBalancer {
 		final GridCell[][] grid = roadNetwork.grid;
 
 		double laneLengthWholeMap = 0;
-		for (int i = 0; i < Settings.numGridRows; i++) {
-			for (int j = 0; j < Settings.numGridCols; j++) {
+		for (int i = 0; i < settings.numGridRows; i++) {
+			for (int j = 0; j < settings.numGridCols; j++) {
 				laneLengthWholeMap += grid[i][j].laneLength;
 			}
 		}
 
-		final double optimalLaneLengthPerWorker = laneLengthWholeMap / Settings.numWorkers;
+		final double optimalLaneLengthPerWorker = laneLengthWholeMap / settings.numWorkers;
 
 		int totalLaneLengthInCurrentWorkarea = 0;
 		int workerIndex = 0;
-		for (int row = 0; row < Settings.numGridRows; row++) {
-			for (int col = 0; col < Settings.numGridCols; col++) {
+		for (int row = 0; row < settings.numGridRows; row++) {
+			for (int col = 0; col < settings.numGridCols; col++) {
 
 				final int nextTotalLength = totalLaneLengthInCurrentWorkarea + grid[row][col].laneLength;
 
-				if ((nextTotalLength > optimalLaneLengthPerWorker) && (workerIndex < (Settings.numWorkers - 1))) {
+				if ((nextTotalLength > optimalLaneLengthPerWorker) && (workerIndex < (settings.numWorkers - 1))) {
 					final boolean isAddCellToCurrentWorker = random.nextBoolean();
 					if (isAddCellToCurrentWorker) {
 						totalLaneLengthInCurrentWorkarea += grid[row][col].laneLength;

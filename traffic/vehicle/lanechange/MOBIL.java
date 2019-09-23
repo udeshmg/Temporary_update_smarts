@@ -26,8 +26,8 @@ public class MOBIL {
 	private ImpedingObject impedingObject;
 	private IDM idm;
 
-	public MOBIL() {
-		idm = new IDM();
+	public MOBIL(Settings settings) {
+		idm = new IDM(settings);
 		impedingObject = new ImpedingObject();
 		random = new Random();
 	}

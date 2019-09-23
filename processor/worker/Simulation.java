@@ -22,10 +22,12 @@ public class Simulation {
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	SimulationListener simulationListener = null;
+	Settings settings;
 
-	public Simulation(final TrafficNetwork trafficNetwork) {
+	public Simulation(Settings settings, final TrafficNetwork trafficNetwork) {
+		this.settings = settings;
 		this.trafficNetwork = trafficNetwork;
-		simulationListener = Settings.getSimulationListener();
+		simulationListener = settings.getSimulationListener();
 	}
 
 	void clearOneStepData() {
@@ -93,9 +95,9 @@ public class Simulation {
 	 * Pause thread. This can be useful for observing simulation on GUI.
 	 */
 	void pause() {
-		if (Settings.pauseTimeBetweenStepsInMilliseconds > 0) {
+		if (settings.pauseTimeBetweenStepsInMilliseconds > 0) {
 			try {
-				Thread.sleep(Settings.pauseTimeBetweenStepsInMilliseconds);
+				Thread.sleep(settings.pauseTimeBetweenStepsInMilliseconds);
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -157,7 +159,7 @@ public class Simulation {
 	}
 
 	void transferDataTofellow(final Worker worker){
-		if (!Settings.isServerBased) {
+		if (!settings.isServerBased) {
 			worker.transferVehicleDataToFellow();
 		}
 	}
@@ -184,5 +186,31 @@ public class Simulation {
 		if(simulationListener != null){
 			simulationListener.onVehicleRemove(vehicles, step, trafficNetwork);
 		}
+	}
+
+	synchronized public void simulateOneStepSingle(double timeNow, int step, List<Edge> pspBorderEdges,
+											 List<Edge> pspNonBorderEdges, int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
+											 int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed,
+											 boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
+		pause();
+		moveVehiclesAroundBorder(new ArrayList<>(), timeNow, pspBorderEdges);
+		moveVehiclesNotAroundBorder(new ArrayList<>(), timeNow, pspNonBorderEdges);
+		onVehicleMove(step);
+		removeTripFinishedVehicles();
+		onVehicleRemove(oneStepData_allVehiclesReachedDestination, step);
+		trafficNetwork.changeLaneOfVehicles(timeNow);
+		trafficNetwork.updateTrafficLights(timeNow);
+		trafficNetwork.updateTramStopTimers();
+		trafficNetwork.releaseTripMakingVehicles(timeNow, simulationListener);
+		trafficNetwork.releaseVehicleFromParking(timeNow, simulationListener);
+		trafficNetwork.blockTramAtTramStop();
+		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
+		trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+				numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+				timeNow);
+		trafficNetwork.repeatExternalVehicles(step, timeNow);
+		trafficNetwork.finishRemoveCheck(timeNow);
+		// Clear one-step data
+		clearOneStepData();
 	}
 }

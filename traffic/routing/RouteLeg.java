@@ -87,10 +87,10 @@ public class RouteLeg {
 		return (time-p0.getY())*(p3.getX()-p0.getX())/(p3.getY() - p0.getY()) + p0.getX();
 	}
 
-	public double getHeadwayMultiplier(double pos){
+	public double getHeadwayMultiplier(double pos, double defaultVal){
 		if(startH > 0 && endH > 0) {
 			return startH + (pos / edge.length) * (endH - startH);
 		}
-		return Settings.safetyHeadwayMultiplier;
+		return defaultVal;
 	}
 }

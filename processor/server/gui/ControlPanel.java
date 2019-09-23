@@ -27,9 +27,9 @@ public class ControlPanel extends JPanel {
 		setBorder(null);
 		setBackground(Color.WHITE);
 		cpRes = new ControlPanel_Resource(processor, this);
-		cpMiscConfig = new ControlPanel_MiscConfig(gui);
+		cpMiscConfig = new ControlPanel_MiscConfig(processor.getSettings(), gui);
 		GuiUtil.setEnabledStatusOfComponents(cpMiscConfig, false);
-		cpMap = new ControlPanel_Map(gui);
+		cpMap = new ControlPanel_Map(gui, processor.getSettings());
 		cpRealtime = new ControlPanel_Realtime(processor, this);
 		GuiUtil.setEnabledStatusOfComponents(cpRealtime, false);
 		addSubPanel(cpRes, cpRes.getPreferredSize(), displayPanelDimension, "Computing Resource", true);

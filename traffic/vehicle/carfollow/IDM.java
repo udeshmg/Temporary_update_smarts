@@ -18,8 +18,11 @@ import traffic.vehicle.*;
  */
 public class IDM {
 
+    private Settings settings;
 
-	public IDM() {}
+	public IDM(Settings settings) {
+	    this.settings = settings;
+    }
 
 	/**
 	 * Calculates the acceleration of vehicle based on its relation to an
@@ -179,7 +182,7 @@ public class IDM {
 				examinedDist += vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length;
 				// Proceeds to the next leg on route if look-ahead distance is
 				// not exhausted
-				if (((examinedDist - vehicle.headPosition) < Settings.lookAheadDistance)
+				if (((examinedDist - vehicle.headPosition) < settings.lookAheadDistance)
 						&& (indexLegOnRouteBeingChecked < (vehicle.getRouteLegCount() - 1))) {
 					indexLegOnRouteBeingChecked++;
 				} else {
@@ -228,7 +231,7 @@ public class IDM {
 
 			// Gets the earliest time that conflicting traffic arrives at
 			// intersection
-			for (final Edge e : RoadUtil.getConflictingEdges(targetEdge, nextEdge)) {
+			for (final Edge e : RoadUtil.getConflictingEdges(targetEdge, nextEdge, settings.isDriveOnLeft)) {
 				for (final Lane lane : e.getLanes()) {
 					if (lane.getVehicleCount() > 0) {
 						final Vehicle firstV = lane.getFrontVehicleInLane();
@@ -269,7 +272,7 @@ public class IDM {
 			if(pos < vehicle.headPosition) {
 				return;
 			}
-			if ((!vehicle.lane.isPriority && (earliestTime < Settings.minTimeSafeToCrossIntersection))
+			if ((!vehicle.lane.isPriority && (earliestTime < settings.minTimeSafeToCrossIntersection))
 					|| isGiveWayToPriorityVehicle) {
 				slowdownObj.speed = 0;
 				//slowdownObj.headPosition = (examinedDist + targetEdge.length - targetEdge.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0) - 0.00001;
@@ -309,7 +312,7 @@ public class IDM {
 			// Do not cross the intersection that is immediately behind the front vehicle if the front vehicle is too slow and is too close to the intersection
 			if (RoadUtil.hasIntersectionAtEdgeStart(frontVehicle.lane.edge)
 					&& (vehicle.lane.edge != frontVehicle.lane.edge)
-					&& (slowdownObj.speed < Settings.intersectionSpeedThresholdOfFront)
+					&& (slowdownObj.speed < settings.intersectionSpeedThresholdOfFront)
 					&& (frontVehicle.headPosition - frontVehicle.length <= vehicle.driverProfile.IDM_s0 + vehicle.length)//The current vehicle cannot stop between the intersection and the front vehicle due to limited space
 					&& (frontVehicle.headPosition - frontVehicle.length >= 0)//Only consider the situation where front vehicle has passed the intersection in whole
 					&& (VehicleUtil.getBrakingDistance(vehicle) <= (examinedDist - vehicle.headPosition))) {
@@ -347,7 +350,7 @@ public class IDM {
 		// Stop vehicle if the emergency strategy requires non-priority vehicles to pull off
 		for (int i = laneNumber + 1; i < edgeBeingChecked.getLaneCount(); i++) {
 			if (edgeBeingChecked.getLane(i).isPriority
-					&& (Settings.emergencyStrategy == EmergencyStrategy.NonEmergencyPullOffToRoadside)) {
+					&& (settings.emergencyStrategy == EmergencyStrategy.NonEmergencyPullOffToRoadside)) {
 				final double brakingDist = VehicleUtil.getBrakingDistance(vehicle);
 				slowdownObj.headPosition = vehicle.headPosition + brakingDist;
 				slowdownObj.length = 0;
@@ -394,7 +397,7 @@ public class IDM {
 		/*
 		 * Checks traffic light at the end of the target lane's edge.
 		 */
-		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+		if (settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			if (vehicle.type == VehicleType.PRIORITY) {
 				// Priority vehicle ignores any traffic light
 				return;
@@ -418,7 +421,7 @@ public class IDM {
 
 			// Flags the event that vehicle is within certain distance to light
 			if (targetEdge.endNode.light && (((examinedDist + targetEdge.length)
-					- vehicle.headPosition) < Settings.trafficLightDetectionDistance)) {
+					- vehicle.headPosition) < settings.trafficLightDetectionDistance)) {
 				targetEdge.isDetectedVehicleForLight = true;
 			}
 
@@ -472,7 +475,7 @@ public class IDM {
 			return;
 		}
 
-		if ((vehicle.type != VehicleType.TRAM) && Settings.isAllowTramRule) {
+		if ((vehicle.type != VehicleType.TRAM) && settings.isAllowTramRule) {
 
 			if (targetEdge.timeTramStopping > 0) {
 				slowdownObj.speed = 0;
@@ -513,9 +516,9 @@ public class IDM {
 		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft || edgeBeingChecked == vehicle.edgeBeforeTurnRight) {
 			// Block vehicle if vehicle's lane cannot be used for turning
-			boolean isNeedToBlock = VehicleUtil.isNeedLaneChangeForTurn(edgeBeingChecked, vehicle);
+			boolean isNeedToBlock = VehicleUtil.isNeedLaneChangeForTurn(edgeBeingChecked, vehicle, settings.isDriveOnLeft);
 			if (isNeedToBlock) {
-				slowdownObj.headPosition = examinedDist + edgeBeingChecked.getBeforeTurnLaneChangePos(vehicle)
+				slowdownObj.headPosition = examinedDist + edgeBeingChecked.getBeforeTurnLaneChangePos(vehicle, settings.isDriveOnLeft)
 						+ vehicle.driverProfile.IDM_s0; //TODO this should be properly implemented, may not work for realworld networks
 				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 				slowdownObj.speed = 0;
@@ -552,7 +555,7 @@ public class IDM {
 			Vehicle.IntersectionDecision decision = vehicle.getDecision();
 			Edge current = vehicle.getCurrentEdge();
 			if(current == decision.getStartLane().edge && edgeBeingChecked == decision.getEndLane().edge){
-				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle) && vehicle.isNotWithinIntersections()){
+				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection) && vehicle.isNotWithinIntersections()){
 					slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
 					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 					slowdownObj.speed = 0;

@@ -69,11 +69,12 @@ public class ConsoleUI {
 
     public void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
-        Settings.inputSimulationScript = sc.nextLine();
+        String inputSimulationScript = sc.nextLine();
         while (!processor.loadScript()) {
             System.out.println("Please specify the simulation script path.");
-            Settings.inputSimulationScript = sc.nextLine();
+            inputSimulationScript = sc.nextLine();
         }
+        processor.getSettings().inputSimulationScript = inputSimulationScript;
         acceptSimStartCommandFromConsole();
     }
 

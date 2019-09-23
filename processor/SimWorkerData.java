@@ -49,9 +49,14 @@ public class SimWorkerData {
 	private List<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
     private int step = 0;
     private double timeNow;
+    private Settings settings;
 
-	public void initSimulation(Map<String, List<Edge>> pspEdges){
-        simulation = new Simulation(trafficNetwork);
+    public SimWorkerData(Settings settings) {
+        this.settings = settings;
+    }
+
+    public void initSimulation(Map<String, List<Edge>> pspEdges){
+        simulation = new Simulation(settings, trafficNetwork);
         pspBorderEdges = pspEdges.get("Border");
         pspNonBorderEdges = pspEdges.get("NonBorder");
     }
@@ -64,11 +69,11 @@ public class SimWorkerData {
 
     public void initTrafficNetwork(String roadGraph){
         if (roadGraph.equals("builtin")) {
-            Settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile();
+            settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
         } else {
-            Settings.roadGraph = roadGraph;
+            settings.roadGraph = roadGraph;
         }
-        trafficNetwork = new TrafficNetwork();
+        trafficNetwork = new TrafficNetwork(settings);
     }
 
     public void setTrafficNetwork(TrafficNetwork trafficNetwork) {
@@ -144,8 +149,8 @@ public class SimWorkerData {
 
     public void buildEnvironment(ArrayList<GridCell> workCells, String workerName){
         trafficNetwork.buildEnvironment(workCells, workerName, step);
-        if(Settings.getSimulationListener() != null) {
-            Settings.getSimulationListener().onStart(trafficNetwork, Settings.maxNumSteps, (int) Settings.numStepsPerSecond);
+        if(settings.getSimulationListener() != null) {
+            settings.getSimulationListener().onStart(trafficNetwork, settings.maxNumSteps, (int) settings.numStepsPerSecond);
         }
     }
 
@@ -159,6 +164,6 @@ public class SimWorkerData {
 
     public void setStep(int step) {
         this.step = step;
-        this.timeNow = step / Settings.numStepsPerSecond;
+        this.timeNow = step / settings.numStepsPerSecond;
     }
 }

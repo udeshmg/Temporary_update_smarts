@@ -33,10 +33,12 @@ public class GuiUtil {
 		MonitorPanel monitor;
 		GUI gui;
 		String nameDownloadedFile = "download.osm";
+		Settings settings;
 
-		OSMDownloader(final MonitorPanel monitor, final GUI gui) {
+		OSMDownloader(final MonitorPanel monitor, final GUI gui, Settings settings) {
 			this.monitor = monitor;
 			this.gui = gui;
+			this.settings = settings;
 		}
 
 		@Override
@@ -139,7 +141,7 @@ public class GuiUtil {
 					outputFile.delete();
 				}
 				outputFile.createNewFile();
-				Settings.inputOpenStreetMapFile = outputFile.getPath();
+				settings.inputOpenStreetMapFile = outputFile.getPath();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
@@ -152,7 +154,7 @@ public class GuiUtil {
 			BufferedWriter out;
 			try {
 				out = new BufferedWriter(
-						new OutputStreamWriter(new FileOutputStream(Settings.inputOpenStreetMapFile), StandardCharsets.UTF_8));
+						new OutputStreamWriter(new FileOutputStream(settings.inputOpenStreetMapFile), StandardCharsets.UTF_8));
 				out.write(str);
 				out.close();
 			} catch (final IOException e) {

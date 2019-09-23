@@ -27,7 +27,7 @@ public class SerializableVehicle {
 	}
 
 	public Vehicle createVehicle(TrafficNetwork trafficNetwork){
-		final Vehicle vehicle = new Vehicle();
+		final Vehicle vehicle = new Vehicle(trafficNetwork.getSettings());
 		vehicle.type = VehicleType.getVehicleTypeFromName(type);
 		vehicle.length = vehicle.type.length;
 		vehicle.setRouteLegs(RouteUtil.parseReceivedRoute(routeLegs, trafficNetwork.edges));

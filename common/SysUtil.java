@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class SysUtil {
 
-	public static String getMyIpV4Addres() {
-		if (Settings.isSharedJVM) {
+	public static String getMyIpV4Addres(boolean isSharedJVM) {
+		if (isSharedJVM) {
 			return "127.0.0.1"; // Fix to localhost (might be necessary for computer without Internet)
 		} else {
 			try {

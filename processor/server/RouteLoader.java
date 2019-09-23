@@ -72,12 +72,12 @@ public class RouteLoader {
 		return null;
 	}
 
-	void loadRoutes() {
-		if (Settings.inputForegroundVehicleFile.length() > 0) {
-			scanXML(Settings.inputForegroundVehicleFile, true);
+	void loadRoutes(String inputForegroundVehicleFile, String inputBackgroundVehicleFile) {
+		if (inputForegroundVehicleFile.length() > 0) {
+			scanXML(inputForegroundVehicleFile, true);
 		}
-		if (Settings.inputBackgroundVehicleFile.length() > 0) {
-			scanXML(Settings.inputBackgroundVehicleFile, false);
+		if (inputBackgroundVehicleFile.length() > 0) {
+			scanXML(inputBackgroundVehicleFile, false);
 		}
 		for (final Node node : roadNetwork.nodes) {
 			idMappers.add(new NodeInfo(node.osmId, node.index));

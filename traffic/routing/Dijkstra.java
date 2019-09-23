@@ -118,7 +118,7 @@ public class Dijkstra extends Routing {
 
 			// Visit each edge exiting u
 			for (final DijkstraEdge e : u.adjacencies) {
-				if (!VehicleUtil.canGoThrough(u.node, e.target.node, type)) {
+				if (!VehicleUtil.canGoThrough(u.node, e.target.node, type, settings.isAllowPriorityVehicleUseTramTrack)) {
 					continue;
 				}
 				final DijkstraVertex v = e.target;

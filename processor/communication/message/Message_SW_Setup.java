@@ -59,49 +59,49 @@ public class Message_SW_Setup {
 
 	}
 
-	public Message_SW_Setup(final ArrayList<WorkerMeta> workers, final WorkerMeta workerToReceiveMessage,
+	public Message_SW_Setup(Settings settings, final ArrayList<WorkerMeta> workers, final WorkerMeta workerToReceiveMessage,
 			final ArrayList<Edge> edges, final int step, final ArrayList<Node> nodesToAddLight,
 			final ArrayList<Node> nodesToRemoveLight) {
-		isNewEnvironment = Settings.isNewEnvironment;
-		numWorkers = Settings.numWorkers;
+		isNewEnvironment = settings.isNewEnvironment;
+		numWorkers = settings.numWorkers;
 		startStep = step;
-		maxNumSteps = Settings.maxNumSteps;
-		numStepsPerSecond = Settings.numStepsPerSecond;
-		workerToServerReportStepGapInServerlessMode = Settings.trafficReportStepGapInServerlessMode;
-		periodOfTrafficWaitForTramAtStop = Settings.periodOfTrafficWaitForTramAtStop;
-		driverProfileDistribution = getDriverProfilePercentage(Settings.driverProfileDistribution);
-		lookAheadDistance = Settings.lookAheadDistance;
-		trafficLightTiming = Settings.trafficLightTiming.name();
-		isVisualize = Settings.isVisualize;
+		maxNumSteps = settings.maxNumSteps;
+		numStepsPerSecond = settings.numStepsPerSecond;
+		workerToServerReportStepGapInServerlessMode = settings.trafficReportStepGapInServerlessMode;
+		periodOfTrafficWaitForTramAtStop = settings.periodOfTrafficWaitForTramAtStop;
+		driverProfileDistribution = getDriverProfilePercentage(settings.driverProfileDistribution);
+		lookAheadDistance = settings.lookAheadDistance;
+		trafficLightTiming = settings.trafficLightTiming.name();
+		isVisualize = settings.isVisualize;
 		metadataWorkers = appendMetadataOfWorkers(workers);
 		numRandomPrivateVehicles = workerToReceiveMessage.numRandomPrivateVehicles;
 		numRandomTrams = workerToReceiveMessage.numRandomTrams;
 		numRandomBuses = workerToReceiveMessage.numRandomBuses;
 		externalRoutes = workerToReceiveMessage.externalRoutes;
-		isServerBased = Settings.isServerBased;
-		if (Settings.isNewEnvironment) {
-			if (Settings.isBuiltinRoadGraph) {
+		isServerBased = settings.isServerBased;
+		if (settings.isNewEnvironment) {
+			if (settings.isBuiltinRoadGraph) {
 				roadGraph = "builtin";
 			} else {
-				roadGraph = Settings.roadGraph;
+				roadGraph = settings.roadGraph;
 			}
 		} else {
 			roadGraph = "";
 		}
-		routingAlgorithm = Settings.routingAlgorithm.name();
-		isAllowPriorityVehicleUseTramTrack = Settings.isAllowPriorityVehicleUseTramTrack;
+		routingAlgorithm = settings.routingAlgorithm.name();
+		isAllowPriorityVehicleUseTramTrack = settings.isAllowPriorityVehicleUseTramTrack;
 		indexNodesToAddLight = getLightNodeIndex(nodesToAddLight);
 		indexNodesToRemoveLight = getLightNodeIndex(nodesToRemoveLight);
-		isOutputForegroundTrajectory = Settings.isOutputTrajectory;
-		isOutputInternalBackgroundRoutePlan = Settings.isOutputInitialRoutes;
-		listRouteSourceWindowForInternalVehicle = getListRouteWindow(Settings.listRouteSourceWindowForInternalVehicle);
+		isOutputForegroundTrajectory = settings.isOutputTrajectory;
+		isOutputInternalBackgroundRoutePlan = settings.isOutputInitialRoutes;
+		listRouteSourceWindowForInternalVehicle = getListRouteWindow(settings.listRouteSourceWindowForInternalVehicle);
 		listRouteDestinationWindowForInternalVehicle = getListRouteWindow(
-				Settings.listRouteDestinationWindowForInternalVehicle);
+				settings.listRouteDestinationWindowForInternalVehicle);
 		listRouteSourceDestinationWindowForInternalVehicle = getListRouteWindow(
-				Settings.listRouteSourceDestinationWindowForInternalVehicle);
-		isAllowReroute = Settings.isAllowReroute;
-		isAllowTramRule = Settings.isAllowTramRule;
-		isDriveOnLeft = Settings.isDriveOnLeft;
+				settings.listRouteSourceDestinationWindowForInternalVehicle);
+		isAllowReroute = settings.isAllowReroute;
+		isAllowTramRule = settings.isAllowTramRule;
+		isDriveOnLeft = settings.isDriveOnLeft;
 	}
 
 	ArrayList<SerializableWorkerMetadata> appendMetadataOfWorkers(final ArrayList<WorkerMeta> workers) {
@@ -136,27 +136,27 @@ public class Message_SW_Setup {
 		return list;
 	}
 
-	public void setupFromMessage(){
-		Settings.numWorkers = numWorkers;
-		Settings.maxNumSteps = maxNumSteps;
-		Settings.numStepsPerSecond = numStepsPerSecond;
-		Settings.trafficReportStepGapInServerlessMode = workerToServerReportStepGapInServerlessMode;
-		Settings.periodOfTrafficWaitForTramAtStop = periodOfTrafficWaitForTramAtStop;
-		Settings.driverProfileDistribution = setDriverProfileDistribution(driverProfileDistribution);
-		Settings.lookAheadDistance = lookAheadDistance;
-		Settings.trafficLightTiming = LightUtil.getLightTypeFromString(trafficLightTiming);
-		Settings.isVisualize = isVisualize;
-		Settings.isServerBased = isServerBased;
-		Settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString(routingAlgorithm);
-		Settings.isAllowPriorityVehicleUseTramTrack = isAllowPriorityVehicleUseTramTrack;
-		Settings.isOutputInitialRoutes = isOutputInternalBackgroundRoutePlan;
-		Settings.isOutputTrajectory = isOutputForegroundTrajectory;
-		Settings.listRouteSourceWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceWindowForInternalVehicle);
-		Settings.listRouteDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteDestinationWindowForInternalVehicle);
-		Settings.listRouteSourceDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceDestinationWindowForInternalVehicle);
-		Settings.isAllowReroute = isAllowReroute;
-		Settings.isAllowTramRule = isAllowTramRule;
-		Settings.isDriveOnLeft = isDriveOnLeft;
+	public void setupFromMessage(Settings settings){
+		settings.numWorkers = numWorkers;
+		settings.maxNumSteps = maxNumSteps;
+		settings.numStepsPerSecond = numStepsPerSecond;
+		settings.trafficReportStepGapInServerlessMode = workerToServerReportStepGapInServerlessMode;
+		settings.periodOfTrafficWaitForTramAtStop = periodOfTrafficWaitForTramAtStop;
+		settings.driverProfileDistribution = setDriverProfileDistribution(driverProfileDistribution);
+		settings.lookAheadDistance = lookAheadDistance;
+		settings.trafficLightTiming = LightUtil.getLightTypeFromString(trafficLightTiming);
+		settings.isVisualize = isVisualize;
+		settings.isServerBased = isServerBased;
+		settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString(routingAlgorithm);
+		settings.isAllowPriorityVehicleUseTramTrack = isAllowPriorityVehicleUseTramTrack;
+		settings.isOutputInitialRoutes = isOutputInternalBackgroundRoutePlan;
+		settings.isOutputTrajectory = isOutputForegroundTrajectory;
+		settings.listRouteSourceWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceWindowForInternalVehicle);
+		settings.listRouteDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteDestinationWindowForInternalVehicle);
+		settings.listRouteSourceDestinationWindowForInternalVehicle = setRouteSourceDestinationWindow(listRouteSourceDestinationWindowForInternalVehicle);
+		settings.isAllowReroute = isAllowReroute;
+		settings.isAllowTramRule = isAllowTramRule;
+		settings.isDriveOnLeft = isDriveOnLeft;
 	}
 
 	/**

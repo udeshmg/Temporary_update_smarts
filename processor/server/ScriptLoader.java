@@ -33,17 +33,17 @@ public class ScriptLoader {
 	/*
 	 * Load setups from a file and save the setups to a list.
 	 */
-	public boolean loadScriptFile() {
+	public boolean loadScriptFile(String inputSimulationScript) {
 		experiments.clear();
-		if(Settings.inputSimulationScript.endsWith(".xml")){
-			return loadFromXMLFile(Settings.inputSimulationScript);
+		if(inputSimulationScript.endsWith(".xml")){
+			return loadFromXMLFile(inputSimulationScript);
 		}else{
-			return loadFromTextFile(Settings.inputSimulationScript);
+			return loadFromTextFile(inputSimulationScript);
 		}
 	}
 
-	public boolean loadFromTextFile(String fileName){
-		File file = new File(Settings.inputSimulationScript);
+	public boolean loadFromTextFile(String inputSimulationScript){
+		File file = new File(inputSimulationScript);
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			ArrayList<String> oneSimSetup = new ArrayList<>();
 			String line;

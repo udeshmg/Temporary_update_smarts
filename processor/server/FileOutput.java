@@ -19,6 +19,11 @@ public class FileOutput {
 	FileOutputStream trjFos;
 	FileOutputStream vdFos;
 	FileOutputStream bestTTFos;
+	private Settings settings;
+
+	public FileOutput(Settings settings) {
+		this.settings = settings;
+	}
 
 	/**
 	 * Close output file
@@ -51,14 +56,14 @@ public class FileOutput {
 	}
 
 	public void init() {
-		if (Settings.isOutputTrajectory) {
+		if (settings.isOutputTrajectory) {
 			initTrajectoryOutputFile();
 		}
-		if (Settings.isOutputInitialRoutes) {
+		if (settings.isOutputInitialRoutes) {
 			initRouteOutputFile();
 			initBestTTOutputFile();
 		}
-		if (Settings.isOutputSimulationLog) {
+		if (settings.isOutputSimulationLog) {
 			initSimLogOutputFile();
 		}
 		initTrjOutputFile();
@@ -66,23 +71,23 @@ public class FileOutput {
 	}
 
 	File getNewFile(String prefix, String extension) {
-		File downloadDir = new File(Settings.downloadDirectory);
+		File downloadDir = new File(settings.downloadDirectory);
 		if(!downloadDir.exists()){
 			System.out.println("Download directory not exist. Creating a new directory");
 			downloadDir.mkdirs();
 		}
-		String testName = Settings.testName;
+		String testName = settings.testName;
 		if(testName == null){
 			testName = prefix + SysUtil.getTimeStampString();
 		}else{
 			testName = prefix + testName;
 		}
-		String fileName = Settings.downloadDirectory + "/" + testName + "." +extension;
+		String fileName = settings.downloadDirectory + "/" + testName + "." +extension;
 		File file = new File(fileName);
 		int counter = 0;
 		while (file.exists()) {
 			counter++;
-			fileName = Settings.downloadDirectory + "/" + testName + "_" + counter + ".txt";
+			fileName = settings.downloadDirectory + "/" + testName + "_" + counter + ".txt";
 			file = new File(fileName);
 		}
 		return file;
@@ -94,7 +99,7 @@ public class FileOutput {
 
 	void initRouteOutputFile() {
 		try {
-			final File file = getNewFile(Settings.prefixOutputRoutePlan);
+			final File file = getNewFile(settings.prefixOutputRoutePlan);
 			fosRoute = new FileOutputStream(file, true);
 			outputStringToFile(fosRoute,
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + System.getProperty("line.separator"));
@@ -108,7 +113,7 @@ public class FileOutput {
 	void initSimLogOutputFile() {
 
 		try {
-			final File file = getNewFile(Settings.prefixOutputSimLog);
+			final File file = getNewFile(settings.prefixOutputSimLog);
 			// Print column titles
 			fosLog = new FileOutputStream(file, true);
 			outputStringToFile(fosLog, "Time Stamp, Real Time(s), Simulation Time(s), # of Worker-Worker Connections"
@@ -120,7 +125,7 @@ public class FileOutput {
 
 	void initTrajectoryOutputFile() {
 		try {
-			final File file = getNewFile(Settings.prefixOutputTrajectory);
+			final File file = getNewFile(settings.prefixOutputTrajectory);
 			// Print column titles
 			fosTrajectory = new FileOutputStream(file, true);
 			outputStringToFile(fosTrajectory,
@@ -172,7 +177,7 @@ public class FileOutput {
 	 * Output trajectory of individual vehicles
 	 */
 	public void outputTrajectories(HashMap<String, TreeMap<Double, double[]>> allTrajectories) {
-		if (Settings.isOutputTrajectory) {
+		if (settings.isOutputTrajectory) {
 			int trajectoryId = 0;
 			for (String vehicleId : allTrajectories.keySet()) {
 				// Trajectory counter	
@@ -205,7 +210,7 @@ public class FileOutput {
 	}
 
 	public void outputRoutes(final ArrayList<SerializableRouteDump> routes) {
-		if (Settings.isOutputInitialRoutes) {
+		if (settings.isOutputInitialRoutes) {
 			try {
 				final StringBuilder sb = new StringBuilder();
 				for (final SerializableRouteDump route : routes) {
@@ -247,13 +252,13 @@ public class FileOutput {
 		}
 	}
 
-	public void outputSimLog(final int stepCurrent, final double simulationTimeCounter, final int totalNumFellowsOfWorker) {
+	public void outputSimLog(final int stepCurrent, final double simulationTimeCounter, final int totalNumFellowsOfWorker, int resolution) {
 		final Date date = new Date();
 
-		if (Settings.isOutputSimulationLog && (fosLog != null)) {
+		if (settings.isOutputSimulationLog && (fosLog != null)) {
 			outputStringToFile(fosLog, date.toString());
 			outputStringToFile(fosLog, ",");
-			outputStringToFile(fosLog, String.valueOf(stepCurrent / Settings.numStepsPerSecond));
+			outputStringToFile(fosLog, String.valueOf(stepCurrent / resolution));
 			outputStringToFile(fosLog, ",");
 			outputStringToFile(fosLog, String.valueOf(simulationTimeCounter));
 			outputStringToFile(fosLog, ",");

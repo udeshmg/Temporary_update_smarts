@@ -44,16 +44,16 @@ public class RandomODDistributor extends ODDistributor{
 
     @Override
     public List<double[]> getSourceWidows(RoadNetwork network) {
-        return Settings.guiSourceWindowsForInternalVehicle;
+        return network.getSettings().guiSourceWindowsForInternalVehicle;
     }
 
     @Override
     public List<double[]> getDestinationWidows(RoadNetwork network) {
-        return Settings.guiDestinationWindowsForInternalVehicle;
+        return network.getSettings().guiDestinationWindowsForInternalVehicle;
     }
 
     @Override
     public List<double[]> getSourceDestinationWidows(RoadNetwork network) {
-        return Settings.guiSourceDestinationWindowsForInternalVehicle;
+        return network.getSettings().guiSourceDestinationWindowsForInternalVehicle;
     }
 }

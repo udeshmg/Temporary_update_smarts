@@ -35,7 +35,6 @@ public class Simulator {
 	 */
 	public static void main(final String[] args) {
 		Settings.isSharedJVM = true;
-		Settings.isVisualize = true;
 		if (isPortFree(Settings.serverListeningPortForWorkers)) {
 			startSystem();
 		} else {
@@ -45,7 +44,7 @@ public class Simulator {
 
 	static void startSystem() {
 
-		new Server().run();
+		new Server(true).run();
 		createWorkers();
 
 	}

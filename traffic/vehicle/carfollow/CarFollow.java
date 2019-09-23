@@ -1,5 +1,6 @@
 package traffic.vehicle.carfollow;
 
+import common.Settings;
 import traffic.vehicle.Vehicle;
 
 /**
@@ -11,8 +12,8 @@ import traffic.vehicle.Vehicle;
 public class CarFollow {
 	IDM idm;
 
-	public CarFollow() {
-		idm = new IDM();
+	public CarFollow(Settings settings) {
+		idm = new IDM(settings);
 	}
 
 	public double computeAccelerationBasedOnImpedingObjects(final Vehicle vehicle) {

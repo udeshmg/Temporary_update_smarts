@@ -45,12 +45,12 @@ public class TrafficNetwork extends RoadNetwork {
 
 		@Override
 		public int compare(final Edge edge1, final Edge edge2) {
-			final Line2D.Double line1 = new Line2D.Double(edge1.startNode.lon, edge1.startNode.lat * Settings.lonVsLat,
-					edge1.endNode.lon, edge1.endNode.lat * Settings.lonVsLat);
-			final double dist1 = line1.ptSegDist(node.lon, node.lat * Settings.lonVsLat);
-			final Line2D.Double line2 = new Line2D.Double(edge2.startNode.lon, edge2.startNode.lat * Settings.lonVsLat,
-					edge2.endNode.lon, edge2.endNode.lat * Settings.lonVsLat);
-			final double dist2 = line2.ptSegDist(node.lon, node.lat * Settings.lonVsLat);
+			final Line2D.Double line1 = new Line2D.Double(edge1.startNode.lon, edge1.startNode.lat * settings.lonVsLat,
+					edge1.endNode.lon, edge1.endNode.lat * settings.lonVsLat);
+			final double dist1 = line1.ptSegDist(node.lon, node.lat * settings.lonVsLat);
+			final Line2D.Double line2 = new Line2D.Double(edge2.startNode.lon, edge2.startNode.lat * settings.lonVsLat,
+					edge2.endNode.lon, edge2.endNode.lat * settings.lonVsLat);
+			final double dist2 = line2.ptSegDist(node.lon, node.lat * settings.lonVsLat);
 			return dist1 < dist2 ? -1 : dist1 == dist2 ? 0 : 1;
 		}
 	}
@@ -96,8 +96,8 @@ public class TrafficNetwork extends RoadNetwork {
 	/**
 	 * Initialize traffic network.
 	 */
-	public TrafficNetwork() {
-		super();
+	public TrafficNetwork(Settings settings) {
+		super(settings);
 		identifyInternalTramStopEdges();
 		addTramStopsToParallelNonTramEdges();
 		tripMakingVehicles = new PriorityQueue<>(getTripMakingVehicleComparator());
@@ -121,7 +121,7 @@ public class TrafficNetwork extends RoadNetwork {
 			return;
 		}*///TODO if the start and end is not reachable it should be handled
 		// Create new vehicle
-		final Vehicle vehicle = new Vehicle();
+		final Vehicle vehicle = new Vehicle(settings);
 		// Creation time
 		vehicle.timeRouteStart = timeRouteStart;
 		// Jam start time
@@ -143,7 +143,7 @@ public class TrafficNetwork extends RoadNetwork {
 		// Set as active
 		vehicle.active = true;
 		// Add vehicle to system
-		vehicle.setHeadWayMultiplier(Settings.safetyHeadwayMultiplier);
+		vehicle.setHeadWayMultiplier(settings.safetyHeadwayMultiplier);
 		if (!vehicle.isExternal) {
 			// Update vehicle counters				
 			numInternalVehicleAllTime++;
@@ -212,17 +212,17 @@ public class TrafficNetwork extends RoadNetwork {
 				}
 
 				final Line2D.Double line = new Line2D.Double(candidateEdge.startNode.lon,
-						candidateEdge.startNode.lat * Settings.lonVsLat, candidateEdge.endNode.lon,
-						candidateEdge.endNode.lat * Settings.lonVsLat);
+						candidateEdge.startNode.lat * settings.lonVsLat, candidateEdge.endNode.lon,
+						candidateEdge.endNode.lat * settings.lonVsLat);
 				final double distSq_StopToLine = line.ptSegDistSq(tramEdge.endNode.lon,
-						tramEdge.endNode.lat * Settings.lonVsLat);
+						tramEdge.endNode.lat * settings.lonVsLat);
 				final double distSq_StopToLineStart = Point2D.distanceSq(tramEdge.endNode.lon,
-						tramEdge.endNode.lat * Settings.lonVsLat, candidateEdge.startNode.lon,
-						candidateEdge.startNode.lat * Settings.lonVsLat);
+						tramEdge.endNode.lat * settings.lonVsLat, candidateEdge.startNode.lon,
+						candidateEdge.startNode.lat * settings.lonVsLat);
 				final double dist_StartToClosestPoint = Math.sqrt(distSq_StopToLineStart - distSq_StopToLine);
 				final double dist_StartToEnd = Point2D.distance(candidateEdge.startNode.lon,
-						candidateEdge.startNode.lat * Settings.lonVsLat, candidateEdge.endNode.lon,
-						candidateEdge.endNode.lat * Settings.lonVsLat);
+						candidateEdge.startNode.lat * settings.lonVsLat, candidateEdge.endNode.lon,
+						candidateEdge.endNode.lat * settings.lonVsLat);
 				final double ratio = dist_StartToClosestPoint / dist_StartToEnd;
 				if ((ratio >= 0) && (ratio <= 1)) {
 					candidateEdge.distToTramStop = candidateEdge.length * ratio;
@@ -247,9 +247,9 @@ public class TrafficNetwork extends RoadNetwork {
 		identifyReferencesOfAllPublicTransportTypesInSourceDestinationWindow();
 		computeAccumulatedDriverProfileDistribution();
 
-		if (Settings.routingAlgorithm == Routing.Algorithm.DIJKSTRA) {
+		if (settings.routingAlgorithm == Routing.Algorithm.DIJKSTRA) {
 			routingAlgorithm = new Dijkstra(this);
-		} else if (Settings.routingAlgorithm == Routing.Algorithm.RANDOM_A_STAR) {
+		} else if (settings.routingAlgorithm == Routing.Algorithm.RANDOM_A_STAR) {
 			routingAlgorithm = new RandomAStar(this);
 		}
 
@@ -258,11 +258,11 @@ public class TrafficNetwork extends RoadNetwork {
 	void computeAccumulatedDriverProfileDistribution() {
 		driverProfilePercAccumulated = new ArrayList<>();
 		double total = 0;
-		for (final Double d : Settings.driverProfileDistribution) {
+		for (final Double d : settings.driverProfileDistribution) {
 			total += d;
 		}
 		double accumulated = 0;
-		for (final Double d : Settings.driverProfileDistribution) {
+		for (final Double d : settings.driverProfileDistribution) {
 			accumulated += d;
 			driverProfilePercAccumulated.add(accumulated / total);
 		}
@@ -283,7 +283,7 @@ public class TrafficNetwork extends RoadNetwork {
 						vehicle.startTime, vehicle.id, vehicle.vid, DriverProfile.valueOf(vehicle.driverProfile));
 			} else {
 				// This is a simple way to get number of vehicles per step. The result number may be inaccurate.
-				final double numRepeatPerStep = vehicle.numberRepeatPerSecond / Settings.numStepsPerSecond;
+				final double numRepeatPerStep = vehicle.numberRepeatPerSecond / settings.numStepsPerSecond;
 				externalVehicleRepeatPerStep.put(vehicle, numRepeatPerStep);
 			}
 		}
@@ -297,11 +297,11 @@ public class TrafficNetwork extends RoadNetwork {
 	void createInternalNonPublicVehicles(int numLocalRandomPrivateVehicles, final double timeNow,
 			boolean isNewNonPubVehiclesAllowed) {
 		if (isNewNonPubVehiclesAllowed) {
-			final int numVehiclesNeeded = Settings.getTemporalDistributor().getCurrentVehicleLimit(numLocalRandomPrivateVehicles,
-					(int) (timeNow*Settings.numStepsPerSecond),Settings.maxNumSteps) - numInternalNonPublicVehicle;
+			final int numVehiclesNeeded = settings.getTemporalDistributor().getCurrentVehicleLimit(numLocalRandomPrivateVehicles,
+					(int) (timeNow*settings.numStepsPerSecond),settings.maxNumSteps) - numInternalNonPublicVehicle;
 			for (int i = 0; i < numVehiclesNeeded; i++) {
-				VehicleType type = Settings.getVehicleTypeDistributor().getVehicleType();
-				Edge[] edges = Settings.getODDistributor().getStartAndEndEdge(this,
+				VehicleType type = settings.getVehicleTypeDistributor().getVehicleType();
+				Edge[] edges = settings.getODDistributor().getStartAndEndEdge(this,
 						internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges);
 				addNewVehicle(type, false, false, edges[0].startNode, edges[1].endNode, null, internalVehiclePrefix, timeNow, "", -1,
 							getRandomDriverProfile());
@@ -410,7 +410,7 @@ public class TrafficNetwork extends RoadNetwork {
 	}*/
 
 	ArrayList<RouteLeg> createOneRouteFromSerializedData(final ArrayList<SerializableRouteLeg> serializedData, VehicleType type) {
-		if(Settings.inputOnlyODPairsOfForegroundVehicleFile){
+		if(settings.inputOnlyODPairsOfForegroundVehicleFile){
 			SerializableRouteLeg legStart = serializedData.get(0);
 			SerializableRouteLeg legEnd = serializedData.get(serializedData.size()-1);
 			return routingAlgorithm.createCompleteRoute(edges.get(legStart.edgeIndex).startNode, edges.get(legEnd.edgeIndex).endNode, type);
@@ -465,15 +465,15 @@ public class TrafficNetwork extends RoadNetwork {
 		// Start edges within workarea
 		for (final GridCell cell : workareaCells) {
 			for (final Node node : cell.nodes) {
-				if (((Settings.listRouteSourceWindowForInternalVehicle.size() == 0)
-						&& (Settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0))
-						|| ((Settings.listRouteSourceWindowForInternalVehicle.size() > 0)
-								&& isNodeInsideRectangle(node, Settings.listRouteSourceWindowForInternalVehicle))
-						|| ((Settings.listRouteSourceDestinationWindowForInternalVehicle.size() > 0)
+				if (((settings.listRouteSourceWindowForInternalVehicle.size() == 0)
+						&& (settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0))
+						|| ((settings.listRouteSourceWindowForInternalVehicle.size() > 0)
+								&& isNodeInsideRectangle(node, settings.listRouteSourceWindowForInternalVehicle))
+						|| ((settings.listRouteSourceDestinationWindowForInternalVehicle.size() > 0)
 								&& isNodeInsideRectangle(node,
-										Settings.listRouteSourceDestinationWindowForInternalVehicle))) {
+										settings.listRouteSourceDestinationWindowForInternalVehicle))) {
 					for (final Edge edge : node.outwardEdges) {
-						if (edge.isSuitableForRouteStartOfInternalVehicle(workareaCells)) {
+						if (edge.isSuitableForRouteStartOfInternalVehicle(workareaCells, settings.minLengthOfRouteStartEndEdge)) {
 							if (edge.type != RoadType.tram) {
 								internalNonPublicVehicleStartEdges.add(edge);
 								if (edge.busRoutesRef.size() > 0) {
@@ -492,14 +492,14 @@ public class TrafficNetwork extends RoadNetwork {
 
 		// End edges (can be anywhere in road network)
 		for (final Edge edge : edges) {
-			if (((Settings.listRouteDestinationWindowForInternalVehicle.size() == 0)
-					&& (Settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0))
-					|| ((Settings.listRouteDestinationWindowForInternalVehicle.size() > 0) && isNodeInsideRectangle(
-							edge.endNode, Settings.listRouteDestinationWindowForInternalVehicle))
-					|| ((Settings.listRouteSourceDestinationWindowForInternalVehicle.size() > 0)
+			if (((settings.listRouteDestinationWindowForInternalVehicle.size() == 0)
+					&& (settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0))
+					|| ((settings.listRouteDestinationWindowForInternalVehicle.size() > 0) && isNodeInsideRectangle(
+							edge.endNode, settings.listRouteDestinationWindowForInternalVehicle))
+					|| ((settings.listRouteSourceDestinationWindowForInternalVehicle.size() > 0)
 							&& isNodeInsideRectangle(edge.endNode,
-									Settings.listRouteSourceDestinationWindowForInternalVehicle))) {
-				if (edge.isSuitableForRouteEndOfInternalVehicle()) {
+									settings.listRouteSourceDestinationWindowForInternalVehicle))) {
+				if (edge.isSuitableForRouteEndOfInternalVehicle(settings.minLengthOfRouteStartEndEdge)) {
 					if (edge.type != RoadType.tram) {
 						internalNonPublicVehicleEndEdges.add(edge);
 						if (edge.busRoutesRef.size() > 0) {
@@ -665,7 +665,7 @@ public class TrafficNetwork extends RoadNetwork {
 		for (int i = 0; i < internalTramStopEdges.size(); i++) {
 			final Edge edge = internalTramStopEdges.get(i);
 			if (edge.timeTramStopping > 0) {
-				edge.timeTramStopping -= 1 / Settings.numStepsPerSecond;
+				edge.timeTramStopping -= 1 / settings.numStepsPerSecond;
 
 				/*
 				 * Ensure the tram stop CAN NOT block for some time after the
@@ -674,10 +674,10 @@ public class TrafficNetwork extends RoadNetwork {
 				 * without stopping again.
 				 */
 				if (edge.timeTramStopping <= 0) {
-					edge.timeNoTramStopping = Settings.minGapBetweenTramStopTimerCountDowns;
+					edge.timeNoTramStopping = settings.minGapBetweenTramStopTimerCountDowns;
 				}
 			} else if (edge.timeNoTramStopping > 0) {
-				edge.timeNoTramStopping -= 1 / Settings.numStepsPerSecond;
+				edge.timeNoTramStopping -= 1 / settings.numStepsPerSecond;
 			}
 
 		}
@@ -712,7 +712,7 @@ public class TrafficNetwork extends RoadNetwork {
 			edge.setNextVehicleToGetIntoTheLane(next);
 			if(next != null && next.startFromParking()){
 				if(listener != null){
-					listener.onVehicleStartMoving(vehicles, (int) (timeNow*Settings.numStepsPerSecond), this);
+					listener.onVehicleStartMoving(vehicles, (int) (timeNow*settings.numStepsPerSecond), this);
 				}
 			}
 		}
@@ -723,7 +723,7 @@ public class TrafficNetwork extends RoadNetwork {
 		while (next != null){
 			next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
 			if(listener != null){
-				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/Settings.numStepsPerSecond), this);
+				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/settings.numStepsPerSecond), this);
 			}
 			newVehiclesSinceLastReport.add(next);
 			next.park(true, timeNow);
@@ -740,7 +740,7 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	public void updateTrafficLights(double timeNow){
-		if (Settings.trafficLightTiming != TrafficLightTiming.NONE) {
+		if (settings.trafficLightTiming != TrafficLightTiming.NONE) {
 			lightCoordinator.scheduleLights(timeNow);
 			lightCoordinator.updateLights(timeNow);
 		}
@@ -754,7 +754,7 @@ public class TrafficNetwork extends RoadNetwork {
 		for (Vehicle vehicle : vehicles) {
 			if(!vehicle.isFinished()){
 				if(vehicle.lane != null && vehicle.lane.getFrontVehicleInLane().id == vehicle.id) {
-					if(timeNow - vehicle.getLastSpeedChangeTime() > Settings.numStepsPerSecond * 300) {
+					if(timeNow - vehicle.getLastSpeedChangeTime() > settings.numStepsPerSecond * 300) {
 						System.out.println("Vehicle Stucked " + vehicle.id);
 					}
 				}
@@ -773,10 +773,10 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	public boolean isPublishTime(int step){
-		if(Settings.updateStepInterval == 1){
+		if(settings.updateStepInterval == 1){
 			return true;
 		}else {
-			return (step % Settings.updateStepInterval) == 0;
+			return (step % settings.updateStepInterval) == 0;
 		}
 	}
 

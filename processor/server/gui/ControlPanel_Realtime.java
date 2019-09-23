@@ -39,8 +39,10 @@ public class ControlPanel_Realtime extends JPanel {
 	private final JComboBox comboBoxTrafficDrawingMethod;
 	private final JLabel lblDrawTrafficAs;
 	private final ControlPanel cp;
+	private Settings settings;
 
 	public ControlPanel_Realtime(SimulationProcessor processor, ControlPanel cp) {
+		this.settings = processor.getSettings();
 		this.processor = processor;
 		setPreferredSize(new Dimension(445, 250));
 
@@ -214,9 +216,9 @@ public class ControlPanel_Realtime extends JPanel {
 	}
 
 	void resumeSim() {
-		if (!Settings.isServerBased) {
+		if (!settings.isServerBased) {
 			//Only start drawing at the next worker-reporting step to preventing UI freezing
-			cp.gui.stepToDraw += Settings.trafficReportStepGapInServerlessMode;
+			cp.gui.stepToDraw += settings.trafficReportStepGapInServerlessMode;
 			cp.gui.clearObjectData();//Clear received data
 		}
 		processor.resumeSim();
