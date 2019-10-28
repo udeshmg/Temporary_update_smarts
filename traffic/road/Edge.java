@@ -115,6 +115,7 @@ public class Edge {
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
 	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
 	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
+	private LinkedHashMap<Edge, Integer> edgeLaneMap;
 
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
@@ -478,5 +479,13 @@ public class Edge {
 
 	public void setMovementLight(Movement movement, LightColor light){
 		lightColorMap.put(movement, light);
+	}
+
+	public Integer getLaneForNextEdge(Edge next) {
+		return edgeLaneMap.get(next);
+	}
+
+	public void setEdgeLaneMap(LinkedHashMap<Edge, Integer> edgeLaneMap) {
+		this.edgeLaneMap = edgeLaneMap;
 	}
 }

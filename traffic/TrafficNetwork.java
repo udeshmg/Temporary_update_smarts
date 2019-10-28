@@ -11,12 +11,7 @@ import processor.communication.message.SerializableRouteLeg;
 import traffic.light.LightCoordinator;
 import traffic.light.TrafficLightCluster;
 import traffic.light.TrafficLightTiming;
-import traffic.road.Edge;
-import traffic.road.GridCell;
-import traffic.road.Lane;
-import traffic.road.Node;
-import traffic.road.RoadNetwork;
-import traffic.road.RoadType;
+import traffic.road.*;
 import traffic.routing.Dijkstra;
 import traffic.routing.RandomAStar;
 import traffic.routing.ReferenceBasedSearch;
@@ -106,6 +101,7 @@ public class TrafficNetwork extends RoadNetwork {
 		identifyInternalTramStopEdges();
 		addTramStopsToParallelNonTramEdges();
 		tripMakingVehicles = new PriorityQueue<>(getTripMakingVehicleComparator());
+		setCrossingIncreasingOrders();
 	}
 
 	public void clearReportedData() {
@@ -797,4 +793,59 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 		};
 	}
+
+	public void setCrossingIncreasingOrders(){
+		for (Node node : nodes) {
+			for (Edge inwardEdge : node.inwardEdges) {
+				List<Edge> outEdges = new ArrayList<>();
+				outEdges.addAll(node.outwardEdges);
+				if(Settings.isDriveOnLeft) {
+					Collections.sort(outEdges, new Comparator<Edge>() {
+						@Override
+						public int compare(Edge o1, Edge o2) {
+							int o1Left = RoadUtil.findOutwardEdgesOnLeft(inwardEdge, o1).size();
+							int o2Left = RoadUtil.findOutwardEdgesOnLeft(inwardEdge, o2).size();
+							if (o1Left < o2Left) {
+								return -1;
+							} else if (o1Left > o2Left) {
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+					});
+				}else{
+					Collections.sort(outEdges, new Comparator<Edge>() {
+						@Override
+						public int compare(Edge o1, Edge o2) {
+							int o1Right = RoadUtil.findOutwardEdgesOnRight(inwardEdge, o1).size();
+							int o2Right = RoadUtil.findOutwardEdgesOnRight(inwardEdge, o2).size();
+							if(o1Right < o2Right){
+								return -1;
+							}else if(o1Right > o2Right){
+								return 1;
+							}else {
+								return 0;
+							}
+						}
+					});
+				}
+				LinkedHashMap<Edge, Integer> edgeLaneMap = new LinkedHashMap<>();
+
+				if(inwardEdge.getLaneCount() == 1){
+					for (Edge outEdge : outEdges) {
+						edgeLaneMap.put(outEdge, 0);
+					}
+				}else if(inwardEdge.getLaneCount() == outEdges.size()){
+					for (int i = 0; i < outEdges.size() ; i++) {
+						edgeLaneMap.put(outEdges.get(i), i);
+					}
+				}else{
+					throw new UnsupportedOperationException("The condition is not supported at this moment");
+				}
+				inwardEdge.setEdgeLaneMap(edgeLaneMap);
+			}
+		}
+	}
+
 }
