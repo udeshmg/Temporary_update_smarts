@@ -7,6 +7,7 @@ import java.util.*;
 import common.Settings;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
+import traffic.TrafficNetwork;
 import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -19,6 +20,7 @@ import traffic.vehicle.carfollow.SlowdownFactor;
 import traffic.vehicle.lanechange.LaneChange;
 import traffic.vehicle.lanechange.LaneChangeDirection;
 import traffic.vehicle.lanechange.MOBILInput;
+import traffic.vehicle.lanedecide.LaneDecider;
 
 public class Vehicle {
 	public String id = "";
@@ -58,6 +60,7 @@ public class Vehicle {
 	public Edge edgeBeforeTurnLeft = null;
 	private LaneChange laneChange = new LaneChange();
 	private CarFollow carFollow = new CarFollow();
+	private LaneDecider laneDecider = Settings.getLaneDecider();
 	private boolean finished = false;
 	private boolean reachedFellow = false;
 
@@ -200,7 +203,7 @@ public class Vehicle {
 	public boolean startFromParking() {
 		final RouteLeg leg = routeLegs.get(indexLegOnRoute);
 		final Edge edge = leg.edge;
-		final Lane lane = edge.getFirstLane();// Start from the lane closest to roadside
+		final Lane lane = laneDecider.getNextEdgeLane(this);// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0();
 		if (pos >= 0) {
 			this.lane = lane;
@@ -416,7 +419,7 @@ public class Vehicle {
 		Edge current = lane.edge;
 		if(hasNextEdge()) {
 			if (headPosition > current.getEndIntersectionLaneChangeProhibitedPos()) {
-				Lane next = getLaneInNextEdge(getNextEdge());
+				Lane next = laneDecider.getNextEdgeLane(this);
 				decision = new IntersectionDecision(lane, next);
 			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
 				decision = null;
@@ -521,6 +524,7 @@ public class Vehicle {
 
 	public void setRouteLegs(List<RouteLeg> routeLegs){
 		this.routeLegs = routeLegs;
+		laneDecider.computeLanes(this);
 	}
 
 	public int getRouteLegCount(){
@@ -655,19 +659,7 @@ public class Vehicle {
 		}
 	}
 
-	public Lane getLaneInNextEdge(Edge nextEdge){
-		if(nextEdge.endNode == lane.edge.startNode){
-			return nextEdge.getLane(0);
-		}else {
-			Lane newLane = null;
-			if (nextEdge.getLaneCount() <= lane.laneNumber) {
-				newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
-			} else {
-				newLane = nextEdge.getLane(lane.laneNumber);
-			}
-			return newLane;
-		}
-	}
+
 
 	public double getHeadWayMultiplier() {
 		return headWayMultiplier;

@@ -18,6 +18,8 @@ public class RouteLeg {
 	 */
 	public double stopover = 0;
 
+	public int lane;
+
 	private double speed;
 	private double previousEndTarget = -1;
 	private double nextStartTarget = -1;
@@ -41,6 +43,14 @@ public class RouteLeg {
 		this.edge = edge;
 		this.stopover = stopover;
 		this.speed = edge.freeFlowSpeed;
+	}
+
+	public int getLane() {
+		return lane;
+	}
+
+	public void setLane(int lane) {
+		this.lane = lane;
 	}
 
 	public void setTargetTimes(double previousEndTarget, double nextStartTarget, double nextEndTarget, Edge next) {
