@@ -6,6 +6,9 @@ import traffic.light.manager.FixedTwoPhaseTLManager;
 import traffic.light.manager.TLManager;
 import traffic.network.*;
 import traffic.routing.Routing;
+import traffic.vehicle.lanedecide.DefaultLaneDecider;
+import traffic.vehicle.lanedecide.LaneDecider;
+import traffic.vehicle.lanedecide.PredefinedLaneDecider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +42,7 @@ public class SettingsDictionary {
     private Map<String, VehicleTypeDistributor> vehicleTypeDistributorMap;
     private Map<String, Routing> routingAlgoMap;
     private Map<String, TLManager> lightSchedulerMap;
+    private Map<String, LaneDecider> laneDeciderMap;
 
     public SettingsDictionary() {
         this.listenerMap = new HashMap<>();
@@ -52,6 +56,10 @@ public class SettingsDictionary {
         this.lightSchedulerMap = new HashMap<>();
         addTLScheduler("FIXED", new FixedTwoPhaseTLManager());
         addTLScheduler("DYNAMIC", new DynamicTwoPhaseTLManager());
+        this.laneDeciderMap = new HashMap<>();
+        addLaneDecider("DEFAULT", new DefaultLaneDecider());
+        addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
+
     }
 
     public void addSimulationListener(String key, SimulationListener listener){
@@ -94,5 +102,13 @@ public class SettingsDictionary {
 
     public TLManager getTLScheduler(String key){
         return lightSchedulerMap.get(key);
+    }
+
+    public void addLaneDecider(String key, LaneDecider laneDecider){
+        laneDeciderMap.put(key, laneDecider);
+    }
+
+    public LaneDecider getLaneDecider(String key) {
+        return laneDeciderMap.get(key);
     }
 }

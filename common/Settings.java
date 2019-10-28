@@ -10,6 +10,7 @@ import traffic.network.*;
 import traffic.light.TrafficLightTiming;
 import traffic.routing.Routing;
 import traffic.vehicle.EmergencyStrategy;
+import traffic.vehicle.lanedecide.LaneDecider;
 
 /**
  * Global settings.
@@ -153,6 +154,7 @@ public class Settings {
 	public static boolean stopsAtMaxSteps = true;
 	public static int gridlockDetectionTime = 600;
 	public static String tlManager = "";
+	public static String laneDecide = "DEFAULT";
 
 	public static ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);
@@ -177,5 +179,8 @@ public class Settings {
 		return dictionary.getTLScheduler(trafficLightTiming.name());
 	}
 
+	public static LaneDecider getLaneDecider(){
+		return dictionary.getLaneDecider(laneDecide);
+	}
 
 }
