@@ -799,7 +799,7 @@ public class TrafficNetwork extends RoadNetwork {
 			for (Edge inwardEdge : node.inwardEdges) {
 				List<Edge> outEdges = new ArrayList<>();
 				outEdges.addAll(node.outwardEdges);
-				if(Settings.isDriveOnLeft) {
+				if(settings.isDriveOnLeft) {
 					Collections.sort(outEdges, new Comparator<Edge>() {
 						@Override
 						public int compare(Edge o1, Edge o2) {
