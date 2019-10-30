@@ -2,6 +2,7 @@ package processor.server;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import common.Settings;
@@ -9,22 +10,7 @@ import processor.SimServerData;
 import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
-import processor.communication.message.Message_SW_BlockLane;
-import processor.communication.message.Message_SW_ChangeSpeed;
-import processor.communication.message.Message_SW_KillWorker;
-import processor.communication.message.Message_SW_ServerBased_ShareTraffic;
-import processor.communication.message.Message_SW_ServerBased_Simulate;
-import processor.communication.message.Message_SW_Serverless_Pause;
-import processor.communication.message.Message_SW_Serverless_Resume;
-import processor.communication.message.Message_SW_Serverless_Start;
-import processor.communication.message.Message_SW_Serverless_Stop;
-import processor.communication.message.Message_SW_Setup;
-import processor.communication.message.Message_WS_Join;
-import processor.communication.message.Message_WS_TrafficReport;
-import processor.communication.message.Message_WS_ServerBased_SharedMyTrafficWithNeighbor;
-import processor.communication.message.Message_WS_Serverless_Complete;
-import processor.communication.message.Message_WS_SetupCreatingVehicles;
-import processor.communication.message.Message_WS_SetupDone;
+import processor.communication.message.*;
 import traffic.network.ODDistributor;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
@@ -264,40 +250,23 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public void setupNewSim() {
 		data.resetVariablesForSetup();
 		receivedTrafficReportCache.clear();
-
-		// Reset worker status
-		for (final WorkerMeta worker : workerMetas) {
-			worker.setState(WorkerState.NEW);
-		}
+		data.initFileOutput();
 
 		// In a new environment (map), determine the work areas for all workers
 		if (settings.isNewEnvironment) {
 			data.getRoadNetwork().buildGrid();
-			WorkloadBalancer.partitionGridCells(settings, workerMetas, data.getRoadNetwork());
 		}
 		assignODWindows();
-
-		// Determine the number of internal vehicles at all workers
-		WorkloadBalancer.assignNumInternalVehiclesToWorkers(settings, workerMetas, data.getRoadNetwork());
-
-		// Assign vehicle routes from external file to workers
-		final RouteLoader routeLoader = new RouteLoader(data.getRoadNetwork(), workerMetas);
-		routeLoader.loadRoutes(settings.inputForegroundVehicleFile, settings.inputBackgroundVehicleFile);
-
+		final RouteLoader routeLoader = new RouteLoader(data.getRoadNetwork());
+		List<SerializableExternalVehicle> vehicleList = routeLoader.loadRoutes(settings.inputForegroundVehicleFile, settings.inputBackgroundVehicleFile);
 		data.updateNoOfVehiclesNeededAtStart(routeLoader.vehicles.size());
 
-		// Send simulation configuration to workers
-		for (final WorkerMeta worker : workerMetas) {
-			worker.send(new Message_SW_Setup(settings, workerMetas, worker, data.getRoadNetwork().edges, data.getStep(), data.getNodesToAddLight(),
-					data.getNodesToRemoveLight()));
-		}
 
-		data.initFileOutput();
+		WorkloadBalancer workloadBalancer = new WorkloadBalancer(workerMetas, data.getRoadNetwork());
+		workloadBalancer.balanceLoad(settings, data.getStep(), vehicleList, data.getNodesToAddLight(), data.getNodesToRemoveLight());
+
 
 		settings.isNewEnvironment = false;
-
-		System.out.println("Sent simulation configuration to all workers.");
-
 	}
 
 	private void assignODWindows(){

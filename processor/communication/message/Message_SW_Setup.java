@@ -59,9 +59,13 @@ public class Message_SW_Setup {
 
 	}
 
-	public Message_SW_Setup(Settings settings, final ArrayList<WorkerMeta> workers, final WorkerMeta workerToReceiveMessage,
-			final ArrayList<Edge> edges, final int step, final ArrayList<Node> nodesToAddLight,
-			final ArrayList<Node> nodesToRemoveLight) {
+	public Message_SW_Setup(Settings settings,
+							List<WorkerMeta> workers,
+							WorkerMeta workerToReceiveMessage,
+							List<Edge> edges,
+							int step,
+							List<Node> nodesToAddLight,
+							List<Node> nodesToRemoveLight) {
 		isNewEnvironment = settings.isNewEnvironment;
 		numWorkers = settings.numWorkers;
 		startStep = step;
@@ -104,7 +108,7 @@ public class Message_SW_Setup {
 		isDriveOnLeft = settings.isDriveOnLeft;
 	}
 
-	ArrayList<SerializableWorkerMetadata> appendMetadataOfWorkers(final ArrayList<WorkerMeta> workers) {
+	ArrayList<SerializableWorkerMetadata> appendMetadataOfWorkers(List<WorkerMeta> workers) {
 		final ArrayList<SerializableWorkerMetadata> listSerializableWorkerMetadata = new ArrayList<>();
 		for (final WorkerMeta worker : workers) {
 			listSerializableWorkerMetadata.add(new SerializableWorkerMetadata(worker));
@@ -112,7 +116,7 @@ public class Message_SW_Setup {
 		return listSerializableWorkerMetadata;
 	}
 
-	ArrayList<SerializableDouble> getDriverProfilePercentage(final ArrayList<Double> percentages) {
+	ArrayList<SerializableDouble> getDriverProfilePercentage(List<Double> percentages) {
 		final ArrayList<SerializableDouble> list = new ArrayList<>();
 		for (final Double percentage : percentages) {
 			list.add(new SerializableDouble(percentage));
@@ -120,7 +124,7 @@ public class Message_SW_Setup {
 		return list;
 	}
 
-	ArrayList<SerializableInt> getLightNodeIndex(final ArrayList<Node> nodes) {
+	ArrayList<SerializableInt> getLightNodeIndex(List<Node> nodes) {
 		final ArrayList<SerializableInt> list = new ArrayList<>();
 		for (final Node node : nodes) {
 			list.add(new SerializableInt(node.index));
@@ -128,7 +132,7 @@ public class Message_SW_Setup {
 		return list;
 	}
 
-	ArrayList<Serializable_GPS_Rectangle> getListRouteWindow(final List<double[]> windows) {
+	ArrayList<Serializable_GPS_Rectangle> getListRouteWindow(List<double[]> windows) {
 		final ArrayList<Serializable_GPS_Rectangle> list = new ArrayList<>();
 		for (final double[] window : windows) {
 			list.add(new Serializable_GPS_Rectangle(window[0], window[1], window[2], window[3]));

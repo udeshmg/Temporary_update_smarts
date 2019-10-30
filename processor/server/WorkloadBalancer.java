@@ -1,10 +1,15 @@
 package processor.server;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import common.Settings;
+import processor.communication.message.Message_SW_Setup;
+import processor.communication.message.SerializableExternalVehicle;
+import processor.worker.Worker;
 import traffic.road.GridCell;
+import traffic.road.Node;
 import traffic.road.RoadNetwork;
 
 /**
@@ -13,9 +18,36 @@ import traffic.road.RoadNetwork;
  * running at the worker reaches the assigned volume.
  */
 public class WorkloadBalancer {
-	static Random random = new Random();
+	private Random random;
+	private List<WorkerMeta> workerMetaList;
+	private RoadNetwork roadNetwork;
 
-	static void assignNumInternalVehiclesToWorkers(Settings settings, final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
+	public WorkloadBalancer(List<WorkerMeta> workerMetaList, RoadNetwork roadNetwork){
+		this.random = new Random();
+		this.workerMetaList = workerMetaList;
+		this.roadNetwork = roadNetwork;
+	}
+
+	public void balanceLoad(Settings settings, int step, List<SerializableExternalVehicle> vehicleList, List<Node> nodesRoAddLight, List<Node> nodesToRemoveLight){
+		// Reset worker status
+		for (final WorkerMeta worker : workerMetaList) {
+			worker.setState(WorkerState.NEW);
+		}
+		if(settings.isNewEnvironment){
+			partitionGridCells(settings, workerMetaList, roadNetwork);
+		}
+		// Determine the number of internal vehicles at all workers
+		assignNumInternalVehiclesToWorkers(settings, workerMetaList, roadNetwork);
+		// Assign vehicle routes from external file to workers
+		assignVehicleToWorker(workerMetaList, roadNetwork, vehicleList);
+		// Send simulation configuration to workers
+		for (final WorkerMeta worker : workerMetaList) {
+			worker.send(new Message_SW_Setup(settings, workerMetaList, worker, roadNetwork.edges, step, nodesRoAddLight,nodesToRemoveLight));
+		}
+		System.out.println("Sent simulation configuration to all workers.");
+	}
+
+	private void assignNumInternalVehiclesToWorkers(Settings settings, List<WorkerMeta> workers, RoadNetwork roadNetwork) {
 		if ((settings.listRouteSourceWindowForInternalVehicle.size() == 0)
 				&& (settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0)) {
 			assignNumInternalVehiclesToWorkersBasedOnWorkarea(settings, workers);
@@ -33,8 +65,8 @@ public class WorkloadBalancer {
 	 * maintain a higher number of vehicles.
 	 *
 	 */
-	static void assignNumInternalVehiclesToWorkersBasedOnSourceWindow(Settings settings, final ArrayList<WorkerMeta> workers,
-			final RoadNetwork roadNetwork) {
+	private void assignNumInternalVehiclesToWorkersBasedOnSourceWindow(Settings settings, List<WorkerMeta> workers,
+			RoadNetwork roadNetwork) {
 		final ArrayList<double[]> windows = new ArrayList<>();
 		windows.addAll(settings.listRouteSourceDestinationWindowForInternalVehicle);
 		windows.addAll(settings.listRouteSourceWindowForInternalVehicle);
@@ -80,28 +112,32 @@ public class WorkloadBalancer {
 	 * at each worker is roughly the same.
 	 *
 	 */
-	static void assignNumInternalVehiclesToWorkersBasedOnWorkarea(Settings settings, final ArrayList<WorkerMeta> workers) {
+	private void assignNumInternalVehiclesToWorkersBasedOnWorkarea(Settings settings, List<WorkerMeta> workers) {
 		int totalNumAssignedPrivateVehicles = 0;
 		int totalNumAssignedTrams = 0;
 		int totalNumAssignedBuses = 0;
 
 		// Assign numbers to workers except the last one
-		for (int i = 0; i < (workers.size() - 1); i++) {
-			workers.get(i).numRandomPrivateVehicles = (int) (workers.get(i).laneLengthRatioAgainstWholeMap
-					* settings.numGlobalRandomPrivateVehicles);
-			totalNumAssignedPrivateVehicles += workers.get(i).numRandomPrivateVehicles;
-			workers.get(
-					i).numRandomTrams = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * settings.numGlobalRandomTrams);
-			totalNumAssignedTrams += workers.get(i).numRandomTrams;
-			workers.get(
-					i).numRandomBuses = (int) (workers.get(i).laneLengthRatioAgainstWholeMap * settings.numGlobalRandomBuses);
-			totalNumAssignedBuses += workers.get(i).numRandomBuses;
+		for (int i = 0; i < workers.size(); i++) {
+			WorkerMeta worker = workers.get(i);
+
+			if(i != workers.size()-1) {
+				double ratio = worker.laneLengthRatioAgainstWholeMap;
+				worker.numRandomPrivateVehicles = (int) (ratio * settings.numGlobalRandomPrivateVehicles);
+				totalNumAssignedPrivateVehicles += worker.numRandomPrivateVehicles;
+				worker.numRandomTrams = (int) (ratio * settings.numGlobalRandomTrams);
+				totalNumAssignedTrams += worker.numRandomTrams;
+				worker.numRandomBuses = (int) (ratio * settings.numGlobalRandomBuses);
+				totalNumAssignedBuses += worker.numRandomBuses;
+			}else{
+				// Assign numbers to the last worker
+				worker.numRandomPrivateVehicles = settings.numGlobalRandomPrivateVehicles
+						- totalNumAssignedPrivateVehicles;
+				worker.numRandomTrams = settings.numGlobalRandomTrams - totalNumAssignedTrams;
+				worker.numRandomBuses = settings.numGlobalRandomBuses - totalNumAssignedBuses;
+			}
 		}
-		// Assign numbers to the last worker
-		workers.get(workers.size() - 1).numRandomPrivateVehicles = settings.numGlobalRandomPrivateVehicles
-				- totalNumAssignedPrivateVehicles;
-		workers.get(workers.size() - 1).numRandomTrams = settings.numGlobalRandomTrams - totalNumAssignedTrams;
-		workers.get(workers.size() - 1).numRandomBuses = settings.numGlobalRandomBuses - totalNumAssignedBuses;
+
 	}
 
 	/**
@@ -109,7 +145,7 @@ public class WorkloadBalancer {
 	 * cells. The total lane length of a worker area is similar to that of
 	 * another work area.
 	 */
-	public static void partitionGridCells(Settings settings, final ArrayList<WorkerMeta> workers, final RoadNetwork roadNetwork) {
+	private void partitionGridCells(Settings settings, List<WorkerMeta> workers, RoadNetwork roadNetwork) {
 
 		// Clear existing grid cells in the work area of each worker
 		for (final WorkerMeta worker : workers) {
@@ -168,4 +204,27 @@ public class WorkloadBalancer {
 
 	}
 
+
+	/**
+	 * Append route of vehicles to the workers whose work area covers the first
+	 * node of the route.
+	 */
+	static void assignVehicleToWorker(List<WorkerMeta> workers, RoadNetwork roadNetwork, List<SerializableExternalVehicle> vehicles) {
+		// Clear routes from previous loading
+		for (final WorkerMeta worker : workers) {
+			worker.externalRoutes.clear();
+		}
+		for (SerializableExternalVehicle ev : vehicles) {
+			final Node routeStartNode = roadNetwork.edges.get(ev.route.get(0).edgeIndex).startNode;
+			WorkerMeta routeStartWorker = null;
+			for (final WorkerMeta worker : workers) {
+				if (worker.workarea.workCells.contains(routeStartNode.gridCell)) {
+					routeStartWorker = worker;
+				}
+			}
+			if(routeStartWorker != null) {
+				routeStartWorker.externalRoutes.add(ev);
+			}
+		}
+	}
 }

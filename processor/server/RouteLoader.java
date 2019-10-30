@@ -3,6 +3,7 @@ package processor.server;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -34,45 +35,18 @@ public class RouteLoader {
 		}
 	}
 
-	ArrayList<String> vehicles = new ArrayList<>(150000);
+	List<String> vehicles = new ArrayList<>(150000);
 	ArrayList<NodeInfo> idMappers = new ArrayList<>(300000);
 	RoadNetwork roadNetwork;
 	NodeIdComparator nodeIdComparator = new NodeIdComparator();
 
-	ArrayList<WorkerMeta> workers;
-
-	public RouteLoader(RoadNetwork roadNetwork, final ArrayList<WorkerMeta> workers) {
+	public RouteLoader(RoadNetwork roadNetwork) {
 		this.roadNetwork = roadNetwork;
-		this.workers = workers;
 	}
 
-	/**
-	 * Append route of vehicles to the workers whose work area covers the first
-	 * node of the route.
-	 */
-	void assignVehicleToWorker() {
-		// Clear routes from previous loading
-		for (final WorkerMeta worker : workers) {
-			worker.externalRoutes.clear();
-		}
-		for (final String vehicle : vehicles) {
-			SerializableExternalVehicle ev = SerializableExternalVehicle.createFromString(vehicle, roadNetwork, idMappers, nodeIdComparator);
-			final Node routeStartNode = roadNetwork.edges.get(ev.route.get(0).edgeIndex).startNode;
-			final WorkerMeta routeStartWorker = getWorkerAtRouteStart(routeStartNode);
-			routeStartWorker.externalRoutes.add(ev);
-		}
-	}
 
-	public WorkerMeta getWorkerAtRouteStart(final Node routeStartNode) {
-		for (final WorkerMeta worker : workers) {
-			if (worker.workarea.workCells.contains(routeStartNode.gridCell)) {
-				return worker;
-			}
-		}
-		return null;
-	}
 
-	void loadRoutes(String inputForegroundVehicleFile, String inputBackgroundVehicleFile) {
+	public List<SerializableExternalVehicle> loadRoutes(String inputForegroundVehicleFile, String inputBackgroundVehicleFile) {
 		if (inputForegroundVehicleFile.length() > 0) {
 			scanXML(inputForegroundVehicleFile, true);
 		}
@@ -83,7 +57,13 @@ public class RouteLoader {
 			idMappers.add(new NodeInfo(node.osmId, node.index));
 		}
 		Collections.sort(idMappers, nodeIdComparator);
-		assignVehicleToWorker();
+		List<SerializableExternalVehicle> vehicleList = new ArrayList<>();
+		for (final String vehicle : vehicles) {
+			SerializableExternalVehicle ev = SerializableExternalVehicle.createFromString(vehicle, roadNetwork, idMappers, nodeIdComparator);
+			vehicleList.add(ev);
+
+		}
+		return vehicleList;
 	}
 
 	/**
