@@ -61,12 +61,6 @@ public class SimWorkerData {
         pspNonBorderEdges = pspEdges.get("NonBorder");
     }
 
-    public void initSimulation(Map<String, List<Edge>> pspEdges, Simulation simulation){
-        this.simulation = simulation;
-        pspBorderEdges = pspEdges.get("Border");
-        pspNonBorderEdges = pspEdges.get("NonBorder");
-    }
-
     public void initTrafficNetwork(String roadGraph){
         if (roadGraph.equals("builtin")) {
             settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
