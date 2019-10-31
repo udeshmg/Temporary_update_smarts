@@ -28,13 +28,17 @@ public class LightCoordinator {
 	public List<TrafficLightCluster> lightClusters = new ArrayList<>();
 	private TLManager tlManager;
 
-	public void addRemoveLights(final List<Node> nodes, final List<SerializableInt> indexNodesToAddLight,
-			final List<SerializableInt> indexNodesToRemoveLight) {
-		for (final SerializableInt si : indexNodesToAddLight) {
-			nodes.get(si.value).light = true;
+	public void addRemoveLights(List<Node> nodes, List<SerializableInt> lightNodes) {
+		List<Integer> lightNodeIndices = new ArrayList<>();
+		for (SerializableInt lightNode : lightNodes) {
+			lightNodeIndices.add(lightNode.value);
 		}
-		for (final SerializableInt si : indexNodesToRemoveLight) {
-			nodes.get(si.value).light = false;
+		for (Node node : nodes) {
+			if(lightNodeIndices.contains(node.index)){
+				node.light = true;
+			}else{
+				node.light = false;
+			}
 		}
 	}
 
@@ -145,10 +149,9 @@ public class LightCoordinator {
 	 * first street gets green light and other streets get red lights.
 	 *
 	 */
-	public void init(TrafficNetwork trafficNetwork, final List<Node> mapNodes, final List<SerializableInt> indexNodesToAddLight,
-			final List<SerializableInt> indexNodesToRemoveLight) {
+	public void init(TrafficNetwork trafficNetwork, List<Node> mapNodes, List<SerializableInt> lightNodes) {
 		// Add or remove lights
-		addRemoveLights(mapNodes, indexNodesToAddLight, indexNodesToRemoveLight);
+		addRemoveLights(mapNodes, lightNodes);
 
 		// Groups adjacent nodes with traffic lights based on distance.
 		groupAdjacentNodes(mapNodes, trafficNetwork.getSettings().trafficLightTiming, trafficNetwork.getSettings().maxLightGroupRadius);

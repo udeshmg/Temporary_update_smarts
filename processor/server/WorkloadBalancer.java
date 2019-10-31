@@ -7,6 +7,8 @@ import java.util.Random;
 import common.Settings;
 import processor.communication.message.Message_SW_Setup;
 import processor.communication.message.SerializableExternalVehicle;
+import processor.communication.message.SerializableInt;
+import processor.worker.Workarea;
 import processor.worker.Worker;
 import traffic.road.GridCell;
 import traffic.road.Node;
@@ -40,9 +42,10 @@ public class WorkloadBalancer {
 		assignNumInternalVehiclesToWorkers(settings, workerMetaList, roadNetwork);
 		// Assign vehicle routes from external file to workers
 		assignVehicleToWorker(workerMetaList, roadNetwork, vehicleList);
+		assignLightNodes(workerMetaList, roadNetwork, nodesRoAddLight, nodesToRemoveLight);
 		// Send simulation configuration to workers
 		for (final WorkerMeta worker : workerMetaList) {
-			worker.send(new Message_SW_Setup(settings, workerMetaList, worker, roadNetwork.edges, step, nodesRoAddLight,nodesToRemoveLight));
+			worker.send(new Message_SW_Setup(settings, workerMetaList, worker, roadNetwork.edges, step));
 		}
 		System.out.println("Sent simulation configuration to all workers.");
 	}
@@ -224,6 +227,23 @@ public class WorkloadBalancer {
 			}
 			if(routeStartWorker != null) {
 				routeStartWorker.externalRoutes.add(ev);
+			}
+		}
+	}
+
+	public void assignLightNodes(List<WorkerMeta> workers, RoadNetwork roadNetwork, List<Node> nodesRoAddLight, List<Node> nodesToRemoveLight){
+		for (int i = 0; i < workers.size(); i++) {
+			WorkerMeta worker = workers.get(i);
+			for (final Node node : roadNetwork.nodes) {
+				if (worker.workarea.workCells.contains(node.gridCell) && node.light && (node.inwardEdges.size() > 0)) {
+					if(!nodesToRemoveLight.contains(node)) {
+						worker.lightNodes.add(node);
+					}
+				}else{
+					if(nodesRoAddLight.contains(node)){
+						worker.lightNodes.add(node);
+					}
+				}
 			}
 		}
 	}

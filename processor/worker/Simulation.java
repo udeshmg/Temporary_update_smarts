@@ -2,13 +2,16 @@ package processor.worker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import common.Settings;
 import processor.SimulationListener;
+import processor.communication.message.SerializableExternalVehicle;
+import processor.communication.message.SerializableInt;
+import processor.communication.message.SerializableWorkerMetadata;
 import traffic.TrafficNetwork;
-import traffic.road.Edge;
-import traffic.road.Lane;
+import traffic.road.*;
 import traffic.vehicle.Vehicle;
 
 /**
@@ -18,16 +21,57 @@ import traffic.vehicle.Vehicle;
  *
  */
 public class Simulation {
+
+	private int numLocalRandomPrivateVehicles = 0;
+	private int numLocalRandomTrams = 0;
+	private int numLocalRandomBuses = 0;
+	private List<Edge> pspBorderEdges = new ArrayList<>();// For PSP (server-less)
+	private List<Edge> pspNonBorderEdges = new ArrayList<>();// For PSP (server-less)
+	private int step = 0;
+	private double timeNow;
 	TrafficNetwork trafficNetwork;
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	SimulationListener simulationListener = null;
 	Settings settings;
 
-	public Simulation(Settings settings, final TrafficNetwork trafficNetwork) {
+	public Simulation(Settings settings,int startStep, String roadGraph,
+					  int numLocalRandomPrivateVehicles, int numLocalRandomTrams, int numLocalRandomBuses,
+					  String workAreaName,
+					  List<SerializableWorkerMetadata> workerMetadatas,
+					  List<SerializableInt> lightNodes) {
+		if (roadGraph.equals("builtin")) {
+			settings.roadGraph = RoadUtil.importBuiltinRoadGraphFile(settings.inputBuiltinRoadGraph);
+		} else {
+			settings.roadGraph = roadGraph;
+		}
+		this.trafficNetwork = new TrafficNetwork(settings, workAreaName, workerMetadatas);
+		resetSimulation(settings, startStep, numLocalRandomPrivateVehicles, numLocalRandomTrams, numLocalRandomBuses, lightNodes);
+	}
+
+	public void resetSimulation(Settings settings,int startStep,
+								int numLocalRandomPrivateVehicles, int numLocalRandomTrams, int numLocalRandomBuses,
+								List<SerializableInt> lightNodes){
 		this.settings = settings;
-		this.trafficNetwork = trafficNetwork;
+		setStep(startStep);
+		this.numLocalRandomPrivateVehicles = numLocalRandomPrivateVehicles;
+		this.numLocalRandomTrams = numLocalRandomTrams;
+		this.numLocalRandomBuses = numLocalRandomBuses;
+		trafficNetwork.lightCoordinator.init(trafficNetwork, trafficNetwork.nodes, lightNodes);
+		trafficNetwork.buildEnvironment();
+		if(settings.getSimulationListener() != null) {
+			settings.getSimulationListener().onStart(trafficNetwork, settings.maxNumSteps, (int) settings.numStepsPerSecond);
+		}
+		resetExistingNetwork();
+		resetTraffic();
 		simulationListener = settings.getSimulationListener();
+	}
+
+
+
+	public void setStep(int step) {
+		this.step = step;
+		this.timeNow = step / settings.numStepsPerSecond;
 	}
 
 	void clearOneStepData() {
@@ -212,5 +256,70 @@ public class Simulation {
 		trafficNetwork.finishRemoveCheck(timeNow);
 		// Clear one-step data
 		clearOneStepData();
+	}
+
+	/////////////////////////////////////////
+
+	public void setPspEdges(Map<String, List<Edge>> pspEdges){
+		this.pspBorderEdges = pspEdges.get("Border");
+		this.pspNonBorderEdges = pspEdges.get("NonBorder");
+	}
+
+	public TrafficNetwork getTrafficNetwork() {
+		return trafficNetwork;
+	}
+
+	public void createVehicles(ArrayList<SerializableExternalVehicle> externalRoutes){
+		trafficNetwork.createExternalVehicles(externalRoutes, timeNow);
+		trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+				numLocalRandomBuses, true, true, true, timeNow);
+	}
+
+	public void changeLaneBlock(int laneIndex, boolean isBlocked) {
+		trafficNetwork.lanes.get(laneIndex).isBlocked = isBlocked;
+	}
+
+	public void addTransferredVehicle(Vehicle vehicle){
+		trafficNetwork.addOneTransferredVehicle(vehicle, timeNow);
+	}
+
+	public void resetExistingNetwork(){
+		// Reset existing network
+		for (final Edge edge : trafficNetwork.edges) {
+			edge.currentSpeed = edge.freeFlowSpeed;
+		}
+	}
+
+	public void resetTraffic(){
+		for (final Edge edge : pspBorderEdges) {
+			edge.clearVehicles();
+		}
+		for (final Edge edge : pspNonBorderEdges) {
+			edge.clearVehicles();
+		}
+		trafficNetwork.resetTraffic();
+	}
+
+	public void updateTrafficAtOutgoingEdgesToFellows(int laneIndex, double position, double speed){
+		trafficNetwork.lanes.get(laneIndex).endPositionOfLatestVehicleLeftThisWorker = position;
+		trafficNetwork.lanes.get(laneIndex).speedOfLatestVehicleLeftThisWorker = speed;
+	}
+
+	public void clearReportedTrafficData(){
+		trafficNetwork.clearReportedData();
+	}
+
+	public void simulateOneStep(Worker worker, boolean isNewNonPubVehiclesAllowed,
+								boolean isNewTramsAllowed, boolean isNewBusesAllowed){
+		simulateOneStep(worker, timeNow, step, pspBorderEdges, pspNonBorderEdges, numLocalRandomPrivateVehicles,
+				numLocalRandomTrams, numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed);
+	}
+
+	public int getStep() {
+		return step;
+	}
+
+	public double getTimeNow() {
+		return timeNow;
 	}
 }

@@ -37,14 +37,7 @@ public class Message_SW_Setup {
 	public boolean isServerBased;
 	public String roadGraph;
 	public String routingAlgorithm;
-	/**
-	 * Index of nodes where traffic light is added by user
-	 */
-	public ArrayList<SerializableInt> indexNodesToAddLight = new ArrayList<>();
-	/**
-	 * Index of nodes where traffic light is removed by user
-	 */
-	public ArrayList<SerializableInt> indexNodesToRemoveLight = new ArrayList<>();
+	public ArrayList<SerializableInt> lightNodes = new ArrayList<>();
 	public boolean isAllowPriorityVehicleUseTramTrack;
 	public boolean isOutputForegroundTrajectory = false;
 	public boolean isOutputInternalBackgroundRoutePlan = false;
@@ -63,9 +56,7 @@ public class Message_SW_Setup {
 							List<WorkerMeta> workers,
 							WorkerMeta workerToReceiveMessage,
 							List<Edge> edges,
-							int step,
-							List<Node> nodesToAddLight,
-							List<Node> nodesToRemoveLight) {
+							int step) {
 		isNewEnvironment = settings.isNewEnvironment;
 		numWorkers = settings.numWorkers;
 		startStep = step;
@@ -94,8 +85,7 @@ public class Message_SW_Setup {
 		}
 		routingAlgorithm = settings.routingAlgorithm.name();
 		isAllowPriorityVehicleUseTramTrack = settings.isAllowPriorityVehicleUseTramTrack;
-		indexNodesToAddLight = getLightNodeIndex(nodesToAddLight);
-		indexNodesToRemoveLight = getLightNodeIndex(nodesToRemoveLight);
+		this.lightNodes = getLightNodeIndex(workerToReceiveMessage.lightNodes);
 		isOutputForegroundTrajectory = settings.isOutputTrajectory;
 		isOutputInternalBackgroundRoutePlan = settings.isOutputInitialRoutes;
 		listRouteSourceWindowForInternalVehicle = getListRouteWindow(settings.listRouteSourceWindowForInternalVehicle);
@@ -141,6 +131,7 @@ public class Message_SW_Setup {
 	}
 
 	public void setupFromMessage(Settings settings){
+		settings.isNewEnvironment = isNewEnvironment;
 		settings.numWorkers = numWorkers;
 		settings.maxNumSteps = maxNumSteps;
 		settings.numStepsPerSecond = numStepsPerSecond;

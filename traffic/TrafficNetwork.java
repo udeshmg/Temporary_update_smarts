@@ -8,6 +8,8 @@ import common.Settings;
 import processor.SimulationListener;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableRouteLeg;
+import processor.communication.message.SerializableWorkerMetadata;
+import processor.worker.Workarea;
 import traffic.light.LightCoordinator;
 import traffic.light.TrafficLightCluster;
 import traffic.light.TrafficLightTiming;
@@ -57,6 +59,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 
 
+	public Workarea workarea;
 	public ArrayList<Vehicle> vehicles = new ArrayList<>();
 
 	// For report data
@@ -77,7 +80,6 @@ public class TrafficNetwork extends RoadNetwork {
 	public int numInternalTram = 0;
 	public int numInternalBus = 0;
 	public LightCoordinator lightCoordinator = new LightCoordinator();
-	ArrayList<GridCell> workareaCells;
 	String internalVehiclePrefix = "";
 	double timeLastPublicVehicleCreated = 0;
 	ArrayList<String> internalTramRefInSdWindow = new ArrayList<>();
@@ -96,12 +98,26 @@ public class TrafficNetwork extends RoadNetwork {
 	/**
 	 * Initialize traffic network.
 	 */
-	public TrafficNetwork(Settings settings) {
+	public TrafficNetwork(Settings settings, String name, List<SerializableWorkerMetadata> metadataWorkers) {
 		super(settings);
+		this.internalVehiclePrefix = name;
+		setupWorkArea(name, metadataWorkers);
 		identifyInternalTramStopEdges();
 		addTramStopsToParallelNonTramEdges();
 		tripMakingVehicles = new PriorityQueue<>(getTripMakingVehicleComparator());
 		setCrossingIncreasingOrders();
+
+	}
+
+	private void setupWorkArea(String name, List<SerializableWorkerMetadata> metadataWorkers){
+		workarea = new Workarea(name, null);
+		for (final SerializableWorkerMetadata metadata : metadataWorkers) {
+			final ArrayList<GridCell> cellsInWorkarea = metadata.processReceivedGridCells(grid);
+			if (metadata.name.equals(name)) {
+				workarea.setWorkCells(cellsInWorkarea);
+				break;
+			}
+		}
 	}
 
 	public void clearReportedData() {
@@ -237,12 +253,7 @@ public class TrafficNetwork extends RoadNetwork {
 	/**
 	 * Initialize traffic network in work area and certain global settings.
 	 */
-	public void buildEnvironment(final ArrayList<GridCell> cells, final String internalVehiclePrefix,
-			final int stepCurrent) {
-
-		workareaCells = cells;
-		this.internalVehiclePrefix = internalVehiclePrefix;
-
+	public void buildEnvironment() {
 		identifyInternalVehicleRouteStartEndEdges();
 		identifyReferencesOfAllPublicTransportTypesInSourceDestinationWindow();
 		computeAccumulatedDriverProfileDistribution();
@@ -463,7 +474,7 @@ public class TrafficNetwork extends RoadNetwork {
 		internalTramEndEdges.clear();
 
 		// Start edges within workarea
-		for (final GridCell cell : workareaCells) {
+		for (final GridCell cell : workarea.workCells) {
 			for (final Node node : cell.nodes) {
 				if (((settings.listRouteSourceWindowForInternalVehicle.size() == 0)
 						&& (settings.listRouteSourceDestinationWindowForInternalVehicle.size() == 0))
@@ -473,7 +484,7 @@ public class TrafficNetwork extends RoadNetwork {
 								&& isNodeInsideRectangle(node,
 										settings.listRouteSourceDestinationWindowForInternalVehicle))) {
 					for (final Edge edge : node.outwardEdges) {
-						if (edge.isSuitableForRouteStartOfInternalVehicle(workareaCells, settings.minLengthOfRouteStartEndEdge)) {
+						if (edge.isSuitableForRouteStartOfInternalVehicle(workarea.workCells, settings.minLengthOfRouteStartEndEdge)) {
 							if (edge.type != RoadType.tram) {
 								internalNonPublicVehicleStartEdges.add(edge);
 								if (edge.busRoutesRef.size() > 0) {
