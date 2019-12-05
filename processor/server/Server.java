@@ -8,6 +8,7 @@ import java.util.UUID;
 import common.Settings;
 import processor.SimServerData;
 import processor.SimulationProcessor;
+import processor.TMS_MQ;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
 import processor.communication.message.*;
@@ -30,11 +31,14 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
 	private SimServerData data;
 	private Settings settings;
+	private TMS_MQ server_tms_mq;
 
 	public Server(boolean isVisualize){
 		this.settings = new Settings();
 		this.settings.isVisualize = isVisualize;
 		data = new SimServerData(settings);
+		server_tms_mq = TMS_MQ.getInstance();
+		server_tms_mq.init();
 	}
 
 	public static void main(final String[] args) {
