@@ -852,7 +852,7 @@ public class TrafficNetwork extends RoadNetwork {
 						edgeLaneMap.put(outEdges.get(i), i);
 					}
 				}else{
-					throw new UnsupportedOperationException("The condition is not supported at this moment");
+					//throw new UnsupportedOperationException("The condition is not supported at this moment");
 				}
 				inwardEdge.setEdgeLaneMap(edgeLaneMap);
 			}

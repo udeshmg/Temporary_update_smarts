@@ -52,7 +52,13 @@ public class Lane {
 	 * GPS coordinates of start/end points
 	 *
 	 */
-	public double latStart, lonStart, latEnd, lonEnd;
+	public double latStart, lonStart, latEnd, lonEnd, latLength, lonLength;
+
+	/**
+	 * Lane changes the direction and still there are vehicles in road
+	 */
+	public boolean isDirectionChanging = false;
+
 	public VehiclePositionComparator vehiclePositionComparator = new VehiclePositionComparator();
 
 	public Lane(final Edge edge) {
@@ -206,6 +212,40 @@ public class Lane {
 		@Override
 		public int compare(final Vehicle v1, final Vehicle v2) {
 			return v1.headPosition > v2.headPosition ? -1 : v1.headPosition == v2.headPosition ? 0 : 1;
+		}
+	}
+
+	public void changeLaneCoordinates(){
+		double temp = latStart;
+		latStart = latEnd;
+		latEnd = temp;
+
+		temp = lonStart;
+		lonStart = lonEnd;
+		lonEnd = temp;
+
+		lonLength = lonEnd - lonStart;
+		latLength = latEnd - latStart;
+	}
+
+	public void updateDirection(){
+		if (isDirectionChanging){
+			if (vehicles.size() == 0)	{
+				// Vehicles cleared
+				isDirectionChanging = false;
+				// Find the opposite direction edge
+				Edge opposoedEdge = edge.getOppositeEdge();
+
+				// Get the highest lane number of opposite dir. and update changed lane
+				laneNumber = opposoedEdge.getLaneCount();
+
+				//Remove lane from previous direction
+				edge.removeLastLane();
+				// add to new direction
+				edge = opposoedEdge;
+				changeLaneCoordinates();
+				opposoedEdge.addLane(this);
+			}
 		}
 	}
 }

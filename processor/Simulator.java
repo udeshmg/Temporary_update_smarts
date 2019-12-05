@@ -6,6 +6,8 @@ import java.net.Socket;
 import common.Settings;
 import processor.server.Server;
 import processor.worker.Worker;
+import org.zeromq.ZContext;
+import org.zeromq.ZMQ;
 
 /**
  * Class for running a simulator with a single JVM.

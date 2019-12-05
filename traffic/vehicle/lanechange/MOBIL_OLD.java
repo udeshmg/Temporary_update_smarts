@@ -102,12 +102,22 @@ public class MOBIL_OLD {
                     LaneChangeDirection.AWAY_FROM_ROADSIDE);
         }
 
+        Lane currentLane = vehicle.lane;
+
         if ((overallGainForChangeAwayFromRoadside > 0)
                 && ((overallGainForChangeAwayFromRoadside - overallGainForChangeTowardsRoadside) > 0)) {
-            decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
+            if (currentLane.edge.getLaneAwayFromRoadside(currentLane).isDirectionChanging){
+                decision = LaneChangeDirection.SAME;
+            }
+            else
+                decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
         } else if ((overallGainForChangeTowardsRoadside > 0)
                 && ((overallGainForChangeTowardsRoadside - overallGainForChangeAwayFromRoadside) > 0)) {
-            decision = LaneChangeDirection.TOWARDS_ROADSIDE;
+            if (currentLane.edge.getLaneTowardsRoadside(currentLane).isDirectionChanging){
+                decision = LaneChangeDirection.SAME;
+            }
+            else
+                decision = LaneChangeDirection.TOWARDS_ROADSIDE;
         } else if ((overallGainForChangeAwayFromRoadside > 0) && (overallGainForChangeTowardsRoadside > 0)) {
             if (random.nextBoolean()) {
                 decision = LaneChangeDirection.AWAY_FROM_ROADSIDE;
@@ -116,6 +126,22 @@ public class MOBIL_OLD {
             }
         }
 
+        return decision;
+    }
+
+    public LaneChangeDirection dynamicLaneChange(final Vehicle vehicle) {
+        LaneChangeDirection decision = LaneChangeDirection.SAME;
+        Movement movement = vehicle.getCurrentMovement();
+
+        if (vehicle.lane.isDirectionChanging) {
+            if (isSafeToChange(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
+                if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.getMovementLight(movement) == LightColor.KEEP_RED)
+                        || (vehicle.lane.edge.getMovementLight(movement) == LightColor.GYR_R))) {
+                    decision = LaneChangeDirection.SAME;
+                } else
+                    decision = LaneChangeDirection.TOWARDS_ROADSIDE;
+            }
+        }
         return decision;
     }
 

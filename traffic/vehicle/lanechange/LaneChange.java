@@ -25,4 +25,8 @@ public class LaneChange {
 	public LaneChangeDirection decideLaneChange(MOBILInput input, final Vehicle vehicle) {
 		return mobil.decideLaneChange(vehicle);
 	}
+
+	public LaneChangeDirection dynamicLaneChange(final  Vehicle vehicle) {
+		return mobil.dynamicLaneChange(vehicle);
+	}
 }

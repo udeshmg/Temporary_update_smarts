@@ -135,6 +135,12 @@ public class Simulation {
 
 	}
 
+	void updateLaneDirections(){
+		for (Lane lane : trafficNetwork.lanes){
+			lane.updateDirection();
+		}
+	}
+
 	/**
 	 * Pause thread. This can be useful for observing simulation on GUI.
 	 */
@@ -177,6 +183,7 @@ public class Simulation {
 		pause();
 		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
 		transferDataTofellow(worker);
+		updateLaneDirections();
 		moveVehiclesNotAroundBorder(worker.connectedFellows, timeNow, pspNonBorderEdges);
 		onVehicleMove(step);
 		removeTripFinishedVehicles();
@@ -194,7 +201,18 @@ public class Simulation {
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 		// Clear one-step data
+		if (step == 1000){
+			markLanesToChange();
+		}
 		clearOneStepData();
+	}
+
+	public  void markLanesToChange(){
+		for (final Edge edge : trafficNetwork.edges){
+			if (edge.index == 292){
+				edge.getLastLane().isDirectionChanging = true;
+			}
+		}
 	}
 
 	void moveVehiclesAroundBorder(List<Fellow> connectedFellows, double timeNow, List<Edge> pspBorderEdges){

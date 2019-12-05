@@ -241,6 +241,14 @@ public class Vehicle {
 			MOBILInput mobilInput = new MOBILInput(settings, lane, getRouteInLookAheadDistance(), type);
 			laneChangeDecision = laneChange.decideLaneChange(mobilInput, this);
 
+			if (laneChangeDecision == LaneChangeDirection.SAME) {
+				laneChangeDecision = laneChange.dynamicLaneChange(this);
+			}
+
+			if (laneChangeDecision == LaneChangeDirection.SAME) {
+				laneChangeDecision = laneChange.dynamicLaneChange(this);
+			}
+
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
 
 				// Cancel priority lanes

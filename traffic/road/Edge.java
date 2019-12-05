@@ -152,9 +152,20 @@ public class Edge {
 		lanes.add(lane);
 	}
 
+	public void removeLastLane(){
+		lanes.remove(lanes.size()-1);
+	}
+
 	public Lane getFirstLane(){
 		if(!lanes.isEmpty()){
 			return lanes.get(0);
+		}
+		return null;
+	}
+
+	public Lane getLastLane(){
+		if(!lanes.isEmpty()){
+			return lanes.get(lanes.size()-1);
 		}
 		return null;
 	}
@@ -318,6 +329,15 @@ public class Edge {
 				return 0;
 			}
 		};
+	}
+
+	public Edge getOppositeEdge(){
+		for (Edge e : startNode.inwardEdges){
+			if (e.startNode == endNode) {
+				return e;
+			}
+		}
+		return null;
 	}
 
 	public Vehicle getNextParkedVehicle(double timeNow){
