@@ -49,7 +49,17 @@ public class VehicleUtil {
             junc = edge.startNode;
         }
         if(junc != null){
-            return junc.getCurve(v);
+            if (v.getDecision() != null){
+                if ( v.getDecision().getVehicleCurve()!= null){
+                    return v.getDecision().getVehicleCurve();
+                }
+                else{
+                    return junc.getCurve(v);
+                }
+            }
+            else {
+                return junc.getCurve(v);
+            }
         }
         return null;
     }

@@ -228,23 +228,41 @@ public class Lane {
 		latLength = latEnd - latStart;
 	}
 
-	public void updateDirection(){
+	public boolean updateDirection(){
 		if (isDirectionChanging){
 			if (vehicles.size() == 0)	{
 				// Vehicles cleared
 				isDirectionChanging = false;
-				// Find the opposite direction edge
-				Edge opposoedEdge = edge.getOppositeEdge();
-
-				// Get the highest lane number of opposite dir. and update changed lane
-				laneNumber = opposoedEdge.getLaneCount();
-
 				//Remove lane from previous direction
-				edge.removeLastLane();
-				// add to new direction
-				edge = opposoedEdge;
-				changeLaneCoordinates();
-				opposoedEdge.addLane(this);
+				moveLaneToOppositeEdge();
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
+	public void moveLaneToOppositeEdge(){
+		edge.removeLastLane();
+		// Find the opposite direction edge
+		Edge opposedEdge = edge.getOppositeEdge();
+		// add to new direction
+		edge = opposedEdge;
+
+		// Get the highest lane number of opposite dir. and update changed lane
+		laneNumber = edge.getLaneCount();
+		changeLaneCoordinates();
+		edge.addLane(this);
+	}
+
+	public void markLaneToChange(){
+		if ( isDirectionChanging == false){
+			Edge oppositeEdge = edge.getOppositeEdge();
+			if (oppositeEdge.getLastLane().isDirectionChanging == false)
+				isDirectionChanging = true;
+			else {
+				System.out.println("WARNING: attempts to change lane direction while opposite direction lane direction change already in operation."
+				+ " Road already in changing dir: " + edge.getOppositeEdge().index + " Request denied");
 			}
 		}
 	}

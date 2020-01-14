@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import common.Settings;
 import processor.SimulationListener;
+import processor.communication.externalMessage.ExternalSimulationListener;
+import processor.communication.externalMessage.LaneManager;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
 import processor.communication.message.SerializableWorkerMetadata;
@@ -33,6 +35,7 @@ public class Simulation {
 	ArrayList<Vehicle> oneStepData_vehiclesReachedFellowWorker = new ArrayList<>();
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	SimulationListener simulationListener = null;
+	ExternalSimulationListener extListner = null;
 	Settings settings;
 
 	public Simulation(Settings settings,int startStep, String roadGraph,
@@ -47,6 +50,7 @@ public class Simulation {
 		}
 		this.trafficNetwork = new TrafficNetwork(settings, workAreaName, workerMetadatas);
 		resetSimulation(settings, startStep, numLocalRandomPrivateVehicles, numLocalRandomTrams, numLocalRandomBuses, lightNodes);
+		extListner = LaneManager.getInstance();
 	}
 
 	public void resetSimulation(Settings settings,int startStep,
@@ -65,6 +69,10 @@ public class Simulation {
 		resetExistingNetwork();
 		resetTraffic();
 		simulationListener = settings.getSimulationListener();
+
+		if (settings.isExternaListenerUsed){
+			// send road network to TMS_MQ
+		}
 	}
 
 
@@ -137,7 +145,9 @@ public class Simulation {
 
 	void updateLaneDirections(){
 		for (Lane lane : trafficNetwork.lanes){
-			lane.updateDirection();
+			if(lane.updateDirection()){
+				trafficNetwork.laneIndexOfChangeDir.add(lane.index);
+			}
 		}
 	}
 
@@ -183,9 +193,9 @@ public class Simulation {
 		pause();
 		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
 		transferDataTofellow(worker);
-		updateLaneDirections();
 		moveVehiclesNotAroundBorder(worker.connectedFellows, timeNow, pspNonBorderEdges);
 		onVehicleMove(step);
+		updateLaneDirections();
 		removeTripFinishedVehicles();
 		onVehicleRemove(oneStepData_allVehiclesReachedDestination, step);
 		trafficNetwork.changeLaneOfVehicles(timeNow);
@@ -201,8 +211,8 @@ public class Simulation {
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 		// Clear one-step data
-		if (step == 1000){
-			markLanesToChange();
+		if (step % settings.laneUpdateInterval == 0 && step > 0){
+			extListner.getTrafficData(trafficNetwork);
 		}
 		clearOneStepData();
 	}
@@ -295,6 +305,10 @@ public class Simulation {
 
 	public void changeLaneBlock(int laneIndex, boolean isBlocked) {
 		trafficNetwork.lanes.get(laneIndex).isBlocked = isBlocked;
+	}
+
+	public void changeLaneDirection(int edgeIndex){
+		trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChange();
 	}
 
 	public void addTransferredVehicle(Vehicle vehicle){

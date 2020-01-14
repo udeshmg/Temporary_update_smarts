@@ -1,5 +1,6 @@
 package common;
 
+import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.SimulationListener;
 import traffic.light.manager.DynamicTwoPhaseTLManager;
 import traffic.light.manager.FixedTwoPhaseTLManager;
@@ -43,6 +44,7 @@ public class SettingsDictionary {
     private Map<String, Routing> routingAlgoMap;
     private Map<String, TLManager> lightSchedulerMap;
     private Map<String, LaneDecider> laneDeciderMap;
+    private Map<String, ExternalSimulationListener> eListenerMap;
 
     public SettingsDictionary() {
         this.listenerMap = new HashMap<>();
@@ -59,6 +61,7 @@ public class SettingsDictionary {
         this.laneDeciderMap = new HashMap<>();
         addLaneDecider("DEFAULT", new DefaultLaneDecider());
         addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
+
 
     }
 

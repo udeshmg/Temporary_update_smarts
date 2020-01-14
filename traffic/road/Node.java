@@ -201,6 +201,7 @@ public class Node {
 						settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = new Line2D.Double(pavement.getP2(), pavement.getP1());
 			} else {
+				int l = outwardEdge.getLaneCount() - 1;
 				pavement = RoadUtil.getPavementGPS(outwardEdge.getLane(outwardEdge.getLaneCount() - 1),
 						settings.isDriveOnLeft, settings.laneWidthInMeters, settings.lonVsLat, settings.pavementLineRatio);
 				directionCorrected = pavement;

@@ -16,6 +16,7 @@ import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
 import traffic.vehicle.carfollow.CarFollow;
+import traffic.vehicle.carfollow.SimpleCurve;
 import traffic.vehicle.carfollow.SlowdownFactor;
 import traffic.vehicle.lanechange.LaneChange;
 import traffic.vehicle.lanechange.LaneChangeDirection;
@@ -436,7 +437,8 @@ public class Vehicle {
 		if(hasNextEdge()) {
 			if (headPosition > current.getEndIntersectionLaneChangeProhibitedPos()) {
 				Lane next = laneDecider.getNextEdgeLane(this);
-				decision = new IntersectionDecision(lane, next);
+				SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
+				decision = new IntersectionDecision(lane, next, curve);
 			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
 				decision = null;
 			}
@@ -855,11 +857,20 @@ public class Vehicle {
 	public class IntersectionDecision{
 		private Lane startLane;
 		private Lane endLane;
+		private SimpleCurve curveForIntersection = null;
 
 		public IntersectionDecision(Lane startLane, Lane endLane) {
 			this.startLane = startLane;
 			this.endLane = endLane;
 		}
+
+		public IntersectionDecision(Lane startLane, Lane endLane, SimpleCurve curve) {
+			this.startLane = startLane;
+			this.endLane = endLane;
+			this.curveForIntersection = curve;
+		}
+
+		public SimpleCurve getVehicleCurve(){return curveForIntersection;}
 
 		public Lane getStartLane() {
 			return startLane;

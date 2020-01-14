@@ -19,7 +19,7 @@ import processor.communication.message.Serializable_GUI_Vehicle;
 import processor.server.Server;
 import traffic.road.RoadNetwork;
 import traffic.road.RoadUtil;
-
+import traffic.road.Edge;
 /**
  * GUI contains the panels for controlling simulation and showing the progress
  * of simulation in real time.
@@ -212,6 +212,10 @@ public class GUI extends JFrame {
 
 	public void updateSetupProgress(final double createdVehicleRatio) {
 		monitorPanel.updateSetupProgress(createdVehicleRatio);
+	}
+
+	public void updateEdgeObjects(Edge edge){
+		monitorPanel.updateEdgeObject(edge);
 	}
 
 }

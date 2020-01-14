@@ -73,6 +73,7 @@ public class TrafficNetwork extends RoadNetwork {
 	ArrayList<Edge> internalBusEndEdges = new ArrayList<>();
 	ArrayList<Edge> internalTramStartEdges = new ArrayList<>();
 	ArrayList<Edge> internalTramEndEdges = new ArrayList<>();
+	public ArrayList<Integer> laneIndexOfChangeDir = new ArrayList<>();
 	public Routing routingAlgorithm;
 	Random random = new Random();
 	int numInternalVehicleAllTime = 0;
@@ -123,6 +124,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void clearReportedData() {
 		newVehiclesSinceLastReport.clear();
 		finishedVehicles.clear();
+		laneIndexOfChangeDir.clear();
 	}
 
 	/**

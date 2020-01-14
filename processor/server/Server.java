@@ -8,9 +8,10 @@ import java.util.UUID;
 import common.Settings;
 import processor.SimServerData;
 import processor.SimulationProcessor;
-import processor.TMS_MQ;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
+import processor.communication.externalMessage.ExternalSimulationListener;
+import processor.communication.externalMessage.LaneManager;
 import processor.communication.message.*;
 import traffic.network.ODDistributor;
 import traffic.road.Node;
@@ -31,14 +32,14 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private ArrayList<Message_WS_TrafficReport> receivedTrafficReportCache = new ArrayList<>();
 	private SimServerData data;
 	private Settings settings;
-	private TMS_MQ server_tms_mq;
+	private ExternalSimulationListener extListner;
 
 	public Server(boolean isVisualize){
 		this.settings = new Settings();
 		this.settings.isVisualize = isVisualize;
 		data = new SimServerData(settings);
-		server_tms_mq = TMS_MQ.getInstance();
-		server_tms_mq.init();
+		extListner = LaneManager.getInstance();
+		extListner.init();
 	}
 
 	public static void main(final String[] args) {
@@ -132,6 +133,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	public void changeMap() {
 		data.changeMap();
+		extListner.getRoadGraph(data.getRoadNetwork());
 	}
 
 	@Override
@@ -210,7 +212,8 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		while (iMessage.hasNext()) {
 			final Message_WS_TrafficReport message = iMessage.next();
 			data.updateFromReport(message.vehicleList, message.lightList, message.workerName, workerMetas.size(),
-					message.step, message.randomRoutes, message.finishedList,message.numInternalNonPubVehicles, message.numInternalTrams, message.numInternalBuses);
+					message.step, message.randomRoutes, message.finishedList,message.numInternalNonPubVehicles, message.numInternalTrams,
+					message.numInternalBuses, message.laneIndexes);
 			// Remove processed message
 			iMessage.remove();
 		}
@@ -255,6 +258,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		data.resetVariablesForSetup();
 		receivedTrafficReportCache.clear();
 		data.initFileOutput();
+		//data.initRoadNetwork();
 
 		// In a new environment (map), determine the work areas for all workers
 		if (settings.isNewEnvironment) {
@@ -298,6 +302,12 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public void askWorkersChangeLaneBlock(int laneIndex, boolean isBlocked) {
 		for (final WorkerMeta worker : workerMetas) {
 			worker.send(new Message_SW_BlockLane(laneIndex, isBlocked));
+		}
+	}
+
+	public void askWorkersChangeLaneDirection(int edgeIndex) {
+		for (final WorkerMeta worker : workerMetas) {
+			worker.send(new Message_SW_ChangeLaneDirection(edgeIndex));
 		}
 	}
 
@@ -393,6 +403,10 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			// No need to process the message if simulation was stopped
 			return;
 		}
+
+		// process and send the data to external
+
+
 		// Cache received reports
 		receivedTrafficReportCache.add(msg);
 		// Output data from the reports
@@ -430,4 +444,9 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			stopSim();
 		}
 	}
+
+	private void sendTrafficReportToListner(Message_WS_TrafficReport trafficReport){
+		extListner.getMessage(trafficReport);
+	}
+
 }

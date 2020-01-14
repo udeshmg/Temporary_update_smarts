@@ -9,40 +9,11 @@ import common.SysUtil;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
 import processor.communication.MessageSender;
-import processor.communication.message.Message_SW_BlockLane;
-import processor.communication.message.Message_SW_ChangeSpeed;
-import processor.communication.message.Message_SW_KillWorker;
-import processor.communication.message.Message_SW_ServerBased_ShareTraffic;
-import processor.communication.message.Message_SW_ServerBased_Simulate;
-import processor.communication.message.Message_SW_Serverless_Pause;
-import processor.communication.message.Message_SW_Serverless_Resume;
-import processor.communication.message.Message_SW_Serverless_Start;
-import processor.communication.message.Message_SW_Serverless_Stop;
-import processor.communication.message.Message_SW_Setup;
-import processor.communication.message.Message_WS_Join;
-import processor.communication.message.Message_WS_TrafficReport;
-import processor.communication.message.Message_WS_ServerBased_SharedMyTrafficWithNeighbor;
-import processor.communication.message.Message_WS_Serverless_Complete;
-import processor.communication.message.Message_WS_SetupCreatingVehicles;
-import processor.communication.message.Message_WS_SetupDone;
-import processor.communication.message.Message_WW_Traffic;
-import processor.communication.message.SerializableDouble;
-import processor.communication.message.SerializableFrontVehicleOnBorder;
-import processor.communication.message.SerializableGridCell;
-import processor.communication.message.SerializableInt;
-import processor.communication.message.SerializableVehicle;
-import processor.communication.message.SerializableWorkerMetadata;
-import processor.communication.message.Serializable_GPS_Rectangle;
-import traffic.TrafficNetwork;
-import traffic.light.LightUtil;
+import processor.communication.message.*;
 import traffic.road.Edge;
 import traffic.road.GridCell;
 import traffic.road.Node;
-import traffic.road.RoadUtil;
-import traffic.routing.RouteUtil;
-import traffic.vehicle.DriverProfile;
 import traffic.vehicle.Vehicle;
-import traffic.vehicle.VehicleType;
 
 /**
  * Worker receives simulation configuration from server and simulates traffic in
@@ -332,6 +303,8 @@ public class Worker implements MessageHandler, Runnable {
 			onSWChangeSpeed((Message_SW_ChangeSpeed) message);
 		} else if (message instanceof Message_SW_BlockLane) {
 			onSWBlockLane((Message_SW_BlockLane) message);
+		} else if (message instanceof Message_SW_ChangeLaneDirection) {
+			onSWChnageLaneDirection((Message_SW_ChangeLaneDirection) message);
 		}
 	}
 
@@ -500,6 +473,10 @@ public class Worker implements MessageHandler, Runnable {
 
 	private void onSWBlockLane(Message_SW_BlockLane msg){
 		simulation.changeLaneBlock(msg.laneIndex, msg.isBlocked);
+	}
+
+	private void onSWChnageLaneDirection(Message_SW_ChangeLaneDirection msg){
+		simulation.changeLaneDirection(msg.edgeIndex);
 	}
 
 }

@@ -35,6 +35,7 @@ import processor.communication.message.Serializable_GUI_Light;
 import processor.communication.message.Serializable_GUI_Vehicle;
 import processor.server.Server;
 import processor.server.gui.DrawingObject.EdgeObject;
+import processor.server.gui.DrawingObject.LaneObject;
 import processor.server.gui.DrawingObject.EdgeObjectComparator;
 import processor.server.gui.DrawingObject.IntersectionObject;
 import processor.server.gui.DrawingObject.TramStopObject;
@@ -74,6 +75,8 @@ public class MonitorPanel extends JPanel {
 				// Popup menu (note menu opens at current mouse point, not reversed point)
 				if (sdWindowAtMousePoint != null) {
 					showPopupMenu("setup", e.getPoint().x, e.getPoint().y);
+				} else if (laneAtMousePoint != null){
+					showPopupMenu("intersection", e.getPoint().x, e.getPoint().y);
 				} else if (roadIntersectionAtMousePoint != null) {
 					showPopupMenu("intersection", e.getPoint().x, e.getPoint().y);
 				} else if (roadEdgeAtMousePoint != null) {
@@ -156,7 +159,7 @@ public class MonitorPanel extends JPanel {
 
 				findEdgeAtMousePoint(mousePoint);
 				findSdWindowAtMousePoint(mousePoint);
-
+				findLaneAreaAtMousePoint(mousePoint);
 				/*
 				 * Prepare overlay image.
 				 */
@@ -339,6 +342,12 @@ public class MonitorPanel extends JPanel {
 	 * Road edge at mouse point.
 	 */
 	EdgeObject roadEdgeAtMousePoint = null;
+
+	/*
+	 * Lane at mouse point
+	 */
+
+	LaneObject laneAtMousePoint = null;
 
 	/*
 	 * Road intersection at mouse point
@@ -657,6 +666,42 @@ public class MonitorPanel extends JPanel {
 		// Inform server about the action
 		processor.askWorkersChangeLaneBlock(lane.index, blocked);
 	}
+
+	void changeLaneDirection(final EdgeObject selectedEdge) {
+		Edge edge = processor.getRoadNetwork().edges.get(selectedEdge.index);
+		Lane lane = edge.getLane(edge.getLaneCount()-1);
+
+		lane.isDirectionChanging = true;
+
+		// Inform server about the action
+		processor.askWorkersChangeLaneDirection(edge.index);
+	}
+
+	/*void blockUnblockLane(final LaneObject selectedLane) {
+		final Lane lane = processor.getRoadNetwork().lanes.get(selectedLane.index);
+		final Edge edge = lane.edge;
+
+		// Update the blocked edges for visualization
+		if (blocked) {
+			roadEdgesWithBlockingSign.put(lane.index, selectedEdge);
+			selectedEdge.laneBlocks[laneNumber] = true;
+		} else {
+			selectedEdge.laneBlocks[laneNumber] = false;
+			boolean isAllLanesOpen = true;
+			for (final boolean isBlocked : selectedEdge.laneBlocks) {
+				if (isBlocked) {
+					isAllLanesOpen = false;
+					break;
+				}
+			}
+			if (isAllLanesOpen) {
+				roadEdgesWithBlockingSign.remove(selectedEdge.index);
+			}
+		}
+
+		// Inform server about the action
+		processor.askWorkersChangeLaneBlock(lane.index, blocked);
+	}*/
 
 	void changeMap(final double minLon, final double minLat, final double maxLon, final double maxLat) {
 		this.minLon = minLon;
@@ -1003,6 +1048,32 @@ public class MonitorPanel extends JPanel {
 		} else {
 			roadEdgeAtMousePoint = null;
 			roadIntersectionAtMousePoint = null;
+		}
+	}
+
+	synchronized void findLaneAreaAtMousePoint(final Point mousePoint){
+		final double ratioXtoWidth = (-offset_MapAreaToDisplayPanel_TopLeftX + mousePoint.x) / mapAreaWidthInPixels;
+		final double ratioYtoHeight = (-offset_MapAreaToDisplayPanel_TopLeftY + mousePoint.y) / mapAreaHeightInPixels;
+
+		final double lat = maxLat - (ratioYtoHeight * Math.abs(maxLat - minLat));
+		final double lon = minLon + (ratioXtoWidth * Math.abs(maxLon - minLon));
+
+		final Lane laneAtPoint = processor.getRoadNetwork().findLaneAtPoint(lat, lon);
+
+
+
+		if (laneAtPoint != null){
+			//laneAtMousePoint = new LaneObject(laneAtPoint.latStart, laneAtPoint.lonStart,
+			//								  laneAtPoint.latEnd, laneAtPoint.lonEnd, laneAtPoint.index);
+			Edge edgeAtPoint = laneAtPoint.edge;
+			final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edgeAtPoint.index, 0, "", 0, null, null);
+			roadEdgeAtMousePoint = edgeObjects
+					.get(Collections.binarySearch(edgeObjects, dummyEdge, new EdgeObjectComparator()));
+			roadIntersectionAtMousePoint = null;
+		}
+		else{
+			roadEdgeAtMousePoint = null;
+			laneAtMousePoint = null;
 		}
 	}
 
@@ -1379,7 +1450,8 @@ public class MonitorPanel extends JPanel {
 
 		/*
 		 * Edge at mouse point
-		 */if (roadEdgeAtMousePoint != null) {
+		 */
+		if (roadEdgeAtMousePoint != null) {
 			g2d.setColor(Color.cyan);
 			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 			drawRoadEdgeOnImage(g2d, actualDrawingArea, roadEdgeAtMousePoint, EdgeEndMarkerType.start);
@@ -1618,6 +1690,8 @@ public class MonitorPanel extends JPanel {
 							blockUnblockLane(edgeSelected, Integer.parseInt(words[2]), false);
 						} else if (words[0].equals("Block")) {
 							blockUnblockLane(edgeSelected, Integer.parseInt(words[2]), true);
+						} else if (words[0].equals("Change")) {
+							changeLaneDirection(edgeSelected);
 						} else if (words[0].equals("Close")) {
 							hidePopupMenu();
 						}
@@ -1634,11 +1708,18 @@ public class MonitorPanel extends JPanel {
 						item.addActionListener(menuListener);
 						popup.add(item);
 					}
-				}
+				}	
+				final JMenuItem itemC = new JMenuItem("Change Direction of Last Lane");
+				itemC.addActionListener(menuListener);
+				popup.add(itemC);
+				
 				// Add close menu option
 				final JMenuItem item = new JMenuItem("Close menu");
 				item.addActionListener(menuListener);
 				popup.add(item);
+
+			}
+			else if (toDo.equals("lane")){
 
 			}
 		} else {
@@ -1971,5 +2052,29 @@ public class MonitorPanel extends JPanel {
 		if (newMaxLatDisplayArea > 80) {
 			return false;
 		} else return !(newMinLatDisplayArea < -80);
+	}
+
+	void updateEdgeObject(Edge edge){
+		final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edge.index,
+				0, "", 0, null, null);
+		EdgeObject edgeObj = edgeObjects.get(Collections.binarySearch(edgeObjects, dummyEdge, new EdgeObjectComparator()));
+
+
+
+		List<DrawingObject.LaneObject> laneObjs = new ArrayList<>();
+		for (Lane lane : edge.getLanes()) {
+			DrawingObject.LaneObject laneObject = new DrawingObject.LaneObject(lane.latStart, lane.lonStart, lane.latEnd, lane.lonEnd);
+			laneObjs.add(laneObject);
+		}
+
+		edgeObj.numLanes = edge.getLaneCount();
+		edgeObj.lanes = laneObjs;
+
+		edgeObj.laneBlocks = new boolean[edgeObj.numLanes];
+		for (int i = 0; i < edgeObj.laneBlocks.length; i++) {
+			edgeObj.laneBlocks[i] = false;
+		}
+
+
 	}
 }

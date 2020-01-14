@@ -245,6 +245,32 @@ public class RoadNetwork {
 	}
 
 	/**
+	 * Find the Lane of within x, y
+	 * @return Lane
+	 */
+
+	public Lane findLaneAtPoint(final double lat, final double lon){
+
+		double minDist = 100;
+        Lane lane = null;
+		for (Lane l : lanes){
+
+			double[] line = RoadUtil.findLineEquation(l.latStart, l.latEnd, l.lonStart, l.lonEnd);
+
+            double distance  = Line2D.ptSegDist(l.lonStart, l.latStart * settings.lonVsLat,
+                    l.lonEnd, l.latEnd * settings.lonVsLat, lon, lat * settings.lonVsLat);
+
+			if (Math.abs(distance) < minDist) {
+				minDist = Math.abs(distance);
+				lane = l;
+			}
+		}
+		if (minDist < 0.001)
+			return lane;
+		else return null;
+	}
+
+	/**
 	 * Get the index of the nearest edge to a given point.
 	 */
 	public Edge getEdgeAtPoint(final double lat, final double lon) {

@@ -31,6 +31,7 @@ public class Message_WS_TrafficReport {
 	public int numInternalNonPubVehicles;
 	public int numInternalTrams;
 	public int numInternalBuses;
+	public ArrayList<SerializableLaneIndex> laneIndexes = new ArrayList<>();
 
 	public Message_WS_TrafficReport() {
 
@@ -39,7 +40,8 @@ public class Message_WS_TrafficReport {
 	public Message_WS_TrafficReport(Settings settings, final String workerName, final ArrayList<Vehicle> vehiclesOnRoad,
 									final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport,
 									List<Vehicle> vehiclesFinished,final int step,
-									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses) {
+									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses,
+									final ArrayList<Integer> laneIndexes) {
 		this.workerName = workerName;
 		if (settings.isVisualize || settings.isOutputTrajectory) {
 			vehicleList = getDetailOfActiveVehiclesOnRoad(vehiclesOnRoad);
@@ -55,13 +57,22 @@ public class Message_WS_TrafficReport {
 		this.numInternalNonPubVehicles = numInternalNonPubVehicles;
 		this.numInternalTrams = numInternalTrams;
 		this.numInternalBuses = numInternalBuses;
+		this.laneIndexes = addLaneIndexes(laneIndexes);
 	}
 
 	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork){
 		this(settings, workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
 				trafficNetwork.newVehiclesSinceLastReport, trafficNetwork.getFinishedVehicles(), step,
 				trafficNetwork.numInternalNonPublicVehicle,
-				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus);
+				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus, trafficNetwork.laneIndexOfChangeDir);
+	}
+
+	ArrayList<SerializableLaneIndex> addLaneIndexes(final ArrayList<Integer> lanes){
+		ArrayList<SerializableLaneIndex> l = new ArrayList<>();
+		for (final Integer i : lanes){
+			l.add(new SerializableLaneIndex(i.intValue()));
+		}
+		return l;
 	}
 
 	ArrayList<Serializable_GUI_Vehicle> getDetailOfActiveVehiclesOnRoad(final ArrayList<Vehicle> vehicles) {

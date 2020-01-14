@@ -566,4 +566,19 @@ public class RoadUtil {
 			return bearing + Math.PI;
 		}
 	}
+
+	public static double[] findLineEquation(double latStart, double latEnd, double lonStart, double lonEnd){
+		double [] line = {0,0,0}; // represent a, b, c
+
+		line[0] = latStart - latEnd;
+		line[1] = lonStart - lonEnd;
+		line[2] = line[0]*lonStart+line[1]*latEnd;
+
+		double sqrt = Math.sqrt(Math.pow(line[0],2) + Math.pow(line[0],2) + Math.pow(line[0],2));
+
+		for (int i =0; i < 3; i++){
+			line[i] /= sqrt;
+		}
+		return line;
+	}
 }

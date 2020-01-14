@@ -97,6 +97,8 @@ public class SingleSimulation implements SimulationProcessor {
         }
     }
 
+    public void askWorkersChangeLaneDirection(int index) {}
+
     @Override
     public RoadNetwork getRoadNetwork() {
         return null;

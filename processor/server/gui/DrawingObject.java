@@ -49,12 +49,31 @@ public class DrawingObject {
 
 	public static class LaneObject {
 		double latStart, lonStart, latEnd, lonEnd;
+		int index;
 
 		public LaneObject(double latStart, double lonStart, double latEnd, double lonEnd) {
 			this.latStart = latStart;
 			this.lonStart = lonStart;
 			this.latEnd = latEnd;
 			this.lonEnd = lonEnd;
+		}
+
+		public LaneObject(double latStart, double lonStart, double latEnd, double lonEnd, int index) {
+			this.latStart = latStart;
+			this.lonStart = lonStart;
+			this.latEnd = latEnd;
+			this.lonEnd = lonEnd;
+			this.index = index;
+		}
+
+		public void changeCoordinates(){
+			double temp = latStart;
+			latStart = latEnd;
+			latEnd = temp;
+
+			temp = lonStart;
+			lonStart = lonEnd;
+			lonEnd = temp;
 		}
 	}
 

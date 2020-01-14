@@ -31,6 +31,7 @@ public class Settings {
 	public double numStepsPerSecond = 5;//This determines the step length.
 	public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
 	public int trafficReportStepGapInServerlessMode = 1;
+	public int laneUpdateInterval = 12; // lane update time interval in steps
 
 	/*
 	 * Display
@@ -55,7 +56,7 @@ public class Settings {
 	 * Input
 	 */
 	public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
-	public String inputOpenStreetMapFile = "cbd.osm";//OSM file where road network information can be extracted
+	public String inputOpenStreetMapFile = "/resources/Grid_12x12.osm";//OSM file where road network information can be extracted
 	public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -158,6 +159,12 @@ public class Settings {
 	public int gridlockDetectionTime = 600;
 	public String tlManager = "";
 	public String laneDecide = "DEFAULT";
+
+	/**
+	 * External Listener Settings
+	 */
+
+	public boolean isExternaListenerUsed = true;
 
 	public ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);

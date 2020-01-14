@@ -5,9 +5,12 @@ import osm.OSM;
 import processor.communication.message.*;
 import processor.server.*;
 import processor.server.gui.GUI;
+import traffic.network.RandomODDistributor;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
 import traffic.road.RoadUtil;
+import traffic.road.Edge;
+import traffic.road.Lane;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +129,7 @@ public class SimServerData {
                                  final ArrayList<Serializable_GUI_Light> lightList, final String workerName, final int numWorkers,
                                  final int step, ArrayList<SerializableRouteDump> randomRoutes,
                                  ArrayList<Serializable_Finished_Vehicle> finished, int numInternalNonPubVehicles,
-                                 int numInternalTrams, int numInternalBuses) {
+                                 int numInternalTrams, int numInternalBuses, ArrayList<SerializableLaneIndex> laneList) {
         // Update GUI
         if (settings.isVisualize) {
             gui.updateObjectData(vehicleList, lightList, workerName, numWorkers, step);
@@ -157,6 +160,22 @@ public class SimServerData {
         numInternalNonPubVehiclesAtAllWorkers += numInternalNonPubVehicles;
         numInternalTramsAtAllWorkers += numInternalTrams;
         numInternalBusesAtAllWorkers += numInternalBuses;
+
+        updateLanes(laneList);
+    }
+
+
+    private void updateLanes(ArrayList<SerializableLaneIndex> laneIndexes){
+        for (SerializableLaneIndex laneIndex : laneIndexes) {
+            Lane lane = getRoadNetwork().lanes.get(laneIndex.index);
+            Edge currEdge = lane.edge;
+            lane.moveLaneToOppositeEdge();
+            Edge newEdge = lane.edge;
+
+            gui.updateEdgeObjects(currEdge);
+            gui.updateEdgeObjects(newEdge);
+        }
+
     }
 
     public void startSimulationInUI() {
