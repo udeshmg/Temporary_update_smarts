@@ -27,6 +27,7 @@ public class LaneManager implements ExternalSimulationListener {
     private ZContext context = null;
     private ZMQ.Socket socket = null;
     private RoadGraphExternal roadGraph = null;
+    private RoadIndex rdIndex = null;
 
 
     @Override
@@ -68,13 +69,20 @@ public class LaneManager implements ExternalSimulationListener {
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
         System.out.println("GSON output: " + str);
-
         sendMessage(str);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public RoadIndex getRoadDirChange(){
+        RoadIndex extSend = new RoadIndex();
+        extSend = this.rdIndex;
+        this.rdIndex = null;
+        return extSend;
     }
 
     @Override
@@ -85,12 +93,16 @@ public class LaneManager implements ExternalSimulationListener {
     private void sendMessage(String str){
         socket.send(str.getBytes(ZMQ.CHARSET), 0);
         byte[] reply = socket.recv();
-        System.out.println(
-                "Received: [" + new String(reply, ZMQ.CHARSET) + "]"
-        );
+        String data = new String(reply, ZMQ.CHARSET);
+        Gson gson = new Gson();
+        RoadIndex rdInex = gson.fromJson(data, RoadIndex.class);
+
+        this.rdIndex = rdInex;
+
     }
 
-    public void readBuffer(){
+
+    public void getAvailableControls(String command){
 
     }
 }

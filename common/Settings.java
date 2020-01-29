@@ -50,7 +50,7 @@ public class Settings {
 	public int numGridCols = 0;//Number of columns in the virtual grid covering simulation area
 	public double maxGridCellWidthHeightInMeters = 500;//A cell should not be too large for load balancing purpose
 	public static String serverAddress = "127.0.0.1";
-	public static int serverListeningPortForWorkers = 50000;//Server's port for listening connection request initiated by worker
+	public static int serverListeningPortForWorkers = 50002;//Server's port for listening connection request initiated by worker
 
 	/*
 	 * Input
@@ -164,7 +164,7 @@ public class Settings {
 	 * External Listener Settings
 	 */
 
-	public boolean isExternaListenerUsed = true;
+	public boolean isExternalListenerUsed = true;
 
 	public ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);

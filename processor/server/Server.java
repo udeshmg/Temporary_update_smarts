@@ -133,7 +133,9 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	public void changeMap() {
 		data.changeMap();
-		extListner.getRoadGraph(data.getRoadNetwork());
+		if (settings.isExternalListenerUsed) {
+			extListner.getRoadGraph(data.getRoadNetwork());
+		}
 	}
 
 	@Override
@@ -200,6 +202,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			onWSSetupDoneMsg((Message_WS_SetupDone) message);
 		} else if (message instanceof Message_WS_ServerBased_SharedMyTrafficWithNeighbor) {
 			onWSServerBasedShareMyTrafficWithNeighbourMsg((Message_WS_ServerBased_SharedMyTrafficWithNeighbor) message);
+			onWSServerBasedShareMyTrafficWithNeighbourMsg((Message_WS_ServerBased_SharedMyTrafficWithNeighbor) message);
 		} else if (message instanceof Message_WS_TrafficReport) {
 			onWSTrafficReportMsg((Message_WS_TrafficReport) message);
 		} else if (message instanceof Message_WS_Serverless_Complete) {
@@ -213,7 +216,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			final Message_WS_TrafficReport message = iMessage.next();
 			data.updateFromReport(message.vehicleList, message.lightList, message.workerName, workerMetas.size(),
 					message.step, message.randomRoutes, message.finishedList,message.numInternalNonPubVehicles, message.numInternalTrams,
-					message.numInternalBuses, message.laneIndexes);
+					message.numInternalBuses, message.laneIndexes, message.edgesToUpdate);
 			// Remove processed message
 			iMessage.remove();
 		}
@@ -306,6 +309,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	}
 
 	public void askWorkersChangeLaneDirection(int edgeIndex) {
+
 		for (final WorkerMeta worker : workerMetas) {
 			worker.send(new Message_SW_ChangeLaneDirection(edgeIndex));
 		}
@@ -448,5 +452,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private void sendTrafficReportToListner(Message_WS_TrafficReport trafficReport){
 		extListner.getMessage(trafficReport);
 	}
+
 
 }

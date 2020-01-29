@@ -32,6 +32,7 @@ public class Message_WS_TrafficReport {
 	public int numInternalTrams;
 	public int numInternalBuses;
 	public ArrayList<SerializableLaneIndex> laneIndexes = new ArrayList<>();
+	public ArrayList<SerializableLaneIndex> edgesToUpdate = new ArrayList<>();
 
 	public Message_WS_TrafficReport() {
 
@@ -41,7 +42,7 @@ public class Message_WS_TrafficReport {
 									final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport,
 									List<Vehicle> vehiclesFinished,final int step,
 									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses,
-									final ArrayList<Integer> laneIndexes) {
+									final ArrayList<Integer> laneIndexes, final  ArrayList<Integer> edgesToUpdate) {
 		this.workerName = workerName;
 		if (settings.isVisualize || settings.isOutputTrajectory) {
 			vehicleList = getDetailOfActiveVehiclesOnRoad(vehiclesOnRoad);
@@ -58,13 +59,14 @@ public class Message_WS_TrafficReport {
 		this.numInternalTrams = numInternalTrams;
 		this.numInternalBuses = numInternalBuses;
 		this.laneIndexes = addLaneIndexes(laneIndexes);
+		this.edgesToUpdate = addLaneIndexes(edgesToUpdate);
 	}
 
-	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork){
+	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork, final ArrayList<Integer> edgesToUpdate){
 		this(settings, workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
 				trafficNetwork.newVehiclesSinceLastReport, trafficNetwork.getFinishedVehicles(), step,
 				trafficNetwork.numInternalNonPublicVehicle,
-				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus, trafficNetwork.laneIndexOfChangeDir);
+				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus, trafficNetwork.laneIndexOfChangeDir, edgesToUpdate);
 	}
 
 	ArrayList<SerializableLaneIndex> addLaneIndexes(final ArrayList<Integer> lanes){

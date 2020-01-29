@@ -390,7 +390,7 @@ public class Vehicle {
 			// Check whether road is explicitly blocked on vehicle's route
 			updateRoadBlockInfo();
 			takeIntersectionDecision();
-			updateLaneChangeConflictData();
+			//updateLaneChangeConflictData();
 
 			if((indexLegOnRoute == getRouteLegCount() - 1) && (headPosition >= lane.edge.length - lane.edge.getEndIntersectionSize())){
 				markAsFinished();
@@ -437,8 +437,8 @@ public class Vehicle {
 		if(hasNextEdge()) {
 			if (headPosition > current.getEndIntersectionLaneChangeProhibitedPos()) {
 				Lane next = laneDecider.getNextEdgeLane(this);
-				SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
-				decision = new IntersectionDecision(lane, next, curve);
+				//SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
+				decision = new IntersectionDecision(lane, next);
 			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
 				decision = null;
 			}

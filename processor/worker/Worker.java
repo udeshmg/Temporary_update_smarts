@@ -108,7 +108,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	public void sendTrafficReportInServerlessMode() {
 		if ((simulation.getStep() + 1) % settings.trafficReportStepGapInServerlessMode == 0) {
-			senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork()));
+			senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getLaneChanges()));
 			simulation.clearReportedTrafficData();
 		}
 	}
@@ -304,7 +304,7 @@ public class Worker implements MessageHandler, Runnable {
 		} else if (message instanceof Message_SW_BlockLane) {
 			onSWBlockLane((Message_SW_BlockLane) message);
 		} else if (message instanceof Message_SW_ChangeLaneDirection) {
-			onSWChnageLaneDirection((Message_SW_ChangeLaneDirection) message);
+			onSWChangeLaneDirection((Message_SW_ChangeLaneDirection) message);
 		}
 	}
 
@@ -420,7 +420,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	public void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
 		simulation.simulateOneStep(this, msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
-		senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork()));
+		senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getLaneChanges()));
 		simulation.clearReportedTrafficData();
 	}
 
@@ -475,7 +475,7 @@ public class Worker implements MessageHandler, Runnable {
 		simulation.changeLaneBlock(msg.laneIndex, msg.isBlocked);
 	}
 
-	private void onSWChnageLaneDirection(Message_SW_ChangeLaneDirection msg){
+	private void onSWChangeLaneDirection(Message_SW_ChangeLaneDirection msg){
 		simulation.changeLaneDirection(msg.edgeIndex);
 	}
 

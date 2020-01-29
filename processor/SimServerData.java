@@ -5,7 +5,6 @@ import osm.OSM;
 import processor.communication.message.*;
 import processor.server.*;
 import processor.server.gui.GUI;
-import traffic.network.RandomODDistributor;
 import traffic.road.Node;
 import traffic.road.RoadNetwork;
 import traffic.road.RoadUtil;
@@ -129,7 +128,8 @@ public class SimServerData {
                                  final ArrayList<Serializable_GUI_Light> lightList, final String workerName, final int numWorkers,
                                  final int step, ArrayList<SerializableRouteDump> randomRoutes,
                                  ArrayList<Serializable_Finished_Vehicle> finished, int numInternalNonPubVehicles,
-                                 int numInternalTrams, int numInternalBuses, ArrayList<SerializableLaneIndex> laneList) {
+                                 int numInternalTrams, int numInternalBuses, ArrayList<SerializableLaneIndex> laneList,
+                                 ArrayList<SerializableLaneIndex> edgeList) {
         // Update GUI
         if (settings.isVisualize) {
             gui.updateObjectData(vehicleList, lightList, workerName, numWorkers, step);
@@ -162,6 +162,15 @@ public class SimServerData {
         numInternalBusesAtAllWorkers += numInternalBuses;
 
         updateLanes(laneList);
+        getChangedLanesFromWorker(edgeList);
+    }
+
+    private void getChangedLanesFromWorker(ArrayList<SerializableLaneIndex> laneIndexes){
+        ArrayList<Integer> edges = new ArrayList<>();
+        for (SerializableLaneIndex index :laneIndexes){
+            edges.add(index.index);
+        }
+        getRoadNetwork().updateLaneDirections(edges);
     }
 
 

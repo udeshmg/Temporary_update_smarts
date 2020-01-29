@@ -17,8 +17,8 @@ public class VehicleUtil {
 	 * Compute the GPS coordinates of the head and end of a given vehicle
 	 */
 	public static double[] calculateCoordinates(final Vehicle v) {
-        SimpleCurve curve = getIntersectionCurve(v);
-//        SimpleCurve curve = null;
+        //SimpleCurve curve = getIntersectionCurve(v);
+        SimpleCurve curve = null;
 	    if(curve != null){
 	        Point2D[] points = curve.getMappedPositions(v.headPosition, v.length, v.lane);
             final double[] coords = {points[0].getX(), points[0].getY(), points[1].getX(), points[1].getY()};
@@ -126,10 +126,10 @@ public class VehicleUtil {
                 isNeedToBlock = true;
             } else if (edgeBeingChecked == vehicle.edgeBeforeTurnRight
                     && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numRightLanes
-                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked, isDriveOnLeft)) {
+                    && !edgeBeingChecked.isAllLanesOnRightBlocked(laneNumberBeingChecked, isDriveOnLeft) && !edgeBeingChecked.getLastLane().isDirectionChanging) {
                 isNeedToBlock = true;
             }
-        } else {
+        } else { //TODO : add lane check driveOnRight
             if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft
                     && laneNumberBeingChecked < edgeBeingChecked.getLaneCount() - edgeBeingChecked.numLeftLanes
                     && !edgeBeingChecked.isAllLanesOnLeftBlocked(laneNumberBeingChecked, isDriveOnLeft)) {

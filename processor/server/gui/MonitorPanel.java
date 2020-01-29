@@ -669,10 +669,7 @@ public class MonitorPanel extends JPanel {
 
 	void changeLaneDirection(final EdgeObject selectedEdge) {
 		Edge edge = processor.getRoadNetwork().edges.get(selectedEdge.index);
-		Lane lane = edge.getLane(edge.getLaneCount()-1);
-
-		lane.isDirectionChanging = true;
-
+		processor.getRoadNetwork().updateLaneDirections(new ArrayList<Integer>(edge.index));
 		// Inform server about the action
 		processor.askWorkersChangeLaneDirection(edge.index);
 	}

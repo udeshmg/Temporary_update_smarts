@@ -665,4 +665,12 @@ public class RoadNetwork {
 		}
 	}
 
+	public void updateLaneDirections(ArrayList<Integer> edges){
+		for (Integer edgeIndex : edges) {
+			Edge edge =  this.edges.get(edgeIndex);
+			Lane lane = edge.getLane(edge.getLaneCount()-1);
+			lane.isDirectionChanging = true;
+		}
+	}
+
 }

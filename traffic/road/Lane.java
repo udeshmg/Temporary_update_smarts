@@ -255,7 +255,7 @@ public class Lane {
 		edge.addLane(this);
 	}
 
-	public void markLaneToChange(){
+	public void markLaneToChangeDir(){
 		if ( isDirectionChanging == false){
 			Edge oppositeEdge = edge.getOppositeEdge();
 			if (oppositeEdge.getLastLane().isDirectionChanging == false)
