@@ -13,6 +13,7 @@ import processor.worker.Workarea;
 import traffic.light.LightCoordinator;
 import traffic.light.TrafficLightCluster;
 import traffic.light.TrafficLightTiming;
+import traffic.network.ODDemand;
 import traffic.road.*;
 import traffic.routing.Dijkstra;
 import traffic.routing.RandomAStar;
@@ -310,16 +311,20 @@ public class TrafficNetwork extends RoadNetwork {
 	void createInternalNonPublicVehicles(int numLocalRandomPrivateVehicles, final double timeNow,
 			boolean isNewNonPubVehiclesAllowed) {
 		if (isNewNonPubVehiclesAllowed) {
-			final int numVehiclesNeeded = settings.getTemporalDistributor().getCurrentVehicleLimit(numLocalRandomPrivateVehicles,
-					(int) (timeNow*settings.numStepsPerSecond),settings.maxNumSteps) - numInternalNonPublicVehicle;
-			for (int i = 0; i < numVehiclesNeeded; i++) {
-				VehicleType type = settings.getVehicleTypeDistributor().getVehicleType();
-				Edge[] edges = settings.getODDistributor().getStartAndEndEdge(this,
-						internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges);
-				addNewVehicle(type, false, false, edges[0].startNode, edges[1].endNode, null, internalVehiclePrefix, timeNow, "", -1,
+
+			ArrayList<ODDemand> traffic = settings.getTrafficGenerator().getGeneratedTraffic(this,
+					internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges, (int) (timeNow*settings.numStepsPerSecond));
+
+			for (ODDemand odpair : traffic){
+				final int numVehiclesNeeded = odpair.getNumVehicles();
+				for (int i = 0; i < numVehiclesNeeded; i++) {
+
+					addNewVehicle(odpair.getVehicleType(), false, false, odpair.getOrigin().startNode, odpair.getDestination().endNode, null, internalVehiclePrefix, timeNow, "", -1,
 							getRandomDriverProfile());
+				}
+				}
 			}
-		}
+
 	}
 
 	/**

@@ -39,7 +39,19 @@ public abstract class ODDistributor {
     }
 
     public abstract Edge[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges);
-    public abstract List<double[]> getSourceWidows(RoadNetwork network);
-    public abstract List<double[]> getDestinationWidows(RoadNetwork network);
-    public abstract List<double[]> getSourceDestinationWidows(RoadNetwork network);
+
+
+    public List<double[]> getSourceWidows(RoadNetwork network) {
+        return network.getSettings().guiSourceWindowsForInternalVehicle;
+    }
+
+
+    public List<double[]> getDestinationWidows(RoadNetwork network) {
+        return network.getSettings().guiDestinationWindowsForInternalVehicle;
+    }
+
+
+    public List<double[]> getSourceDestinationWidows(RoadNetwork network) {
+        return network.getSettings().guiSourceDestinationWindowsForInternalVehicle;
+    }
 }

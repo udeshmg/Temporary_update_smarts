@@ -42,18 +42,4 @@ public class RandomODDistributor extends ODDistributor{
         return new Edge[]{start, end};
     }
 
-    @Override
-    public List<double[]> getSourceWidows(RoadNetwork network) {
-        return network.getSettings().guiSourceWindowsForInternalVehicle;
-    }
-
-    @Override
-    public List<double[]> getDestinationWidows(RoadNetwork network) {
-        return network.getSettings().guiDestinationWindowsForInternalVehicle;
-    }
-
-    @Override
-    public List<double[]> getSourceDestinationWidows(RoadNetwork network) {
-        return network.getSettings().guiSourceDestinationWindowsForInternalVehicle;
-    }
 }

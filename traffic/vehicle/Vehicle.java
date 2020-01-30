@@ -390,7 +390,7 @@ public class Vehicle {
 			// Check whether road is explicitly blocked on vehicle's route
 			updateRoadBlockInfo();
 			takeIntersectionDecision();
-			//updateLaneChangeConflictData();
+			updateLaneChangeConflictData();
 
 			if((indexLegOnRoute == getRouteLegCount() - 1) && (headPosition >= lane.edge.length - lane.edge.getEndIntersectionSize())){
 				markAsFinished();
@@ -504,6 +504,20 @@ public class Vehicle {
 				edge = targetEdge;
 			}
 		}
+	}
+
+	/*
+	* Get Route legs to visit
+	*/
+
+	public ArrayList<RouteLeg> getNextRouteLegs(){
+		ArrayList<RouteLeg> nextRouteLegs = new ArrayList<>();
+		if (routeLegs != null) {
+			for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
+				nextRouteLegs.add(routeLegs.get(i));
+			}
+		}
+		return nextRouteLegs;
 	}
 
 	public Edge getCurrentEdge(){

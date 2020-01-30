@@ -140,6 +140,7 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
+	public String trafficGenerator = "RushHour";
 	public String odDistributor = "Random";
 	public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -163,8 +164,17 @@ public class Settings {
 	/**
 	 * External Listener Settings
 	 */
+	public boolean isExternalListenerUsed = false;
 
-	public boolean isExternalListenerUsed = true;
+
+	public TrafficGenerator getTrafficGenerator() {
+		return dictionary.getTrafficGenerator(trafficGenerator);
+	}
+
+	public void setTrafficGenerator(String trafficGenerator) {
+		this.trafficGenerator = trafficGenerator;
+	}
+
 
 	public ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);

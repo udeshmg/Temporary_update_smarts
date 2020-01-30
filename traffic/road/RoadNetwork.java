@@ -278,7 +278,7 @@ public class RoadNetwork {
 		final double lonPerCol = Math.abs(maxLon - minLon) / settings.numGridCols;
 		final int row = (int) Math.floor(Math.abs(lat - minLat) / latPerRow);
 		final int col = (int) Math.floor(Math.abs(lon - minLon) / lonPerCol);
-		double minDistToEdge = 100000;
+		double minDistToEdge = 10000000;
 		double distToEdge = minDistToEdge;
 		Edge edgeFound = null;
 		for (int i = row - 1; i <= (row + 1); i++) {

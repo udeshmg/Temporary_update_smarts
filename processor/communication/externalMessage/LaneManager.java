@@ -4,6 +4,7 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import processor.communication.message.Message_WS_TrafficReport;
+import traffic.TrafficNetwork;
 import traffic.road.RoadNetwork;
 import processor.communication.externalMessage.RoadGraphExternal;
 import com.google.gson.Gson;
@@ -63,9 +64,9 @@ public class LaneManager implements ExternalSimulationListener {
     }
 
     @Override
-    public void getTrafficData(RoadNetwork roadNetwork) {
+    public void getTrafficData(TrafficNetwork trafficNetwork) {
         TrafficData trafficData = new TrafficData();
-        trafficData.setTrafficData(roadNetwork);
+        trafficData.setTrafficData(trafficNetwork);
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
         System.out.println("GSON output: " + str);

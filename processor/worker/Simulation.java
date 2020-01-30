@@ -217,8 +217,14 @@ public class Simulation {
 				timeNow);
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
-		// Clear one-step data
 
+		sendTrafficDataToExternal();
+
+		// Clear one-step data
+		clearOneStepData();
+	}
+
+	public void sendTrafficDataToExternal(){
 		if (settings.isExternalListenerUsed) {
 			if (step % settings.laneUpdateInterval == 0 && step > 0) {
 				extListner.getTrafficData(trafficNetwork);
@@ -234,7 +240,7 @@ public class Simulation {
 				}
 			}
 		}
-		clearOneStepData();
+
 	}
 
 	public ArrayList<Integer> getLaneChanges(){

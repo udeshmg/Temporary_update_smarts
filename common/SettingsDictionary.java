@@ -37,6 +37,8 @@ import java.util.Map;
  */
 public class SettingsDictionary {
 
+
+    private Map<String, TrafficGenerator> trafficGeneratorMap;
     private Map<String, SimulationListener> listenerMap;
     private Map<String, ODDistributor> odDistributorMap;
     private Map<String, TemporalDistributor> temporalDistributorMap;
@@ -61,8 +63,20 @@ public class SettingsDictionary {
         this.laneDeciderMap = new HashMap<>();
         addLaneDecider("DEFAULT", new DefaultLaneDecider());
         addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
+        this.trafficGeneratorMap = new HashMap<>();
+        addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(), new PreDefinedDemandLoader(), new DefaultVehicleTypeDistributor(), 3));
+        addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
+    }
 
+    public TrafficGenerator getTrafficGenerator(String key) {
+        return trafficGeneratorMap.get(key);
+    }
+    public void setTrafficGenerator(String key, TrafficGenerator trafficGeneratorMap) {
+        this.trafficGeneratorMap.put(key, trafficGeneratorMap);
+    }
 
+    public void addtrafficGenerator(String generatorName, TrafficGenerator tfGenerator){
+        setTrafficGenerator(generatorName, tfGenerator);
     }
 
     public void addSimulationListener(String key, SimulationListener listener){
