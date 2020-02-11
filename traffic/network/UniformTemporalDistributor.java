@@ -29,6 +29,12 @@ public class UniformTemporalDistributor extends TemporalDistributor{
 
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
-        return amount;
+
+        if ( currentStep < 4000) {
+            return amount;
+        }
+        else{
+            return 0;
+        }
     }
 }

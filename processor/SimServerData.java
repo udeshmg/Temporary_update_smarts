@@ -149,7 +149,7 @@ public class SimServerData {
             lastVehicleFinishedStep = step;
         }
         for (Serializable_Finished_Vehicle finishedVehicle : finished) {
-            vdOutput.outputVehicleData(finishedVehicle);
+            vdOutput.outputVehicleData(finishedVehicle, timeStamp);
         }
         trjOutput.outputTrajData(step, vehicleList);
         // Store routes of new vehicles created since last report
@@ -269,7 +269,7 @@ public class SimServerData {
     }
 
     public boolean[] updateVehicleCounts() {
-        boolean isNewNonPubVehiclesAllowed = numInternalNonPubVehiclesAtAllWorkers < settings.numGlobalRandomPrivateVehicles;
+        boolean isNewNonPubVehiclesAllowed = true; //numInternalNonPubVehiclesAtAllWorkers < settings.numGlobalRandomPrivateVehicles;
         boolean isNewTramsAllowed = numInternalTramsAtAllWorkers < settings.numGlobalRandomTrams;
         boolean isNewBusesAllowed = numInternalBusesAtAllWorkers < settings.numGlobalRandomBuses;
 

@@ -31,12 +31,12 @@ public class Settings {
 	public double numStepsPerSecond = 5;//This determines the step length.
 	public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
 	public int trafficReportStepGapInServerlessMode = 1;
-	public int laneUpdateInterval = 12; // lane update time interval in steps
+	public int laneUpdateInterval = 300; // lane update time interval in steps
 
 	/*
 	 * Display
 	 */
-	public boolean isVisualize = true;
+	public boolean isVisualize = false;
 	public int controlPanelGapToRight = 20;
 	public int controlPanelWidth = 450;
 
@@ -140,7 +140,7 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	public String trafficGenerator = "RushHour";
+	public String trafficGenerator = "Random";
 	public String odDistributor = "Random";
 	public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -159,7 +159,7 @@ public class Settings {
 	public boolean stopsAtMaxSteps = true;
 	public int gridlockDetectionTime = 600;
 	public String tlManager = "";
-	public String laneDecide = "DEFAULT";
+	public String laneDecide = "UNBALANCED";
 
 	/**
 	 * External Listener Settings

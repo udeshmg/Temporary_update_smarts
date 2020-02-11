@@ -117,6 +117,27 @@ public class Edge {
 	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
 	private LinkedHashMap<Edge, Integer> edgeLaneMap;
 
+	public double getNumVehicles() {
+		return numVehicles;
+	}
+
+	public double getNumVehiclesRight() {
+		return numVehiclesRight;
+	}
+
+	public double getNumVehiclesStraight() {
+		return numVehiclesStraight;
+	}
+
+	public double getNumVehiclesLeft() {
+		return numVehiclesLeft;
+	}
+
+	private double numVehicles = 0;
+	private double numVehiclesRight = 0;
+	private double numVehiclesStraight = 0;
+	private double numVehiclesLeft = 0;
+
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
 			final List<String> busRoutesRef, final int numRightLanes, final int numLeftLanes,
@@ -142,6 +163,13 @@ public class Edge {
 		for (Lane lane : lanes) {
 			lane.clearVehicles();
 		}
+	}
+
+	public void updateVehicleNumbes(int numVehicles, int numVehiclesStraight, int numVehiclesRight, int numVehiclesLeft){
+		this.numVehicles = 0.9*this.numVehicles + 0.1*numVehicles;
+		this.numVehiclesRight = 0.9*this.numVehiclesRight + 0.1*numVehiclesRight;
+		this.numVehiclesStraight = 0.9*this.numVehiclesStraight + 0.1*numVehiclesStraight;
+		this.numVehiclesLeft = 0.9*this.numVehiclesLeft + 0.1*numVehiclesLeft;
 	}
 
 	public int getLaneCount(){

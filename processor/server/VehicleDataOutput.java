@@ -47,6 +47,20 @@ public class VehicleDataOutput {
         outputStringToFile(fos, sb.toString());
     }
 
+    public void outputVehicleData(Serializable_Finished_Vehicle vehicle, double timeNow){
+        StringBuilder sb = new StringBuilder();
+        sb.append(vehicle.id+",");
+        sb.append(vehicle.vid+",");
+        sb.append(vehicle.source+",");
+        sb.append(vehicle.destination+",");
+        sb.append(vehicle.bestTravelTime+",");
+        sb.append(vehicle.actualTravelTime+",");
+        sb.append(timeNow+",");
+        sb.append(vehicle.routeLength+",");
+        sb.append(vehicle.route+ System.getProperty("line.separator"));
+        outputStringToFile(fos, sb.toString());
+    }
+
     private void outputStringToFile(final FileOutputStream fos, String str) {
         try {
             fos.write(str.getBytes());

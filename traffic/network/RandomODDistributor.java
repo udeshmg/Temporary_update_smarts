@@ -3,6 +3,7 @@ package traffic.network;
 import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.road.RoadNetwork;
 
 import java.util.ArrayList;
@@ -33,13 +34,13 @@ public class RandomODDistributor extends ODDistributor{
 
 
     @Override
-    public Edge[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges) {
+    public Node[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeNow) {
         Edge start = possibleStartEdges.get(getRandom().nextInt(possibleStartEdges.size()));
         Edge end = possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
         while(start.startNode == end.endNode){
             end = possibleEndEdges.get(getRandom().nextInt(possibleEndEdges.size()));
         }
-        return new Edge[]{start, end};
+        return new Node[]{start.startNode, end.endNode};
     }
 
 }

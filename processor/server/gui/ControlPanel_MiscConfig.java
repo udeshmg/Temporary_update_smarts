@@ -169,7 +169,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 
 		textField_numRandomTrams = new JTextField();
 		textField_numRandomTrams.setToolTipText("Non-negative integer");
-		textField_numRandomTrams.setText("5");
+		textField_numRandomTrams.setText("0");
 		textField_numRandomTrams.setFont(new Font("Tahoma", Font.PLAIN, 13));
 
 		lblnumRandomBuses = new JLabel("Number of random buses (if applicable)");
@@ -179,7 +179,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 
 		textField_numRandomBuses = new JTextField();
 		textField_numRandomBuses.setToolTipText("Non-negative integer");
-		textField_numRandomBuses.setText("5");
+		textField_numRandomBuses.setText("0");
 		textField_numRandomBuses.setFont(new Font("Tahoma", Font.PLAIN, 13));
 
 		final JLabel lblNumberOfSteps = new JLabel("Max number of steps");
@@ -189,7 +189,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		textField_TotalNumSteps = new JTextField();
 		textField_TotalNumSteps.setToolTipText("Non-negative integer");
 		textField_TotalNumSteps.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textField_TotalNumSteps.setText("18000");
+		textField_TotalNumSteps.setText("10000");
 
 		final JLabel lblNumberOfSteps_1 = new JLabel("Number of steps per second");
 		lblNumberOfSteps_1.setHorizontalAlignment(SwingConstants.RIGHT);

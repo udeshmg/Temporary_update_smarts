@@ -10,6 +10,7 @@ import traffic.routing.Routing;
 import traffic.vehicle.lanedecide.DefaultLaneDecider;
 import traffic.vehicle.lanedecide.LaneDecider;
 import traffic.vehicle.lanedecide.PredefinedLaneDecider;
+import traffic.vehicle.lanedecide.UnbalancedLaneDecider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,8 +64,10 @@ public class SettingsDictionary {
         this.laneDeciderMap = new HashMap<>();
         addLaneDecider("DEFAULT", new DefaultLaneDecider());
         addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
+        addLaneDecider("UNBALANCED", new UnbalancedLaneDecider());
         this.trafficGeneratorMap = new HashMap<>();
-        addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(), new PreDefinedDemandLoader(), new DefaultVehicleTypeDistributor(), 3));
+        int numPairs = 8;
+        addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(numPairs), new PreDefinedDemandLoader(numPairs), new DefaultVehicleTypeDistributor(), numPairs));
         addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
     }
 

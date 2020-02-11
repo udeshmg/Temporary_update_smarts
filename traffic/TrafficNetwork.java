@@ -319,8 +319,8 @@ public class TrafficNetwork extends RoadNetwork {
 				final int numVehiclesNeeded = odpair.getNumVehicles();
 				for (int i = 0; i < numVehiclesNeeded; i++) {
 
-					addNewVehicle(odpair.getVehicleType(), false, false, odpair.getOrigin().startNode, odpair.getDestination().endNode, null, internalVehiclePrefix, timeNow, "", -1,
-							getRandomDriverProfile());
+					addNewVehicle(odpair.getVehicleType(), false, false, odpair.getOrigin(), odpair.getDestination(), null, internalVehiclePrefix, timeNow, "", -1,
+							DriverProfile.NORMAL);
 				}
 				}
 			}
@@ -366,11 +366,11 @@ public class TrafficNetwork extends RoadNetwork {
 	public void createInternalVehicles(int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
 			int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed, boolean isNewTramsAllowed,
 			boolean isNewBusesAllowed, final double timeNow) {
-		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0)) {
+		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%60 == 0 )) {
 			createInternalNonPublicVehicles(numLocalRandomPrivateVehicles, timeNow, isNewNonPubVehiclesAllowed);
 		}
-		createInternalPublicVehicles(numLocalRandomTrams, numLocalRandomBuses, isNewTramsAllowed, isNewBusesAllowed,
-				timeNow);
+		//createInternalPublicVehicles(numLocalRandomTrams, numLocalRandomBuses, isNewTramsAllowed, isNewBusesAllowed,
+		//		timeNow);
 	}
 
 	void createOneInternalPublicVehicle(final VehicleType type, final double timeNow) {

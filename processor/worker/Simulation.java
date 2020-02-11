@@ -217,11 +217,37 @@ public class Simulation {
 				timeNow);
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
-
+		updateVehicleNumbers();
 		sendTrafficDataToExternal();
 
 		// Clear one-step data
 		clearOneStepData();
+	}
+
+	public void updateVehicleNumbers(){
+		if (step%10 == 0) {
+			for (Edge edge : trafficNetwork.edges) {
+				int numVehicles = 0;
+				int numVehiclesRight = 0;
+				int numVehiclesStraight = 0;
+				int numVehiclesLeft = 0;
+				for (Lane lane : edge.getLanes()) {
+					numVehicles += lane.getVehicles().size();
+					for (Vehicle v : lane.getVehicles()) {
+						numVehicles++;
+						if (v.edgeBeforeTurnRight == edge) {
+							numVehiclesRight++;
+						} else if (v.edgeBeforeTurnLeft == edge) {
+							numVehiclesLeft++;
+						} else {
+							numVehiclesStraight++;
+						}
+					}
+
+				}
+				edge.updateVehicleNumbes(numVehicles, numVehiclesStraight, numVehiclesRight, numVehiclesLeft);
+			}
+		}
 	}
 
 	public void sendTrafficDataToExternal(){
@@ -344,7 +370,7 @@ public class Simulation {
 	}
 
 	public void changeLaneDirection(int edgeIndex){
-		if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 1) {
+		if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 2) {
 			trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChangeDir();
 		}
 		else {

@@ -2,6 +2,7 @@ package traffic.network;
 
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.vehicle.VehicleType;
 
 import java.util.ArrayList;
@@ -15,14 +16,14 @@ public class RandomTrafficGenerator extends TrafficGenerator {
     @Override
     public ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep) {
         ArrayList<ODDemand> ODMatrix = new ArrayList<>();
-        for (int i = 0; i < getTemporalDistributor().getCurrentVehicleLimit(1000, timeStep, trafficNetwork.getSettings().maxNumSteps); i++){
+        for (int i = 0; i < getTemporalDistributor().getCurrentVehicleLimit(200, timeStep, trafficNetwork.getSettings().maxNumSteps); i++){
             ODDemand odDemand = new ODDemand();
-            Edge[] OD = getOdDistributor().getStartAndEndEdge(trafficNetwork, possibleStartEdges, possibleEndEdges);
+            Node[] OD = getOdDistributor().getStartAndEndEdge(trafficNetwork, possibleStartEdges, possibleEndEdges, timeStep);
 
             odDemand.setOrigin(OD[0]);
             odDemand.setDestination(OD[1]);
 
-            int numVehicles = getTemporalDistributor().getCurrentVehicleLimit(1, timeStep, 18000);
+            int numVehicles = 1; //getTemporalDistributor().getCurrentVehicleLimit(1, timeStep, 18000);
             odDemand.setNumVehicles(numVehicles);
 
             VehicleType vehicleType = getVehicleTypeDistributor().getVehicleType();

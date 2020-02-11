@@ -3,17 +3,53 @@ package traffic.network;
 public class PreDefinedDemandLoader extends TemporalDistributor {
 
     private int counter = 0;
-    private int maxCounter = 3;
-    private int [] demandMatrix = {5,6,7};
+    private int maxCounter = 2;
+    private int [][] demandMatrix = {{15,1,18,1,16,1,12,1},
+                                     {1,15,1,18,1,16,1,12},
+                                     {1,4,3,9,14,3,3},
+                                     {5,12,12,9,6,12}};
+    private int trafficType = 0;
+
+    public PreDefinedDemandLoader(int maxCounter) {
+        this.maxCounter = maxCounter;
+    }
 
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
+
+        selectTrafficType(currentStep);
+        int numVehicles = 0;
+        if (currentStep < 4000)
+            numVehicles =  demandMatrix[trafficType][counter];
+        else
+            numVehicles = 0;
+
         iterate();
-        return demandMatrix[counter];
+        return numVehicles;
+
     }
 
     private void iterate(){
         counter ++;
         if (counter == maxCounter){ counter = 0;}
+    }
+
+    private void selectTrafficType(int currentTime){
+        switch (currentTime/4000){
+            case 0:
+                trafficType = 0;
+                break;
+            case 1:
+                trafficType = 1;
+                break;
+            case 2:
+                trafficType = 2;
+                break;
+            case 3:
+                trafficType = 3;
+                break;
+            default:
+                trafficType = 3;
+        }
     }
 }

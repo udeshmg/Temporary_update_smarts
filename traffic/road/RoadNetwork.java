@@ -529,8 +529,8 @@ public class RoadNetwork {
 				position++;//Skip <Edge> tag
 				int endNodeIndex = Integer.parseInt(fields[++position]);
 				int numLanes = Integer.parseInt(fields[++position]);
-				int numRightLanes = Integer.parseInt(fields[++position]);
-				int numLeftLanes = Integer.parseInt(fields[++position]);
+				int numRightLanes = Integer.parseInt(fields[++position])+1; //TODO: update numright lanes and numleft lanes
+				int numLeftLanes = Integer.parseInt(fields[++position])+1;
 				int numRightOnlyLanes = Integer.parseInt(fields[++position]);
 				int numLeftOnlyLanes = Integer.parseInt(fields[++position]);
 				final String type = fields[++position];

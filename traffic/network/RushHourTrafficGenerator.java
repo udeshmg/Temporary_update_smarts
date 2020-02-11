@@ -2,6 +2,7 @@ package traffic.network;
 
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.vehicle.VehicleType;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class RushHourTrafficGenerator extends TrafficGenerator {
         for (int i = 0; i < numODPairs; i++){
             ODDemand odDemand = new ODDemand();
 
-            Edge[] OD = getOdDistributor().getStartAndEndEdge(trafficNetwork,  possibleStartEdges,  possibleEndEdges);
+            Node[] OD = getOdDistributor().getStartAndEndEdge(trafficNetwork,  possibleStartEdges,  possibleEndEdges, timeStep);
             odDemand.setOrigin(OD[0]);
             odDemand.setDestination(OD[1]);
 

@@ -96,9 +96,9 @@ public class LaneManager implements ExternalSimulationListener {
         byte[] reply = socket.recv();
         String data = new String(reply, ZMQ.CHARSET);
         Gson gson = new Gson();
-        RoadIndex rdInex = gson.fromJson(data, RoadIndex.class);
+        RoadIndex rdIndex = gson.fromJson(data, RoadIndex.class);
 
-        this.rdIndex = rdInex;
+        this.rdIndex = rdIndex;
 
     }
 

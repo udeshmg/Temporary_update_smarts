@@ -27,7 +27,7 @@ public class DefaultVehicleTypeDistributor extends VehicleTypeDistributor{
 
     @Override
     public VehicleType getVehicleType() {
-        final double typeDecider = getRandom().nextDouble();
+        final double typeDecider = 0.2;
         VehicleType type = null;
         if (typeDecider < 0.05) {
             type = VehicleType.BIKE;

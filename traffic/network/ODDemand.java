@@ -1,6 +1,7 @@
 package traffic.network;
 
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.vehicle.VehicleType;
 
 public class ODDemand{
@@ -13,7 +14,7 @@ public class ODDemand{
     }
 
 
-    public ODDemand(Edge origin, Edge destination, int numVehicles, VehicleType vehicleType) {
+    public ODDemand(Node origin, Node destination, int numVehicles, VehicleType vehicleType) {
         this.origin = origin;
         this.destination = destination;
         this.numVehicles = numVehicles;
@@ -28,15 +29,15 @@ public class ODDemand{
         return vehicleType;
     }
 
-    public Edge getOrigin() {
+    public Node getOrigin() {
         return origin;
     }
 
-    public void setOrigin(Edge origin) {
+    public void setOrigin(Node origin) {
         this.origin = origin;
     }
 
-    public void setDestination(Edge destination) {
+    public void setDestination(Node destination) {
         this.destination = destination;
     }
 
@@ -44,7 +45,7 @@ public class ODDemand{
         this.numVehicles = numVehicles;
     }
 
-    public Edge getDestination() {
+    public Node getDestination() {
         return destination;
     }
 
@@ -52,8 +53,8 @@ public class ODDemand{
         return numVehicles;
     }
 
-    private Edge origin;
-    private Edge destination;
+    private Node origin;
+    private Node destination;
     private int numVehicles;
     private VehicleType vehicleType;
 

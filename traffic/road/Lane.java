@@ -244,11 +244,14 @@ public class Lane {
 
 	public void moveLaneToOppositeEdge(){
 		edge.removeLastLane();
+		if (edge.numRightLanes > 1){
+			edge.numRightLanes--;
+		}
 		// Find the opposite direction edge
 		Edge opposedEdge = edge.getOppositeEdge();
 		// add to new direction
 		edge = opposedEdge;
-
+		edge.numRightLanes++;
 		// Get the highest lane number of opposite dir. and update changed lane
 		laneNumber = edge.getLaneCount();
 		changeLaneCoordinates();

@@ -12,6 +12,11 @@ public class RoadExternal {
     private int numVehiclesRight;
     private int numVehiclesStraight;
 
+    private double numVehiclesMvg;
+    private double numVehiclesLeftMvg;
+    private double numVehiclesRightMvg;
+    private double numVehiclesStraightMvg;
+
     private int numLanes;
 
     private int startNode;
@@ -23,6 +28,13 @@ public class RoadExternal {
     private double endLat;
     private double endLon;
 
+    public void updateMvgData(double numVehiclesMvg, double numVehiclesStraightMvg,
+                              double numVehiclesRightMvg, double numVehiclesLeftMvg){
+        this.numVehiclesMvg = numVehiclesMvg;
+        this.numVehiclesStraightMvg = numVehiclesStraightMvg;
+        this.numVehiclesRightMvg = numVehiclesRightMvg;
+        this.numVehiclesLeftMvg = numVehiclesLeftMvg;
+    }
 
     public double getStartLat() {
         return startLat;

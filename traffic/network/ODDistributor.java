@@ -2,6 +2,7 @@ package traffic.network;
 
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
+import traffic.road.Node;
 import traffic.road.RoadNetwork;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class ODDistributor {
         return random;
     }
 
-    public abstract Edge[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges);
+    public abstract Node[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeNow);
 
 
     public List<double[]> getSourceWidows(RoadNetwork network) {

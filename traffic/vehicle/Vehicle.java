@@ -440,7 +440,9 @@ public class Vehicle {
 				//SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
 				decision = new IntersectionDecision(lane, next);
 			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
-				decision = null;
+				Lane next = laneDecider.getNextEdgeLane(this);
+				//SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
+				decision = null; //new IntersectionDecision(lane, next);
 			}
 		}
 	}
