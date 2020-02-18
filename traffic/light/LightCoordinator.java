@@ -10,6 +10,7 @@ import traffic.light.manager.TLManager;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.road.RoadUtil;
+import traffic.vehicle.lanechange.MOBIL;
 
 /**
  * This class handles the initialization of traffic lights and the switch of
@@ -126,19 +127,62 @@ public class LightCoordinator {
 				}
 			}
 		}
-		while(!partialMovements.isEmpty()){
+		/** while(!partialMovements.isEmpty()){
 			Movement partial = partialMovements.remove(0);
 			Node end = partial.getEndNode();
 			if(nodeGroup.contains(end)){
 				for (Edge outwardEdge : end.outwardEdges) {
-					Movement newMove = partial.clone();
-					newMove.addEdge(outwardEdge);
-					partialMovements.add(newMove);
+					if (outwardEdge.endNode != end) {
+						Movement newMove = partial.clone();
+						newMove.addEdge(outwardEdge);
+						partialMovements.add(newMove);
+					}
 				}
 			}else{
 				fullMovements.add(partial);
 			}
+		} **/
+
+		for (Movement movement : partialMovements){
+
+			for (Edge nextRoad : movement.getEdges()){
+				List<Edge> visited = new ArrayList<>();
+				Deque<Edge> stack = new ArrayDeque<Edge>();
+				stack.push(nextRoad);
+
+				while(!stack.isEmpty()){
+
+					Edge edge = stack.peek();
+
+					if ( !nodeGroup.contains(edge.endNode)){
+						//Create movement list
+						ArrayList<Edge> movementList = new ArrayList<>();
+						for (Edge element : stack){
+							movementList.add(0,element);
+						}
+						Movement fullmovement = new Movement(movementList);
+						fullMovements.add(fullmovement);
+						stack.pop();
+					}
+					else {
+						boolean isAllvisited = true;
+						for (Edge otherEdge : edge.endNode.outwardEdges) {
+							if (!visited.contains(otherEdge) && (nextRoad.endNode != otherEdge.endNode)) {
+								stack.push(otherEdge);
+								visited.add(otherEdge);
+								isAllvisited = false;
+								break;
+							}
+						}
+
+						if (isAllvisited) {
+							stack.pop();
+						}
+					}
+				}
+			}
 		}
+
 		return fullMovements;
 	}
 

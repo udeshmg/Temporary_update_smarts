@@ -3,6 +3,7 @@ package traffic.network;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,5 +46,5 @@ public abstract class TrafficGenerator {
     public TrafficGenerator(){
     }
 
-    public abstract ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep);
+    public abstract ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep) throws IOException;
 }

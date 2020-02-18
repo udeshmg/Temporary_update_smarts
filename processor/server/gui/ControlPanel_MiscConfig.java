@@ -189,7 +189,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		textField_TotalNumSteps = new JTextField();
 		textField_TotalNumSteps.setToolTipText("Non-negative integer");
 		textField_TotalNumSteps.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		textField_TotalNumSteps.setText("10000");
+		textField_TotalNumSteps.setText("12000");
 
 		final JLabel lblNumberOfSteps_1 = new JLabel("Number of steps per second");
 		lblNumberOfSteps_1.setHorizontalAlignment(SwingConstants.RIGHT);

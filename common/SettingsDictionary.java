@@ -66,9 +66,10 @@ public class SettingsDictionary {
         addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
         addLaneDecider("UNBALANCED", new UnbalancedLaneDecider());
         this.trafficGeneratorMap = new HashMap<>();
-        int numPairs = 8;
+        int numPairs = 2;
         addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(numPairs), new PreDefinedDemandLoader(numPairs), new DefaultVehicleTypeDistributor(), numPairs));
-        addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
+        addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomlyDistributedODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
+        addtrafficGenerator("NYCTaxi", new NewYorkTaxiGenerator());
     }
 
     public TrafficGenerator getTrafficGenerator(String key) {

@@ -247,6 +247,7 @@ public class Lane {
 		if (edge.numRightLanes > 1){
 			edge.numRightLanes--;
 		}
+
 		// Find the opposite direction edge
 		Edge opposedEdge = edge.getOppositeEdge();
 		// add to new direction

@@ -30,7 +30,7 @@ import java.util.Random;
  * Created by tmuthugama on 6/18/2019
  */
 public abstract class ODDistributor {
-    private Random random = new Random();
+    private Random random = new Random(7);
 
     public ODDistributor(){
     }

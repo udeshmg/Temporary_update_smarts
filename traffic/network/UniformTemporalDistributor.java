@@ -2,6 +2,8 @@ package traffic.network;
 
 import traffic.TrafficNetwork;
 
+import java.util.Random;
+
 /**
  * Copyright (c) 2019, The University of Melbourne.
  * All rights reserved.
@@ -30,8 +32,8 @@ public class UniformTemporalDistributor extends TemporalDistributor{
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
-        if ( currentStep < 4000) {
-            return amount;
+        if ( currentStep < 1500) {
+            return getRandom().nextInt(amount);
         }
         else{
             return 0;

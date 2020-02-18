@@ -2,6 +2,7 @@ package traffic;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.*;
 
 import common.Settings;
@@ -312,8 +313,13 @@ public class TrafficNetwork extends RoadNetwork {
 			boolean isNewNonPubVehiclesAllowed) {
 		if (isNewNonPubVehiclesAllowed) {
 
-			ArrayList<ODDemand> traffic = settings.getTrafficGenerator().getGeneratedTraffic(this,
-					internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges, (int) (timeNow*settings.numStepsPerSecond));
+			ArrayList<ODDemand> traffic = null;
+			try {
+				traffic = settings.getTrafficGenerator().getGeneratedTraffic(this,
+						internalNonPublicVehicleStartEdges, internalNonPublicVehicleEndEdges, (int) (timeNow*settings.numStepsPerSecond));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
 			for (ODDemand odpair : traffic){
 				final int numVehiclesNeeded = odpair.getNumVehicles();
@@ -366,7 +372,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void createInternalVehicles(int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
 			int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed, boolean isNewTramsAllowed,
 			boolean isNewBusesAllowed, final double timeNow) {
-		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%60 == 0 )) {
+		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%90 == 0 )) {
 			createInternalNonPublicVehicles(numLocalRandomPrivateVehicles, timeNow, isNewNonPubVehiclesAllowed);
 		}
 		//createInternalPublicVehicles(numLocalRandomTrams, numLocalRandomBuses, isNewTramsAllowed, isNewBusesAllowed,

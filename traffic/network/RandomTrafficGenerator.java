@@ -16,21 +16,29 @@ public class RandomTrafficGenerator extends TrafficGenerator {
     @Override
     public ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep) {
         ArrayList<ODDemand> ODMatrix = new ArrayList<>();
-        for (int i = 0; i < getTemporalDistributor().getCurrentVehicleLimit(200, timeStep, trafficNetwork.getSettings().maxNumSteps); i++){
+        for (int i = 0; i < 20; i++){
             ODDemand odDemand = new ODDemand();
             Node[] OD = getOdDistributor().getStartAndEndEdge(trafficNetwork, possibleStartEdges, possibleEndEdges, timeStep);
 
-            odDemand.setOrigin(OD[0]);
-            odDemand.setDestination(OD[1]);
+            if (OD[1] != OD[0] ) {
+                odDemand.setOrigin(OD[0]);
+                odDemand.setDestination(OD[1]);
 
-            int numVehicles = 1; //getTemporalDistributor().getCurrentVehicleLimit(1, timeStep, 18000);
-            odDemand.setNumVehicles(numVehicles);
+                int numVehicles = 0;
+                if (i%2 != 0) {
+                    numVehicles = getTemporalDistributor().getCurrentVehicleLimit(36, timeStep, 18000);
+                } else {
+                    numVehicles = getTemporalDistributor().getCurrentVehicleLimit(3, timeStep, 18000);
+                }
 
-            VehicleType vehicleType = getVehicleTypeDistributor().getVehicleType();
+                odDemand.setNumVehicles(numVehicles);
 
-            odDemand.setVehicleType(vehicleType);
+                VehicleType vehicleType = getVehicleTypeDistributor().getVehicleType();
 
-            ODMatrix.add(odDemand);
+                odDemand.setVehicleType(vehicleType);
+
+                ODMatrix.add(odDemand);
+            }
 
         }
         return ODMatrix;

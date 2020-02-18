@@ -50,7 +50,7 @@ public class Settings {
 	public int numGridCols = 0;//Number of columns in the virtual grid covering simulation area
 	public double maxGridCellWidthHeightInMeters = 500;//A cell should not be too large for load balancing purpose
 	public static String serverAddress = "127.0.0.1";
-	public static int serverListeningPortForWorkers = 50002;//Server's port for listening connection request initiated by worker
+	public static int serverListeningPortForWorkers = 50000;//Server's port for listening connection request initiated by worker
 
 	/*
 	 * Input
@@ -133,14 +133,14 @@ public class Settings {
 	 */
 	public TrafficLightTiming trafficLightTiming = TrafficLightTiming.FIXED;//Current traffic light timing strategy
 	public double trafficLightDetectionDistance = 30;//In meters. How far a vehicle can see a light.
-	public double maxLightGroupRadius = 60;//In meters. Controls size of the area where a cluster of lights can be identified.
+	public double maxLightGroupRadius = 0;//In meters. Controls size of the area where a cluster of lights can be identified.
 
 	/**
 	 * OD Distribution
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	public String trafficGenerator = "Random";
+	public String trafficGenerator = "NYCTaxi";
 	public String odDistributor = "Random";
 	public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -165,7 +165,6 @@ public class Settings {
 	 * External Listener Settings
 	 */
 	public boolean isExternalListenerUsed = false;
-
 
 	public TrafficGenerator getTrafficGenerator() {
 		return dictionary.getTrafficGenerator(trafficGenerator);

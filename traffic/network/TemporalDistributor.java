@@ -2,6 +2,8 @@ package traffic.network;
 
 import traffic.TrafficNetwork;
 
+import java.util.Random;
+
 /**
  * Copyright (c) 2019, The University of Melbourne.
  * All rights reserved.
@@ -24,6 +26,13 @@ import traffic.TrafficNetwork;
  * Created by tmuthugama on 6/21/2019
  */
 public abstract class TemporalDistributor {
+
+    private Random random = new Random(1);
+
+
+    public Random getRandom() {
+        return random;
+    }
 
     public TemporalDistributor() {
     }

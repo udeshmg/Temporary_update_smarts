@@ -18,17 +18,23 @@ public class PredefinedODLoader extends ODDistributor {
     }
 
     private int maxCounter = 2;
-    private int [][][] odMatrix = {{{13,1}, {1,13}, {8,11}, {11,8}, {7,4}, {4,7}, {14,2}, {2,14}},
-                                   {{12,2}, {2,12}, {13,7}, {7,13}, {14,2}, {2,14}, {8,3}, {3,8}}};
+    //private int [][][] odMatrix = {{{13,1}, {1,13}, {8,11}, {11,8}, {7,4}, {4,7}, {14,2}, {2,14}},
+    //                               {{12,2}, {2,12}, {13,7}, {7,13}, {14,2}, {2,14}, {8,3}, {3,8}}};
+
+    //private int [][][] odMatrix = {{{6,42}, {42,6}, {8,11}, {11,8}, {7,4}, {4,7}, {14,2}, {2,14}},
+    //        {{12,2}, {2,12}, {13,7}, {7,13}, {14,2}, {2,14}, {8,3}, {3,8}}};
+
+    private  int [][][] odMatrix = {{ {47,5}, {5,47}, {46,4}, {4,46}, {45,3}, {3,45}, {44,2}, {2, 44}, {43,1}, {1,43},
+                                      {41,35}, {35,41}, {34,28}, {28,34}, {27,21}, {21,27}, {20,14}, {14,20}, {13,7}, {7,13}}};
 
     @Override
     public Node[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeNow) {
         Node[] odpair = {trafficNetwork.nodes.get(odMatrix[trafficType][counter][0]), trafficNetwork.nodes.get(odMatrix[trafficType][counter][1])};
         iterate();
-        if (timeNow > 1000) {
-            trafficType = 1;
+        if (timeNow > 2000) {
+            trafficType = 0;
         }
-        else { trafficType = 1;}
+        else { trafficType = 0;}
         return odpair;
     }
 
