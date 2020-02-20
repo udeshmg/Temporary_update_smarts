@@ -247,12 +247,15 @@ public class Lane {
 		if (edge.numRightLanes > 1){
 			edge.numRightLanes--;
 		}
-
+		//if (edge.numLeftLanes > 1){
+		//	edge.numLeftLanes--;
+		//}
 		// Find the opposite direction edge
 		Edge opposedEdge = edge.getOppositeEdge();
 		// add to new direction
 		edge = opposedEdge;
 		edge.numRightLanes++;
+		//edge.numLeftLanes++;
 		// Get the highest lane number of opposite dir. and update changed lane
 		laneNumber = edge.getLaneCount();
 		changeLaneCoordinates();

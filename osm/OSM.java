@@ -679,7 +679,7 @@ public class OSM {
 							// Number of lanes
 							if ((settings.numLanesPerEdge == 0) && k.equals("lanes")) {
 								try {
-									final int numLanes = Integer.parseInt(v);
+									final int numLanes = (int) Double.parseDouble(v);
 									if (numLanes > 0) {
 										e_way.setAttribute("lanes", String.valueOf(numLanes));
 									}

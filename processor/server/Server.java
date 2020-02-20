@@ -10,6 +10,7 @@ import processor.SimServerData;
 import processor.SimulationProcessor;
 import processor.communication.IncomingConnectionBuilder;
 import processor.communication.MessageHandler;
+import processor.communication.externalMessage.DemandBasedLaneManager;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.communication.externalMessage.LaneManager;
 import processor.communication.message.*;
@@ -38,7 +39,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		this.settings = new Settings();
 		this.settings.isVisualize = isVisualize;
 		data = new SimServerData(settings);
-		extListner = LaneManager.getInstance();
+		extListner = settings.getExternalSimulationListener();
 		extListner.init();
 	}
 

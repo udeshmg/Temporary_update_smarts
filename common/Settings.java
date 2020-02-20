@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import processor.SimulationListener;
+import processor.communication.externalMessage.ExternalSimulationListener;
 import traffic.light.manager.TLManager;
 import traffic.network.*;
 import traffic.light.TrafficLightTiming;
@@ -133,7 +134,7 @@ public class Settings {
 	 */
 	public TrafficLightTiming trafficLightTiming = TrafficLightTiming.FIXED;//Current traffic light timing strategy
 	public double trafficLightDetectionDistance = 30;//In meters. How far a vehicle can see a light.
-	public double maxLightGroupRadius = 0;//In meters. Controls size of the area where a cluster of lights can be identified.
+	public double maxLightGroupRadius = 10;//In meters. Controls size of the area where a cluster of lights can be identified.
 
 	/**
 	 * OD Distribution
@@ -158,8 +159,9 @@ public class Settings {
 	public double startPosOffset = 0.0;
 	public boolean stopsAtMaxSteps = true;
 	public int gridlockDetectionTime = 600;
-	public String tlManager = "";
+	public String tlManager = "DYNAMIC";
 	public String laneDecide = "UNBALANCED";
+	public String externalListner = "DLA";
 
 	/**
 	 * External Listener Settings
@@ -174,6 +176,9 @@ public class Settings {
 		this.trafficGenerator = trafficGenerator;
 	}
 
+	public ExternalSimulationListener getExternalSimulationListener(){
+		return dictionary.getExternalSimulationListener(externalListner);
+	}
 
 	public ODDistributor getODDistributor(){
 		return dictionary.getODDistributor(odDistributor);

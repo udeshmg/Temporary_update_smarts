@@ -36,7 +36,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     }
 
     private void selectTrafficType(int currentTime){
-        switch (currentTime/2000){
+        switch (currentTime/4000){
             case 0:
                 trafficType = 0;
                 break;

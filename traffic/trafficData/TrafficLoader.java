@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 public class TrafficLoader {
 
-    public final String SAMPLE_CSV_FILE_PATH = "C:/Users/pgunarathna/PycharmProjects/trafficSimulator/NycData/green_tripdata_2015-01.csv";
+    public final String SAMPLE_CSV_FILE_PATH = "C:/Users/pgunarathna/PycharmProjects/trafficSimulator/NycData/yellow_tripdata_2015-06.csv";
     public BufferedReader fileReader = null;
     private double lastTimeRead = 0;
     private double startTimeRead = 0;
@@ -80,12 +80,12 @@ public class TrafficLoader {
             }
             lastTimeRead = decodeTime(dataFields[1]);
             if ( lastTimeRead > startTimeRead) {
-                System.out.println("Time stamp: " + dataFields[1]);
+                //System.out.println("Time stamp: " + dataFields[1]);
                 Coordinates coord = new Coordinates();
                 coord.setLonStart(Double.parseDouble(dataFields[5]));
                 coord.setLatStart(Double.parseDouble(dataFields[6]));
-                coord.setLonEnd(Double.parseDouble(dataFields[7]));
-                coord.setLatEnd(Double.parseDouble(dataFields[8]));
+                coord.setLonEnd(Double.parseDouble(dataFields[9]));
+                coord.setLatEnd(Double.parseDouble(dataFields[10]));
 
                 vehicleCoordinates.add(coord);
             }

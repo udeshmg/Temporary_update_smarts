@@ -12,6 +12,8 @@ public interface ExternalSimulationListener {
     void getRoadGraph(RoadNetwork roadNetwork);
     void getMessage(Message_WS_TrafficReport trafficReport);
     void getTrafficData(TrafficNetwork trafficNetwork);
+
+    static ExternalSimulationListener getInstance(){return null;};
     RoadIndex getRoadDirChange();
     ArrayList<Integer> laneChangeMessage();
 }

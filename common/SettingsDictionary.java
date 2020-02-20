@@ -1,7 +1,9 @@
 package common;
 
+import processor.communication.externalMessage.DemandBasedLaneManager;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.SimulationListener;
+import processor.communication.externalMessage.LaneManager;
 import traffic.light.manager.DynamicTwoPhaseTLManager;
 import traffic.light.manager.FixedTwoPhaseTLManager;
 import traffic.light.manager.TLManager;
@@ -70,6 +72,19 @@ public class SettingsDictionary {
         addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(numPairs), new PreDefinedDemandLoader(numPairs), new DefaultVehicleTypeDistributor(), numPairs));
         addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomlyDistributedODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
         addtrafficGenerator("NYCTaxi", new NewYorkTaxiGenerator());
+
+        this.eListenerMap = new HashMap<>();
+        addEListner("CLLA", LaneManager.getInstance());
+        addEListner("DLA", DemandBasedLaneManager.getInstance());
+
+    }
+
+    public ExternalSimulationListener getExternalSimulationListener(String key){
+        return this.eListenerMap.get(key);
+    }
+
+    public void addEListner(String key, ExternalSimulationListener externalSimulationListener){
+        this.eListenerMap.put(key, externalSimulationListener);
     }
 
     public TrafficGenerator getTrafficGenerator(String key) {

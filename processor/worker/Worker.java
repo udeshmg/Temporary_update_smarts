@@ -321,6 +321,7 @@ public class Worker implements MessageHandler, Runnable {
 		}
 		receivedTrafficCache.clear();
 		simulation.resetTraffic();
+
 	}
 
 	@Override

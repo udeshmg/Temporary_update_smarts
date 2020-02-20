@@ -56,6 +56,10 @@ public class Movement {
         return edges.get(edges.size() - 1).endNode;
     }
 
+    public Edge getEndEdge(){
+        return edges.get(edges.size() - 1);
+    }
+
     public Node getStartNode(){
         return edges.get(0).startNode;
     }

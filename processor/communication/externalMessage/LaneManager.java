@@ -21,7 +21,8 @@ public class LaneManager implements ExternalSimulationListener {
         private static final LaneManager instance = new LaneManager();
     }
 
-    public static LaneManager getInstance(){
+
+    public static ExternalSimulationListener getInstance(){
         return LaneManagerHelper.instance;
     }
 

@@ -12,7 +12,6 @@ import processor.communication.message.SerializableRouteLeg;
 import processor.communication.message.SerializableWorkerMetadata;
 import processor.worker.Workarea;
 import traffic.light.LightCoordinator;
-import traffic.light.TrafficLightCluster;
 import traffic.light.TrafficLightTiming;
 import traffic.network.ODDemand;
 import traffic.road.*;
@@ -66,6 +65,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 	// For report data
 	public ArrayList<Vehicle> newVehiclesSinceLastReport = new ArrayList<>();
+	public ArrayList<Vehicle> newVehiclesforDemandEstimation = new ArrayList<>();
 	public HashMap<SerializableExternalVehicle, Double> externalVehicleRepeatPerStep = new HashMap<>();
 	ArrayList<Double> driverProfilePercAccumulated = new ArrayList<>();
 	ArrayList<Edge> internalTramStopEdges = new ArrayList<>();
@@ -372,7 +372,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void createInternalVehicles(int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
 			int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed, boolean isNewTramsAllowed,
 			boolean isNewBusesAllowed, final double timeNow) {
-		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%90 == 0 )) {
+		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%60 == 0 )) { //TODO: shift to 90
 			createInternalNonPublicVehicles(numLocalRandomPrivateVehicles, timeNow, isNewNonPubVehiclesAllowed);
 		}
 		//createInternalPublicVehicles(numLocalRandomTrams, numLocalRandomBuses, isNewTramsAllowed, isNewBusesAllowed,
@@ -750,6 +750,7 @@ public class TrafficNetwork extends RoadNetwork {
 				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/settings.numStepsPerSecond), this);
 			}
 			newVehiclesSinceLastReport.add(next);
+			newVehiclesforDemandEstimation.add(next);
 			next.park(true, timeNow);
 			next = getNextTripMakingVehicle(timeNow);
 		}

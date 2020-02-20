@@ -1184,7 +1184,7 @@ public class MonitorPanel extends JPanel {
 			note += edge.type.name() + ", ";
 			note += numLanes + " lane(s), ";
 			note += (int) edge.length + "m, ";
-			note += "'" + edge.startNode.index + "' to '" + edge.endNode.index + "', ";
+			note += "'" + edge.startNode.osmId + "' to '" + edge.endNode.osmId + "', ";
 			note += "Idx " + edge.index + ", ";
 			note += (int) (edge.freeFlowSpeed * 3.6) + "kmh";
 

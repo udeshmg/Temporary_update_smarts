@@ -117,6 +117,8 @@ public class Edge {
 	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
 	private LinkedHashMap<Edge, Integer> edgeLaneMap;
 
+	public int projectVehicles = 0;
+
 	public double getNumVehicles() {
 		return numVehicles;
 	}
@@ -165,7 +167,17 @@ public class Edge {
 		}
 	}
 
-	public void updateVehicleNumbes(int numVehicles, int numVehiclesStraight, int numVehiclesRight, int numVehiclesLeft){
+	public boolean allBlocked(){
+		boolean allBlocked = true;
+		for ( Lane lane : getLanes()){
+			if ( !lane.isBlocked ){
+				allBlocked = false;
+			}
+		}
+		return allBlocked;
+	}
+
+	public void updateVehicleNumbers(int numVehicles, int numVehiclesStraight, int numVehiclesRight, int numVehiclesLeft){
 		this.numVehicles = 0.9*this.numVehicles + 0.1*numVehicles;
 		this.numVehiclesRight = 0.9*this.numVehiclesRight + 0.1*numVehiclesRight;
 		this.numVehiclesStraight = 0.9*this.numVehiclesStraight + 0.1*numVehiclesStraight;

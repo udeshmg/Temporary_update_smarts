@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import common.Settings;
 import processor.SimulationListener;
+import processor.communication.externalMessage.DemandBasedLaneManager;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.communication.externalMessage.LaneManager;
 import processor.communication.externalMessage.RoadIndex;
@@ -53,7 +54,7 @@ public class Simulation {
 		this.trafficNetwork = new TrafficNetwork(settings, workAreaName, workerMetadatas);
 		resetSimulation(settings, startStep, numLocalRandomPrivateVehicles, numLocalRandomTrams, numLocalRandomBuses, lightNodes);
 		if (settings.isExternalListenerUsed) {
-			extListner = LaneManager.getInstance();
+			extListner = settings.getExternalSimulationListener();
 		}
 		laneChangedEdgeIndex = new ArrayList<>();
 	}
@@ -245,7 +246,7 @@ public class Simulation {
 					}
 
 				}
-				edge.updateVehicleNumbes(numVehicles, numVehiclesStraight, numVehiclesRight, numVehiclesLeft);
+				edge.updateVehicleNumbers(numVehicles, numVehiclesStraight, numVehiclesRight, numVehiclesLeft);
 			}
 		}
 	}

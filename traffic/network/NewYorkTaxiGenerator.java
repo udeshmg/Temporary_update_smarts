@@ -19,7 +19,7 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
         super();
         tfl = new TrafficLoader();
         setVehicleTypeDistributor(new DefaultVehicleTypeDistributor());
-        tfl.setTimeLimitRead(480, 520);
+        tfl.setTimeLimitRead(1080, 1110);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
 
     public ArrayList<Node> mapCoordToNodes(Coordinates coord, TrafficNetwork trafficNetwork){
         ArrayList<Node> nodes = new ArrayList<>();
-        Double distanceToSource = 1000000.0; // a large distance
-        Double distanceToDestination = 1000000.0;  // a large distance
+        Double distanceToSource = 200.0; // a large distance
+        Double distanceToDestination = 200.0;  // a large distance
 
         Node source = null;
         Node destination = null;
