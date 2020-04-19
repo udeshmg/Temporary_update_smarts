@@ -11,9 +11,23 @@ public class RandomlyDistributedODDistributor extends ODDistributor {
     //private int[] nodeInArea1 = {40,43,34,53,69,74,41,30,56,10};
     //private int[] nodeInArea2 = {13,14,16,17,19,20,23,35,38,42};
 
+    //7x7
     private int[] nodeInArea1 = {27,5,6,20,11,12,3,13,4,18};
     private int[] nodeInArea2 = {38,42,43,28,29,44,45,36,30,22};
 
+    //12x12
+    //private int[] nodeInArea1 = {132,134,122,136,124,84,85};
+    //private int[] nodeInArea2 = {57,35,10,8,56,82,95};
+
+    //9x9
+    //private int[] nodeInArea1 = {64,72,55,63,74,65,77};
+    //private int[] nodeInArea2 = {26,16,8,6,5,24,33};
+
+    //5x5
+    //private int[] nodeInArea1 = {20,15,10,22};
+    //private int[] nodeInArea2 = {4,9,2,3};
+
+    //3x3
     //private int[] nodeInArea1 = {1,2,3,6,7,14};
     //private int[] nodeInArea2 = {4,8,9,12,13,14};
 
@@ -27,7 +41,7 @@ public class RandomlyDistributedODDistributor extends ODDistributor {
 
         int areaDecider = getRandom().nextInt(2);
 
-        if (selectArea == 0){
+        if (areaDecider == 0){
             selectArea = 1;
             return new Node[]{node1,node2};
         }

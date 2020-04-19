@@ -22,6 +22,7 @@ public class RushHourTrafficGenerator extends TrafficGenerator {
 
         ArrayList<ODDemand> ODMatrix = new ArrayList<>();
 
+
         for (int i = 0; i < numODPairs; i++){
             ODDemand odDemand = new ODDemand();
 

@@ -141,7 +141,7 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	public String trafficGenerator = "NYCTaxi";
+	public String trafficGenerator = "RushHour";
 	public String odDistributor = "Random";
 	public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -159,14 +159,19 @@ public class Settings {
 	public double startPosOffset = 0.0;
 	public boolean stopsAtMaxSteps = true;
 	public int gridlockDetectionTime = 600;
-	public String tlManager = "DYNAMIC";
+	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
-	public String externalListner = "DLA";
+	public String externalListner = "CLLA";
 
 	/**
 	 * External Listener Settings
 	 */
-	public boolean isExternalListenerUsed = false;
+	public boolean isExternalListenerUsed = true;
+
+	public String getOutputPrefix (){
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(dictionary.getDemand())+"_";
+		else return externalListner+"_"+String.valueOf(dictionary.getDemand())+"_";
+	}
 
 	public TrafficGenerator getTrafficGenerator() {
 		return dictionary.getTrafficGenerator(trafficGenerator);

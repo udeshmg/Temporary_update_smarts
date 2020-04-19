@@ -4,24 +4,52 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
 
     private int counter = 0;
     private int maxCounter = 2;
-    private int [][] demandMatrix = {{20,2,20,20,20,20,20,20,20,20,2,38,2,38,2,38,2,38,2,38},
-                                     {20,20,18,1,16,1,12,1},
-                                     {1,15,1,18,1,16,1,12},
-                                     {1,4,3,9,14,3,3},
-                                     {5,12,12,9,6,12}};
-    private int trafficType = 0;
+    private int demand = 20;
+    private int freq = 4000;
+    private int [][] demandMatrix;
+    public int trafficType = 0;
+
+    public int getFreq() {
+        return freq;
+    }
+
+    public void setFreq(int freq) {
+        this.freq = freq;
+    }
 
     public PreDefinedDemandLoader(int maxCounter) {
         this.maxCounter = maxCounter;
     }
+    public PreDefinedDemandLoader(int maxCounter, int freq) {
+        this.maxCounter = maxCounter;
+        this.freq = freq;
+    }
+    public PreDefinedDemandLoader(int maxCounter, int freq, int demand) {
+        this.maxCounter = maxCounter;
+        this.freq = freq;
+        this.demand = demand;
 
+        demandMatrix = new int[][]{{demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2},
+            {2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand},
+            {15,1,18,1,16,1,12,1},
+            {1,15,1,18,1,16,1,12},
+            {1,4,3,9,14,3,3},
+            {5,12,12,9,6,12}};
+
+    }
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
-        if (currentStep < 8000)
-            numVehicles =  demandMatrix[trafficType][counter];
+        if (currentStep < 10000) {
+            if (currentStep % freq < 500) {
+                numVehicles = 0;
+            }
+            else {
+                numVehicles = demandMatrix[trafficType][counter];
+            }
+        }
         else
             numVehicles = 0;
 
@@ -35,22 +63,10 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         if (counter == maxCounter){ counter = 0;}
     }
 
-    private void selectTrafficType(int currentTime){
-        switch (currentTime/4000){
-            case 0:
-                trafficType = 0;
-                break;
-            case 1:
-                trafficType = 1;
-                break;
-            case 2:
-                trafficType = 2;
-                break;
-            case 3:
-                trafficType = 3;
-                break;
-            default:
-                trafficType = 3;
-        }
+    public void selectTrafficType(int currentTime){
+
+        if ((currentTime/freq)%2 == 0) trafficType = 1;
+        else trafficType = 1;
     }
+
 }

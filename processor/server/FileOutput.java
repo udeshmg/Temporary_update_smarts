@@ -149,7 +149,7 @@ public class FileOutput {
 
 	void initVDOutputFile() {
 		try {
-			final File fileTrj = getNewFile("VD_");
+			final File fileTrj = getNewFile("VD_"+settings.getOutputPrefix());
 			// Print column titles
 			vdFos = new FileOutputStream(fileTrj, true);
 			outputStringToFile(vdFos,

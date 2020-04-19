@@ -32,7 +32,7 @@ public class UniformTemporalDistributor extends TemporalDistributor{
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
-        if ( currentStep < 1500) {
+        if ( currentStep < 6000) {
             return getRandom().nextInt(amount);
         }
         else{
