@@ -372,7 +372,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void createInternalVehicles(int numLocalRandomPrivateVehicles, int numLocalRandomTrams,
 			int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed, boolean isNewTramsAllowed,
 			boolean isNewBusesAllowed, final double timeNow) {
-		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%90 == 0 )) { //TODO: shift to 90
+		if ((internalNonPublicVehicleStartEdges.size() > 0) && (internalNonPublicVehicleEndEdges.size() > 0) && ( timeNow%300 == 0 )) { //TODO: shift to 90
 			createInternalNonPublicVehicles(numLocalRandomPrivateVehicles, timeNow, isNewNonPubVehiclesAllowed);
 		}
 		//createInternalPublicVehicles(numLocalRandomTrams, numLocalRandomBuses, isNewTramsAllowed, isNewBusesAllowed,

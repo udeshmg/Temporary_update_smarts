@@ -6,7 +6,6 @@ import org.zeromq.ZMQ;
 import processor.communication.message.Message_WS_TrafficReport;
 import traffic.TrafficNetwork;
 import traffic.road.RoadNetwork;
-import processor.communication.externalMessage.RoadGraphExternal;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -35,9 +34,9 @@ public class LaneManager implements ExternalSimulationListener {
     @Override
     public void init() {
         context = new ZContext();
-        socket = context.createSocket(SocketType.REQ);
-        socket.connect("tcp://*:5556");
-        System.out.println("Created the client connection from SMARTS");
+        socket = context.createSocket(ZMQ.REP);
+        socket.bind("tcp://localhost:5555");
+        System.out.println("Created the server-side connection from SMARTS");
     }
 
     @Override
@@ -50,7 +49,7 @@ public class LaneManager implements ExternalSimulationListener {
         String str = gson.toJson(roadGraph);
         System.out.println("GSON output: " + str);
 
-        sendMessage(str);
+        sendNReceiveMessage(str);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -71,12 +70,36 @@ public class LaneManager implements ExternalSimulationListener {
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
         System.out.println("GSON output: " + str);
+        sendNReceiveMessage(str);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendTrafficData(TrafficNetwork trafficNetwork) {
+        TrafficData trafficData = new TrafficData();
+        trafficData.setTrafficData(trafficNetwork);
+        Gson gson = new Gson();
+        String str = gson.toJson(trafficData);
+        System.out.println("GSON output: " + str);
         sendMessage(str);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void waitForAction() {
+        byte[] reply = socket.recv();
+        System.out.println("Action received");
+        String data = new String(reply, ZMQ.CHARSET);
+        Gson gson = new Gson();
+        RoadIndex rdIndex = gson.fromJson(data, RoadIndex.class);
+        this.rdIndex = rdIndex;
     }
 
 
@@ -92,17 +115,22 @@ public class LaneManager implements ExternalSimulationListener {
         return null;
     }
 
-    private void sendMessage(String str){
+    private void sendNReceiveMessage(String str){
         socket.send(str.getBytes(ZMQ.CHARSET), 0);
         byte[] reply = socket.recv();
         String data = new String(reply, ZMQ.CHARSET);
         Gson gson = new Gson();
         RoadIndex rdIndex = gson.fromJson(data, RoadIndex.class);
-
         this.rdIndex = rdIndex;
-
     }
 
+    private void sendMessage(String str){
+        socket.send(str.getBytes(ZMQ.CHARSET), 0);
+    }
+
+    private void decodeMessageLayer(){
+
+    }
 
     public void getAvailableControls(String command){
 

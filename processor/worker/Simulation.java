@@ -7,9 +7,7 @@ import java.util.stream.Collectors;
 
 import common.Settings;
 import processor.SimulationListener;
-import processor.communication.externalMessage.DemandBasedLaneManager;
 import processor.communication.externalMessage.ExternalSimulationListener;
-import processor.communication.externalMessage.LaneManager;
 import processor.communication.externalMessage.RoadIndex;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
@@ -219,14 +217,56 @@ public class Simulation {
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 		updateVehicleNumbers();
-		sendTrafficDataToExternal();
+		//sendTrafficDataToExternal();
+
+		// Wait for External agent for send instructions after number of time sreps
+		sendTrafficData();
+		waitForActionsFromExternalClient();
 
 		// Clear one-step data
 		clearOneStepData();
 	}
 
+	public void waitForActionsFromExternalClient(){
+		if (settings.isExternalListenerUsed){
+			if (step % settings.laneUpdateInterval == 1) {
+				System.out.println("Waiting...");
+				extListner.waitForAction();
+			}
+		getActionsFromExtListner();
+		}
+	}
+
+	public void sendTrafficData(){
+		if (settings.isExternalListenerUsed){
+			if (step % settings.laneUpdateInterval == 0 & step > 0) {
+				extListner.sendTrafficData(trafficNetwork);
+			}
+		}
+	}
+
+
+
+
+	public void getActionsFromExtListner(){
+		if (settings.isExternalListenerUsed){
+			RoadIndex roadIndex = extListner.getRoadDirChange();
+			if (roadIndex != null) {
+				if (roadIndex.edges != null) {
+					for (int edgeIndex : roadIndex.edges) {
+						changeLaneDirection(edgeIndex);
+						laneChangedEdgeIndex.add(edgeIndex);
+					}
+				}
+			}
+		}
+	}
+
+
+
+
 	public void updateVehicleNumbers(){
-		if (step%10 == 0) {
+		if (step%30 == 0) {
 			for (Edge edge : trafficNetwork.edges) {
 				int numVehicles = 0;
 				int numVehiclesRight = 0;

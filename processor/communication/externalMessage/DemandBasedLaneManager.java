@@ -67,6 +67,16 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
     }
 
     @Override
+    public void sendTrafficData(TrafficNetwork trafficNetwork) {
+
+    }
+
+    @Override
+    public void waitForAction() {
+
+    }
+
+    @Override
     public RoadIndex getRoadDirChange() {
         RoadIndex extSend  = this.rdIndex;
         this.rdIndex = new RoadIndex();

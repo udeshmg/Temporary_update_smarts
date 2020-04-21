@@ -40,7 +40,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		this.settings.isVisualize = isVisualize;
 		data = new SimServerData(settings);
 		extListner = settings.getExternalSimulationListener();
-		extListner.init();
+		//extListner.init();
 	}
 
 	public static void main(final String[] args) {
@@ -134,9 +134,9 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 
 	public void changeMap() {
 		data.changeMap();
-		if (settings.isExternalListenerUsed) {
-			extListner.getRoadGraph(data.getRoadNetwork());
-		}
+		//if (settings.isExternalListenerUsed) {
+		//	extListner.getRoadGraph(data.getRoadNetwork());
+		//}
 	}
 
 	@Override
