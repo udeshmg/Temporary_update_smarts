@@ -57,7 +57,7 @@ public class Settings {
 	 * Input
 	 */
 	public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
-	public String inputOpenStreetMapFile = "/resources/Grid_12x12.osm";//OSM file where road network information can be extracted
+	public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_12x12.osm";//OSM file where road network information can be extracted
 	public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -119,8 +119,8 @@ public class Settings {
 	 * Vehicle model
 	 */
 	public double lookAheadDistance = 50;//In meters. Vehicle looks for impeding objects within a certain distance.
-	public double intersectionSpeedThresholdOfFront = 2.78;//In m/s. If the speed of front vehicle is lower than this value, its back vehicle may not cross intersections between them.
-	public double minTimeSafeToCrossIntersection = 5;//In seconds. This affects how vehicle reacts to conflict traffic at intersection.
+	public double intersectionSpeedThresholdOfFront = 0;//In m/s. If the speed of front vehicle is lower than this value, its back vehicle may not cross intersections between them.
+	public double minTimeSafeToCrossIntersection = 1;//In seconds. This affects how vehicle reacts to conflict traffic at intersection.
 	public double periodOfTrafficWaitForTramAtStop = 20;//In seconds. How long a tram needs to wait at tram stop.
 	public double minGapBetweenTramStopTimerCountDowns = 3;//In seconds. When tram stop timer reaches 0, it cannot be triggered again immediately when this value is positive.
 	public boolean isAllowReroute = false;//Whether imported vehicles can change routes automatically in congested traffic
@@ -145,7 +145,7 @@ public class Settings {
 	public String odDistributor = "Random";
 	public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
-	public double safetyHeadwayMultiplier = 1;
+	public double safetyHeadwayMultiplier = 0.1;
 	public String defaultDownloadDirectory = "download";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;

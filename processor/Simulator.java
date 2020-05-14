@@ -21,7 +21,6 @@ public class Simulator {
 			worker.run();
 		}
 	}
-
 	static boolean isPortFree(final int port) {
 		try (Socket ignored = new Socket("127.0.0.1", port)) {
 			return false;

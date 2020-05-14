@@ -34,6 +34,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	private SimServerData data;
 	private Settings settings;
 	private ExternalSimulationListener extListner;
+	private int writeOutputStepInServerlessMode = 1;
 
 	public Server(boolean isVisualize){
 		this.settings = new Settings();
@@ -262,11 +263,13 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		data.resetVariablesForSetup();
 		receivedTrafficReportCache.clear();
 		data.initFileOutput();
-		//data.initRoadNetwork();
 
+		if (settings.isVisualize == false) data.loadSettingsFromScript();
+		//data.initRoadNetwork();
+		//data.updateSettings();
 		// In a new environment (map), determine the work areas for all workers
 		if (settings.isNewEnvironment) {
-			data.getRoadNetwork().buildGrid();
+				changeMap();
 		}
 		assignODWindows();
 		final RouteLoader routeLoader = new RouteLoader(data.getRoadNetwork());
@@ -396,6 +399,10 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			if (w.name.equals(msg.workerName) && (w.state == WorkerState.SHARING_STARTED)) {
 				updateWorkerState(msg.workerName, WorkerState.SHARED);
 				if (isAllWorkersAtState(WorkerState.SHARED)) {
+
+					//if (data.getStep()%18000 == 0 & data.getStep() > 0){
+					//	data.startReLogging();
+					//}
 					askWorkersSimulateOneStep();
 				}
 				break;
@@ -431,6 +438,12 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 			// Update time step in server-less mode
 			if (msg.step > data.getStep()) {
 				data.setStep(msg.step);
+				//if ( data.getStep()/18000 > writeOutputStepInServerlessMode ){
+				//	System.out.println("Start re-write logs.. ");
+				//	writeOutputStepInServerlessMode++;
+				//	data.startReLogging();
+				//	System.out.println("Logging done");
+				//}
 			}
 		}
 	}

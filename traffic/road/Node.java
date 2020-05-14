@@ -139,9 +139,9 @@ public class Node {
 	}
 
 	public double getIntersectionSize(Node n){
-		/*if(stopLineDists.containsKey(n)) {
+		if(stopLineDists.containsKey(n)) {
 			return stopLineDists.get(n);
-		}*/
+		}
 		return 0;
 	}
 

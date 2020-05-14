@@ -31,6 +31,10 @@ public class TrafficData {
             int numVehiclesLeft = 0;
             int numVehiclesRight = 0;
             int numVehiclesStraight = 0;
+
+            int numVehiclesStopped = 0;
+            int numVehiclesOnMove = 0;
+
             for (Lane lane : edge.getLanes()){
                 numVehicles += lane.getVehicles().size();
                 for (Vehicle v : lane.getVehicles()){
@@ -44,6 +48,13 @@ public class TrafficData {
                     else {
                         numVehiclesStraight++;
                     }
+
+                    if (v.speed < 5){
+                        numVehiclesStopped++;
+                    }
+                    else{
+                        numVehiclesOnMove++;
+                    }
                 }
 
             }
@@ -55,6 +66,10 @@ public class TrafficData {
             roadExt.setNumVehiclesLeft(numVehiclesLeft);
             roadExt.setNumVehiclesRight(numVehiclesRight);
             roadExt.setNumVehiclesStraight(numVehiclesStraight);
+
+            roadExt.setNumVehiclesStopped(numVehiclesStopped);
+            roadExt.setNumVehiclesOnMove(numVehiclesOnMove);
+
             //traffic details
             trafficData.add(roadExt);
         }

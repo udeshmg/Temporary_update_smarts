@@ -50,7 +50,7 @@ public class SettingsDictionary {
     private Map<String, TLManager> lightSchedulerMap;
     private Map<String, LaneDecider> laneDeciderMap;
     private Map<String, ExternalSimulationListener> eListenerMap;
-    private int freq = 6000;
+    private int freq = 240000;
     private int demand = 28;
     public SettingsDictionary() {
         this.listenerMap = new HashMap<>();
@@ -69,7 +69,7 @@ public class SettingsDictionary {
         addLaneDecider("PREDEFINED", new PredefinedLaneDecider());
         addLaneDecider("UNBALANCED", new UnbalancedLaneDecider());
         this.trafficGeneratorMap = new HashMap<>();
-        int numPairs = 2;
+        int numPairs = 1;
         addtrafficGenerator("RushHour", new RushHourTrafficGenerator(new PredefinedODLoader(numPairs), new PreDefinedDemandLoader(numPairs, freq, demand), new DefaultVehicleTypeDistributor(), numPairs));
         addtrafficGenerator("Random", new RandomTrafficGenerator(new RandomODDistributor(), new UniformTemporalDistributor(), new DefaultVehicleTypeDistributor()));
         addtrafficGenerator("NYCTaxi", new NewYorkTaxiGenerator());

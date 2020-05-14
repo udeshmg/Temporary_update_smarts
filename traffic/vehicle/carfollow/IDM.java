@@ -111,24 +111,15 @@ public class IDM {
 	 */
 	public double updateBasedOnAllFactors(final Vehicle vehicle) {
 		final ImpedingObject impedingObject = new ImpedingObject();
-		double lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, 10000,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.FRONT));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TRAM));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LIGHT));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.CONFLICT));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TURN));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LANEBLOCK));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.PRIORITY_VEHICLE));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.WAITING_VEHICLE));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration,
-				computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.QUEUE_SPILLBACK));
+		double lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, 10000, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.FRONT));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TRAM));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LIGHT));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.CONFLICT));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TURN));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LANEBLOCK));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.PRIORITY_VEHICLE));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.WAITING_VEHICLE));
+		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.QUEUE_SPILLBACK));
 		return lowestAcceleration;
 	}
 
@@ -303,7 +294,15 @@ public class IDM {
 		// Returns the closest impeding object, whose head position is in front of the given vehicle.
 		final Lane laneBeingChecked = edgeBeingChecked.getLane(laneNumberBeingChecked);
 		final Vehicle frontVehicle = laneBeingChecked.getClosestFrontVehicleInLane(vehicle, examinedDist);
-		if (frontVehicle != null) {
+
+		boolean correctLane = true;
+		if (frontVehicle != null){
+			if ((vehicle.lane.edge != frontVehicle.lane.edge) && (vehicle.lane.laneNumber > laneBeingChecked.laneNumber)){
+				correctLane = false;
+			}
+		}
+
+		if ((frontVehicle != null) && correctLane) {
 			slowdownObj.speed = frontVehicle.speed;
 			slowdownObj.headPosition = examinedDist + frontVehicle.headPosition;
 			slowdownObj.type = frontVehicle.type;
@@ -556,6 +555,7 @@ public class IDM {
 			Edge current = vehicle.getCurrentEdge();
 			if(current == decision.getStartLane().edge && edgeBeingChecked == decision.getEndLane().edge){
 				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection) && vehicle.isNotWithinIntersections()){
+				//if ( !edgeBeingChecked.hasSpaceInEndOfAllLane(decision.getEndLane())){
 					slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
 					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 					slowdownObj.speed = 0;

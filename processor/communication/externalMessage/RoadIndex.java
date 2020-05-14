@@ -3,7 +3,7 @@ package processor.communication.externalMessage;
 import java.util.ArrayList;
 
 public class RoadIndex {
-    public ArrayList<Integer> edges;
+    public ArrayList<RoadControl> edges;
 
     RoadIndex(){
         edges = new ArrayList<>();

@@ -25,7 +25,7 @@ public class Edge {
 	/**
 	 * Free flow speed of vehicles
 	 */
-	public double freeFlowSpeed;
+	public double freeFlowSpeed, maxFreeFlowSpeed, minFreeFlowSpeed;
 
 	/**
 	 * Number of vehicles that can be filled into this edge based on average
@@ -151,6 +151,8 @@ public class Edge {
 		this.name = name;
 		freeFlowSpeed = maxspeed;
 		currentSpeed = freeFlowSpeed;
+		maxFreeFlowSpeed = freeFlowSpeed + 2.78*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		minFreeFlowSpeed = freeFlowSpeed - 2.78*2; //50kmh from freeFlowSpeed: 2.78ms -> 10kmh.
 		isRoundabout = roundabout;
 		this.tramRoutesRef.addAll(tramRoutesRef);
 		this.busRoutesRef.addAll(busRoutesRef);
@@ -167,6 +169,10 @@ public class Edge {
 		}
 	}
 
+	public void changeFreeFlowSpeed(int speedChange){ // calculated in 10ms
+		freeFlowSpeed = Math.min(maxFreeFlowSpeed, minFreeFlowSpeed + speedChange*2.78);
+	}
+
 	public boolean allBlocked(){
 		boolean allBlocked = true;
 		for ( Lane lane : getLanes()){
@@ -178,10 +184,11 @@ public class Edge {
 	}
 
 	public void updateVehicleNumbers(int numVehicles, int numVehiclesStraight, int numVehiclesRight, int numVehiclesLeft){
-		this.numVehicles = 0.9*this.numVehicles + 0.1*numVehicles;
-		this.numVehiclesRight = 0.9*this.numVehiclesRight + 0.1*numVehiclesRight;
-		this.numVehiclesStraight = 0.9*this.numVehiclesStraight + 0.1*numVehiclesStraight;
-		this.numVehiclesLeft = 0.9*this.numVehiclesLeft + 0.1*numVehiclesLeft;
+		double alpha = 0.8;
+		this.numVehicles = alpha*this.numVehicles + (1-alpha)*numVehicles;
+		this.numVehiclesRight = alpha*this.numVehiclesRight + (1-alpha)*numVehiclesRight;
+		this.numVehiclesStraight = alpha*this.numVehiclesStraight + (1-alpha)*numVehiclesStraight;
+		this.numVehiclesLeft = alpha*this.numVehiclesLeft + (1-alpha)*numVehiclesLeft;
 	}
 
 	public int getLaneCount(){
@@ -507,6 +514,23 @@ public class Edge {
 		return false;
 	}
 
+	public boolean hasSpaceInEndOfAllLane(Lane lane){
+		int vehicleCount = 0;
+		for (Vehicle v : lane.getVehicles()) {
+			if (v.headPosition < lane.edge.getStartIntersectionSize()) {
+				vehicleCount++;
+			}
+		}
+
+		if ( vehicleCount < 2){ // if there is only one vehicle
+			return true;
+		}
+		else {
+			System.out.println("Blocked by Queue spill-back");
+			return false;
+		}
+	}
+
 	public boolean hasSpaceForAvehicleInBack(Lane lane, Vehicle vehicle, double minTimeSafeToCrossIntersection){
 		Vehicle last = lane.getLastVehicleInLane();
 		double startPos = lane.edge.length - lane.edge.getEndIntersectionSize();
@@ -518,6 +542,11 @@ public class Edge {
 			expectedFill += v.length + v.driverProfile.IDM_s0;
 		}
 		double freeSpace = startPos - expectedFill - lane.edge.getStartIntersectionSize();
+
+		if ((vehicle.lane.edge.getLaneCount() > lane.edge.getLaneCount()) && (vehicle.lane.laneNumber >= lane.edge.getLaneCount()-1)){
+			return hasSpaceInEndOfAllLane(lane);
+		}
+
 		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);
 	}
 

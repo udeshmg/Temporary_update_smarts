@@ -120,6 +120,10 @@ public class ScriptLoader {
 		return experiments;
 	}
 
+	public Experiment getFirstExperiment() {
+		return experiments.get(0);
+	}
+
 	public Experiment convertToExperiment(ArrayList<String> newSettings) {
 		Experiment experiment = new Experiment();
 

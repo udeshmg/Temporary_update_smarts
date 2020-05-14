@@ -64,10 +64,15 @@ public class SimServerData {
     private int lastVehicleFinishedStep = 0;
     private int notFinishedVehicles = 0;
     private Settings settings;
+    private boolean isNewMap;
 
     public SimServerData(Settings settings) {
         this.settings = settings;
         this.fileOutput = new FileOutput(settings);
+    }
+
+    public void updateSettings(Settings settings){
+        this.settings = settings;
     }
 
     public void showNumberOfConnectedWorkers(int number) {
@@ -107,6 +112,14 @@ public class SimServerData {
         }
     }
 
+    public boolean isNewMap() {
+        return isNewMap;
+    }
+
+    public void setNewMap(boolean newMap) {
+        isNewMap = newMap;
+    }
+
     public void prepareForSetupAgain() {
         updateExperimentIndices();
         if ((settings.isVisualize)) {
@@ -116,11 +129,11 @@ public class SimServerData {
                 runAutomatedSim();
             }
         } else {
-            consoleUI.acceptConsoleCommandAtSimEnd();
-            if (experiments != null && experiments.size() != experimentIndex) {
-                System.out.println("Loading configuration of new simulation...");
-                startSimulationFromLoadedScript();
-            }
+            //consoleUI.acceptConsoleCommandAtSimEnd();
+            experiments =  scriptLoader.getExperiments();
+            experimentIndex = 0;
+            System.out.println("Loading configuration of new simulation...");
+            startSimulationFromLoadedScript();
         }
     }
 
@@ -161,7 +174,7 @@ public class SimServerData {
         numInternalTramsAtAllWorkers += numInternalTrams;
         numInternalBusesAtAllWorkers += numInternalBuses;
 
-        updateLanes(laneList);
+        if (settings.isVisualize) updateLanes(laneList);
         getChangedLanesFromWorker(edgeList);
     }
 
@@ -257,6 +270,11 @@ public class SimServerData {
         fileOutput.close();
     }
 
+    public void startReLogging(){
+        writeOutputFiles(step);
+        initFileOutput();
+    }
+
     /**
      * Updates wall time spent on simulation.
      */
@@ -346,7 +364,7 @@ public class SimServerData {
      * retrieved setup will be removed from the list.
      */
     public boolean setupForExperimentSimulation(Experiment experiment) {
-        boolean isNewMap = false;
+        isNewMap = false;
 
         settings.isDriveOnLeft = experiment.isDriveOnLeft();
         settings.maxNumSteps = experiment.getMaxNumSteps();
@@ -383,14 +401,15 @@ public class SimServerData {
         settings.isAllowReroute = experiment.isAllowReroute();
         settings.downloadDirectory = experiment.getDownLoadDirectory();
         settings.testName = experiment.getTestName();
-        settings.odDistributor = experiment.getOdDistributor();
-        settings.temporalDistributor = experiment.getTemporalDistributor();
-        settings.simulationListener = experiment.getSimulationListener();
-        settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
+
+        if (experiment.getOdDistributor() != null) settings.odDistributor = experiment.getOdDistributor();
+        if (experiment.getTemporalDistributor() != null) settings.temporalDistributor = experiment.getTemporalDistributor();
+        if (experiment.getSimulationListener() != null) settings.simulationListener = experiment.getSimulationListener();
+        if (experiment.getVehicleTypeDistributor() != null) settings.vehicleTypeDistributor = experiment.getVehicleTypeDistributor();
         settings.stopsAtMaxSteps = experiment.isStopsAtMaxSteps();
         settings.safetyHeadwayMultiplier = experiment.getHeadwayMultiplier();
         settings.updateStepInterval = experiment.getUpdateStepInterval();
-        settings.tlManager = experiment.getTlManager();
+        if (experiment.getTlManager() != null) settings.tlManager = experiment.getTlManager();
 
         return isNewMap;
     }
@@ -433,6 +452,15 @@ public class SimServerData {
         experimentIndex = 0;
         runIndex = settings.defaultRunIndex;
         experiments = null;
+    }
+
+    public void loadSettingsFromScript() {
+        experiments =  scriptLoader.getExperiments();
+        Experiment experiment = experiments.get(0);
+        boolean isNewMap = setupForExperimentSimulation(experiment);
+        if (isNewMap) {
+            changeMap();
+        }
     }
 
     void startSimulationFromLoadedScript() {

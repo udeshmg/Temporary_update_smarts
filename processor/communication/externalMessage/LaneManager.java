@@ -70,7 +70,7 @@ public class LaneManager implements ExternalSimulationListener {
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
         System.out.println("GSON output: " + str);
-        sendNReceiveMessage(str);
+        sendMessage(str); //update for server side
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

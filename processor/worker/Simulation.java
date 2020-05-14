@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import common.Settings;
 import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
+import processor.communication.externalMessage.RoadControl;
 import processor.communication.externalMessage.RoadIndex;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
@@ -37,6 +38,7 @@ public class Simulation {
 	ArrayList<Vehicle> oneStepData_allVehiclesReachedDestination = new ArrayList<>();
 	SimulationListener simulationListener = null;
 	ExternalSimulationListener extListner = null;
+	boolean extListnerInitCalled = false;
 	Settings settings;
 
 	public Simulation(Settings settings,int startStep, String roadGraph,
@@ -195,6 +197,7 @@ public class Simulation {
 											 int numLocalRandomBuses, boolean isNewNonPubVehiclesAllowed,
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
+		waitForInit();
 		updateLaneDirections();
 
 		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
@@ -225,6 +228,25 @@ public class Simulation {
 
 		// Clear one-step data
 		clearOneStepData();
+
+		if (step % 18000 == 0){
+			resetTraffic();
+		}
+
+	}
+	public void waitForInit(){
+		if (settings.isExternalListenerUsed){
+			if (extListnerInitCalled == false) {
+				System.out.println("Initializing...");
+				extListner.waitForAction();
+				extListner.getRoadDirChange();
+
+				extListner.sendTrafficData(trafficNetwork);
+				extListnerInitCalled = true;
+
+				System.out.println("Initialize complete");
+			}
+		}
 	}
 
 	public void waitForActionsFromExternalClient(){
@@ -233,7 +255,7 @@ public class Simulation {
 				System.out.println("Waiting...");
 				extListner.waitForAction();
 			}
-		getActionsFromExtListner();
+			getActionsFromExtListner();
 		}
 	}
 
@@ -253,9 +275,16 @@ public class Simulation {
 			RoadIndex roadIndex = extListner.getRoadDirChange();
 			if (roadIndex != null) {
 				if (roadIndex.edges != null) {
-					for (int edgeIndex : roadIndex.edges) {
-						changeLaneDirection(edgeIndex);
-						laneChangedEdgeIndex.add(edgeIndex);
+					for (RoadControl edge : roadIndex.edges) {
+						if (edge.laneChange) {
+							int oppositeEdgeIndex = trafficNetwork.edges.get(edge.index).getOppositeEdge().index;
+							changeLaneDirection(oppositeEdgeIndex);
+							laneChangedEdgeIndex.add(oppositeEdgeIndex);
+						}
+
+						if (edge.speed != 0){
+							trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
+						}
 					}
 				}
 			}
@@ -291,24 +320,7 @@ public class Simulation {
 		}
 	}
 
-	public void sendTrafficDataToExternal(){
-		if (settings.isExternalListenerUsed) {
-			if (step % settings.laneUpdateInterval == 0 && step > 0) {
-				extListner.getTrafficData(trafficNetwork);
-				RoadIndex roadIndex = extListner.getRoadDirChange();
 
-				if (roadIndex != null) {
-					if (roadIndex.edges != null) {
-						for (int edgeIndex : roadIndex.edges) {
-							changeLaneDirection(edgeIndex);
-							laneChangedEdgeIndex.add(edgeIndex);
-						}
-					}
-				}
-			}
-		}
-
-	}
 
 	public ArrayList<Integer> getLaneChanges(){
 		ArrayList<Integer> indexes = new ArrayList<>();

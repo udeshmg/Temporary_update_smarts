@@ -51,7 +51,7 @@ public class Vehicle {
 	 * lights in the same group if it passes one of the lights in the group.
 	 */
 	public long idLightGroupPassed = -1;
-	public DriverProfile driverProfile = DriverProfile.NORMAL;
+	public DriverProfile driverProfile = DriverProfile.HIGHLY_AGGRESSIVE;
 	/**
 	 * This is for highlighting vehicles affected by emergency vehicles on GUI
 	 */

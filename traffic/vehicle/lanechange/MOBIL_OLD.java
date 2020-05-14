@@ -134,9 +134,8 @@ public class MOBIL_OLD {
         Movement movement = vehicle.getCurrentMovement();
 
         if (vehicle.lane.isDirectionChanging) {
-            if (isSafeToChange(vehicle, LaneChangeDirection.TOWARDS_ROADSIDE)) {
-                if (movement != null && (vehicle == vehicle.lane.getFrontVehicleInLane()) && ((vehicle.lane.edge.getMovementLight(movement) == LightColor.KEEP_RED)
-                        || (vehicle.lane.edge.getMovementLight(movement) == LightColor.GYR_R))) {
+            if (true) {
+                if (false) {
                     decision = LaneChangeDirection.SAME;
                 } else
                     decision = LaneChangeDirection.TOWARDS_ROADSIDE;
