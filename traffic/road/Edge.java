@@ -112,6 +112,13 @@ public class Edge {
 	 */
 	public int numLeftLanes;
 	public int numLeftOnlyLanes;
+
+	/**
+	 * Maximum vehicles at the end of lane can handle:
+	 * this is used when lane numbers are different in two roads
+	 */
+	public int maxVehiclesAtTheEnd = 5;
+
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
 	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
 	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
@@ -522,7 +529,7 @@ public class Edge {
 			}
 		}
 
-		if ( vehicleCount < 2){ // if there is only one vehicle
+		if ( vehicleCount < maxVehiclesAtTheEnd){
 			return true;
 		}
 		else {
@@ -543,6 +550,7 @@ public class Edge {
 		}
 		double freeSpace = startPos - expectedFill - lane.edge.getStartIntersectionSize();
 
+		//When merging from higher lane to lower lane in a different road segment
 		if ((vehicle.lane.edge.getLaneCount() > lane.edge.getLaneCount()) && (vehicle.lane.laneNumber >= lane.edge.getLaneCount()-1)){
 			return hasSpaceInEndOfAllLane(lane);
 		}
