@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.vehicle.VehicleType;
 
 import java.util.Random;
@@ -37,4 +38,6 @@ public abstract class VehicleTypeDistributor {
     }
 
     public abstract VehicleType getVehicleType();
+
+    public abstract void getSettings(Settings settings);
 }

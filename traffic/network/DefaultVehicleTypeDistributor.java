@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.vehicle.VehicleType;
 
 /**
@@ -37,6 +38,11 @@ public class DefaultVehicleTypeDistributor extends VehicleTypeDistributor{
             type = VehicleType.CAR;
         }
         return type;
+    }
+
+    @Override
+    public void getSettings(Settings settings) {
+
     }
 
 }

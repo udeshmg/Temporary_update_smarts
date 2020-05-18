@@ -1,9 +1,11 @@
 package common;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gson.annotations.Expose;
 import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import traffic.light.manager.TLManager;
@@ -17,6 +19,11 @@ import traffic.vehicle.lanedecide.LaneDecider;
  * Global settings.
  *
  */
+
+/*
+	Use: @Expose() to save the variable to a external file
+
+ */
 public class Settings {
 
 	public Settings() {
@@ -27,12 +34,12 @@ public class Settings {
 	/*
 	 * Simulation
 	 */
-	public boolean isNewEnvironment = true;//True when certain settings are changed during setup, e.g., changing map
-	public int maxNumSteps = 10000000;//Simulation stops when reaching this number of steps
-	public double numStepsPerSecond = 5;//This determines the step length.
-	public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
-	public int trafficReportStepGapInServerlessMode = 1;
-	public int laneUpdateInterval = 300; // lane update time interval in steps
+	@Expose() public boolean isNewEnvironment = true;//True when certain settings are changed during setup, e.g., changing map
+	@Expose() public int maxNumSteps = 10000000;//Simulation stops when reaching this number of steps
+	@Expose() public double numStepsPerSecond = 5;//This determines the step length.
+	@Expose() public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
+	@Expose() public int trafficReportStepGapInServerlessMode = 1;
+	@Expose() public int laneUpdateInterval = 300; // lane update time interval in steps
 
 	/*
 	 * Display
@@ -56,13 +63,13 @@ public class Settings {
 	/*
 	 * Input
 	 */
-	public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
-	public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_12x12.osm";//OSM file where road network information can be extracted
-	public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
-	public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
-	public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
-	public String inputForegroundVehicleFile = "";//Route file of foreground vehicles
-	public String inputBackgroundVehicleFile = "";//Route file of background vehicles
+	@Expose() public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
+	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
+	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
+	@Expose() public String inputForegroundVehicleFile = "";//Route file of foreground vehicles
+	@Expose() public String inputBackgroundVehicleFile = "";//Route file of background vehicles
 
 	/*
 	 * Output
@@ -136,17 +143,31 @@ public class Settings {
 	public double trafficLightDetectionDistance = 30;//In meters. How far a vehicle can see a light.
 	public double maxLightGroupRadius = 10;//In meters. Controls size of the area where a cluster of lights can be identified.
 
+
+	/**
+	 *  Traffic Generation settings
+	 */
+
+	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
+	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
+	@Expose() public int numODPairs = 20;
+	@Expose() public int demandChangedFreq = 3000; // in steps
+	@Expose() public boolean isUnidirectional = false;
+	@Expose() public int trafficGenerateDuration = 12000; // in steps
+
+
+	@Expose() public boolean isExternalListenerUsed = true;
 	/**
 	 * OD Distribution
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	public String trafficGenerator = "RushHour";
-	public String odDistributor = "Random";
-	public String temporalDistributor = "Uniform";
+	@Expose() public String trafficGenerator = "RushHour";
+	@Expose() public String odDistributor = "Random";
+	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download";
+	public String defaultDownloadDirectory = "download/Demand/ver2/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -161,19 +182,25 @@ public class Settings {
 	public int gridlockDetectionTime = 600;
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
-	public String externalListner = "CLLA";
+	@Expose() public String externalListner = "CLLA";
 
 	/**
 	 * External Listener Settings
 	 */
-	public boolean isExternalListenerUsed = true;
+	public void setSettingsToFile(){
+		// implement seralized settings
+
+	}
+
+
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(dictionary.getDemand())+"_";
-		else return externalListner+"_"+String.valueOf(dictionary.getDemand())+"_";
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_";
+		else return externalListner+"_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {
+		dictionary.getTrafficGenerator(trafficGenerator).getSettings(this);
 		return dictionary.getTrafficGenerator(trafficGenerator);
 	}
 

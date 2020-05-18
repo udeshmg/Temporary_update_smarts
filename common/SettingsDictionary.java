@@ -76,6 +76,7 @@ public class SettingsDictionary {
 
         this.eListenerMap = new HashMap<>();
         addEListner("CLLA", LaneManager.getInstance());
+        addEListner("LLA", LaneManager.getInstance());
         addEListner("DLA", DemandBasedLaneManager.getInstance());
 
     }

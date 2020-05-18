@@ -43,4 +43,8 @@ public class RandomODDistributor extends ODDistributor{
         return new Node[]{start.startNode, end.endNode};
     }
 
+    @Override
+    public void getSettings(Settings settings) {
+
+    }
 }

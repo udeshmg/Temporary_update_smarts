@@ -1,5 +1,6 @@
 package processor.communication.externalMessage;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -17,7 +18,9 @@ public class TrafficData {
     public TrafficData(){
         trafficData = new ArrayList<>();
         paths = new ArrayList<>();
+
     }
+
 
     public void setTrafficData(TrafficNetwork trafficNetwork){
         for (Edge edge : trafficNetwork.edges) {

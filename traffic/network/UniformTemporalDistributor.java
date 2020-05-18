@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 
 import java.util.Random;
@@ -38,5 +39,10 @@ public class UniformTemporalDistributor extends TemporalDistributor{
         else{
             return 0;
         }
+    }
+
+    @Override
+    public void getSettings(Settings settings) {
+
     }
 }

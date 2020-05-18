@@ -227,6 +227,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	@Override
 	public void run() {
 		data.initRoadNetwork();
+		changeMap();
 		data.initUIs(this);
 		// Prepare to receive connection request from workers
 		new IncomingConnectionBuilder(settings.serverListeningPortForWorkers, this).start();

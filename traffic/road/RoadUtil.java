@@ -152,17 +152,18 @@ public class RoadUtil {
 		Edge e1Adjacent = e1.endNode.getOutwardEdge(e1.startNode);
 
 		if (isDriveOnLeft) {
-			// Drive on LEFT
-			for (final Edge eR : inwardEdgesR) {
-				List<Edge> eROutList = findOutwardEdgesOnRight(eR, e1Adjacent);
-				if (isCrossingMovementsRed(eR, eROutList)) {
-					continue;
-				}
-				if (eR.isRoundabout) {
-					conflictEdges.add(eR);
-				} else if (eR.type.priority > e1.type.priority) {
-					conflictEdges.add(eR);
-				} else if (eR.type.priority == e1.type.priority) {
+			if (e1Adjacent != null) { //null check added
+				// Drive on LEFT
+				for (final Edge eR : inwardEdgesR) {
+					List<Edge> eROutList = findOutwardEdgesOnRight(eR, e1Adjacent);
+					if (isCrossingMovementsRed(eR, eROutList)) {
+						continue;
+					}
+					if (eR.isRoundabout) {
+						conflictEdges.add(eR);
+					} else if (eR.type.priority > e1.type.priority) {
+						conflictEdges.add(eR);
+					} else if (eR.type.priority == e1.type.priority) {
 					/*if (eR.name.length() > 0) {
 						for (final Edge e : outwardEdgesL) {
 							if (e.name.equals(eR.name)) {
@@ -172,28 +173,30 @@ public class RoadUtil {
 							}
 						}
 					}*/
-					if (!eR.name.equals(e1.name)) {
-						// Cross eR's road
-						conflictEdges.add(eR);
+						if (!eR.name.equals(e1.name)) {
+							// Cross eR's road
+							conflictEdges.add(eR);
+						}
+					}
+				}
+
+				for (final Edge eL : inwardEdgesL) {
+					List<Edge> eLOutList = findOutwardEdgesOnRight(eL, e2);
+					if (e1.isRoundabout || isCrossingMovementsRed(eL, eLOutList)
+						/*|| (eL.startNode == e2.endNode)*/) {
+						continue;
+					}
+					if (eL.type.priority > e1.type.priority) {
+						conflictEdges.add(eL);
+					} else if (eL.type.priority == e1.type.priority && eL.name.equals(e1.name)
+							&& isIncomingTrafficCrossingGreen(e1, e2)) {
+						// Consider vehicle from opposite direction on same road when turning right under green light
+						conflictEdges.add(eL);
 					}
 				}
 			}
-
-			for (final Edge eL : inwardEdgesL) {
-				List<Edge> eLOutList = findOutwardEdgesOnRight(eL, e2);
-				if (e1.isRoundabout || isCrossingMovementsRed(eL, eLOutList)
-						/*|| (eL.startNode == e2.endNode)*/) {
-					continue;
-				}
-				if (eL.type.priority > e1.type.priority) {
-					conflictEdges.add(eL);
-				}else if (eL.type.priority == e1.type.priority && eL.name.equals(e1.name)
-						&& isIncomingTrafficCrossingGreen(e1,e2)) {
-						// Consider vehicle from opposite direction on same road when turning right under green light
-					conflictEdges.add(eL);
-				}
-			}
-		} else {
+		}
+		else {
 			// Drive on RIGHT
 			for (final Edge eL : inwardEdgesL) {
 				List<Edge> eLOutList = findOutwardEdgesOnLeft(eL, e1Adjacent);

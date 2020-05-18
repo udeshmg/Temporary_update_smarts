@@ -1,5 +1,6 @@
 package processor.communication.externalMessage;
 
+import common.Settings;
 import processor.communication.message.Message_WS_TrafficReport;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
@@ -68,6 +69,11 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
 
     @Override
     public void sendTrafficData(TrafficNetwork trafficNetwork) {
+
+    }
+
+    @Override
+    public void setSettings(Settings settings) {
 
     }
 

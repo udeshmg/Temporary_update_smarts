@@ -1,5 +1,9 @@
 package processor.communication.externalMessage;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import common.Settings;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -9,6 +13,7 @@ import traffic.road.RoadNetwork;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LaneManager implements ExternalSimulationListener {
 
@@ -29,7 +34,9 @@ public class LaneManager implements ExternalSimulationListener {
     private ZMQ.Socket socket = null;
     private RoadGraphExternal roadGraph = null;
     private RoadIndex rdIndex = null;
+    private boolean isSettingsSent = false;
 
+    private Settings settings = null;
 
     @Override
     public void init() {
@@ -58,6 +65,10 @@ public class LaneManager implements ExternalSimulationListener {
 
     }
 
+    public void setSettings(Settings settings){
+        this.settings = settings;
+    }
+
     @Override
     public void getMessage(Message_WS_TrafficReport trafficReport) {
         // process and send
@@ -69,6 +80,7 @@ public class LaneManager implements ExternalSimulationListener {
         trafficData.setTrafficData(trafficNetwork);
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
+
         System.out.println("GSON output: " + str);
         sendMessage(str); //update for server side
         try {
@@ -82,9 +94,28 @@ public class LaneManager implements ExternalSimulationListener {
         TrafficData trafficData = new TrafficData();
         trafficData.setTrafficData(trafficNetwork);
         Gson gson = new Gson();
-        String str = gson.toJson(trafficData);
-        System.out.println("GSON output: " + str);
-        sendMessage(str);
+        JsonElement jsonToSend = gson.toJsonTree(trafficData);
+        String toSend = jsonToSend.toString();
+
+
+        if (isSettingsSent == false) {
+            JsonObject obj = jsonToSend.getAsJsonObject();
+            JsonElement jsonTrafficData =  obj.get("trafficData");
+
+            isSettingsSent = true;
+            Gson gson_settings = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+            JsonElement jsonSettings = gson_settings.toJsonTree(settings);
+
+            JsonObject combined = new JsonObject();
+            combined.add("trafficData", jsonTrafficData);
+            combined.add("settings", jsonSettings);
+
+            toSend = combined.toString();
+        }
+
+
+        System.out.println("GSON output: " + toSend);
+        sendMessage(toSend);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 
@@ -44,6 +45,12 @@ public abstract class TrafficGenerator {
     }
 
     public TrafficGenerator(){
+    }
+
+    public void getSettings(Settings settings){
+        odDistributor.getSettings(settings);
+        temporalDistributor.getSettings(settings);
+        vehicleTypeDistributor.getSettings(settings);
     }
 
     public abstract ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep) throws IOException;

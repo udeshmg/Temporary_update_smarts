@@ -3,8 +3,11 @@ package processor.server;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import common.Settings;
 import common.SysUtil;
 import processor.communication.message.SerializableRouteDump;
@@ -19,6 +22,7 @@ public class FileOutput {
 	FileOutputStream trjFos;
 	FileOutputStream vdFos;
 	FileOutputStream bestTTFos;
+	FileOutputStream expSettings;
 	private Settings settings;
 
 	public FileOutput(Settings settings) {
@@ -66,8 +70,28 @@ public class FileOutput {
 		if (settings.isOutputSimulationLog) {
 			initSimLogOutputFile();
 		}
-		initTrjOutputFile();
+		//initTrjOutputFile(); TODO: Removed by Udesh
 		initVDOutputFile();
+		saveSettingsToXML();
+	}
+
+
+	public void saveSettingsToXML(){
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+		String str = gson.toJson(settings);
+		System.out.println("Settings: " + str);
+		try {
+			final File fileTrj = getNewFile("Settings_"+settings.getOutputPrefix());
+			// Print column titles
+			expSettings = new FileOutputStream(fileTrj, true);
+			outputStringToFile(expSettings,
+					str + System.getProperty("line.separator"));
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 	}
 
 	File getNewFile(String prefix, String extension) {

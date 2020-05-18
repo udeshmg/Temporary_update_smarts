@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Node;
@@ -55,4 +56,6 @@ public abstract class ODDistributor {
     public List<double[]> getSourceDestinationWidows(RoadNetwork network) {
         return network.getSettings().guiSourceDestinationWindowsForInternalVehicle;
     }
+
+    public abstract void getSettings(Settings settings);
 }

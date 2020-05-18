@@ -1,5 +1,6 @@
 package processor;
 
+import com.google.gson.Gson;
 import common.Settings;
 import osm.OSM;
 import processor.communication.message.*;
@@ -164,7 +165,7 @@ public class SimServerData {
         for (Serializable_Finished_Vehicle finishedVehicle : finished) {
             vdOutput.outputVehicleData(finishedVehicle, timeStamp);
         }
-        trjOutput.outputTrajData(step, vehicleList);
+        //trjOutput.outputTrajData(step, vehicleList); //TODO: Removed by Udesh: TrjOutput
         // Store routes of new vehicles created since last report
         if (settings.isOutputInitialRoutes) {
             allRoutes.addAll(randomRoutes);
@@ -254,9 +255,10 @@ public class SimServerData {
     public void initFileOutput() {
         // Initialize output
         fileOutput.init();
-        trjOutput = new TrjOutput(fileOutput.getTrjFos(), settings.numWorkers, (int) settings.numStepsPerSecond, settings.maxNumSteps,
-                roadNetwork.minLon, roadNetwork.minLat, roadNetwork.mapWidth, roadNetwork.mapHeight);
-        trjOutput.outputMapData();
+        //TODO: Removed by Udesh: trjOutput
+        //trjOutput = new TrjOutput(fileOutput.getTrjFos(), settings.numWorkers, (int) settings.numStepsPerSecond, settings.maxNumSteps,
+                //roadNetwork.minLon, roadNetwork.minLat, roadNetwork.mapWidth, roadNetwork.mapHeight);
+        //trjOutput.outputMapData();
         vdOutput = new VehicleDataOutput(fileOutput.getVdFos());
     }
 
@@ -274,6 +276,7 @@ public class SimServerData {
         writeOutputFiles(step);
         initFileOutput();
     }
+
 
     /**
      * Updates wall time spent on simulation.

@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Node;
@@ -42,5 +43,11 @@ public class RushHourTrafficGenerator extends TrafficGenerator {
 
         return ODMatrix;
 
+    }
+
+    @Override
+    public void getSettings(Settings settings) {
+        super.getSettings(settings);
+        this.numODPairs = settings.numODPairs;
     }
 }

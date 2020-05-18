@@ -1,6 +1,6 @@
 package traffic.network;
 
-import org.apache.commons.statistics.distribution.PoissonDistribution;
+import common.Settings;
 
 import java.util.Random;
 
@@ -12,14 +12,8 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     private int freq = 4000;
     private int [][] demandMatrix;
     public int trafficType = 0;
-
-    public int getFreq() {
-        return freq;
-    }
-
-    public void setFreq(int freq) {
-        this.freq = freq;
-    }
+    private boolean isUnidirectional = false;
+    private int trafficGenarateDuration = 12000;
 
     private Random rand;
 
@@ -47,13 +41,30 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     }
 
     @Override
-    public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
+    public void getSettings(Settings settings){
+        this.maxCounter = settings.numODPairs;
+        this.freq = settings.demandChangedFreq;
+        this.demand = settings.demandPerOneInterval;
+        this.isUnidirectional = settings.isUnidirectional;
+        this.trafficGenarateDuration = settings.trafficGenerateDuration;
+    }
+
+    public int getFreq() {
+        return freq;
+    }
+
+    public void setFreq(int freq) {
+        this.freq = freq;
+    }
+
+    @Override
+    /** public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
         if (true) {
             if (currentStep % 18000 < 15000) {
-                numVehicles =  getPoissonRandom(10, rand);
+                numVehicles =  getPoissonRandom(15, rand);
             }
             else {
                 numVehicles = 0; //demandMatrix[trafficType][counter];
@@ -97,18 +108,18 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
 
         if ((currentTime/freq)%2 == 0) trafficType = 1;
         else trafficType = 0;
-    }/**
+    }**/
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
-        if (currentStep < 10000) {
-            if (currentStep % freq < 500) {
-                numVehicles = 0;
-            }
-            else {
+        if (currentStep < trafficGenarateDuration) {
+            //if (currentStep % freq ) {
+            //    numVehicles = 0;
+            //}
+            // else {
                 numVehicles = demandMatrix[trafficType][counter];
-            }
+            //}
         }
         else
             numVehicles = 0;
@@ -124,9 +135,10 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     }
 
     public void selectTrafficType(int currentTime){
-
-        if ((currentTime/freq)%2 == 0) trafficType = 0;
-        else trafficType = 1;
-    }**/
+        if (isUnidirectional == false){
+            if ((currentTime/freq)%2 == 0) trafficType = 0;
+            else trafficType = 1;
+        }
+    }
 
 }

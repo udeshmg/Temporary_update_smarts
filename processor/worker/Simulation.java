@@ -55,6 +55,7 @@ public class Simulation {
 		resetSimulation(settings, startStep, numLocalRandomPrivateVehicles, numLocalRandomTrams, numLocalRandomBuses, lightNodes);
 		if (settings.isExternalListenerUsed) {
 			extListner = settings.getExternalSimulationListener();
+			extListner.setSettings(settings);
 		}
 		laneChangedEdgeIndex = new ArrayList<>();
 	}
@@ -229,9 +230,9 @@ public class Simulation {
 		// Clear one-step data
 		clearOneStepData();
 
-		if (step % 18000 == 0){
-			resetTraffic();
-		}
+		//if (step % 18000 == 0){
+		//	resetTraffic();
+		//}
 
 	}
 	public void waitForInit(){

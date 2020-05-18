@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 
 import java.util.Random;
@@ -38,4 +39,6 @@ public abstract class TemporalDistributor {
     }
 
     public abstract int getCurrentVehicleLimit(int amount, int currentStep, int maxStep);
+
+    public abstract void getSettings(Settings settings);
 }

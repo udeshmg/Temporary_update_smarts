@@ -1,5 +1,6 @@
 package traffic.network;
 
+import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Node;
@@ -49,6 +50,11 @@ public class RandomlyDistributedODDistributor extends ODDistributor {
             selectArea = 0;
             return new Node[]{node2,node1};
         }
+
+    }
+
+    @Override
+    public void getSettings(Settings settings) {
 
     }
 
