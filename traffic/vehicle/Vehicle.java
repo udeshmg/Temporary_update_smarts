@@ -357,8 +357,8 @@ public class Vehicle {
 			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			// Update vehicle speed, which must be between 0 and free-flow speed
 			speed += acceleration / settings.numStepsPerSecond;
-			if (speed > lane.edge.freeFlowSpeed) {
-				speed = lane.edge.freeFlowSpeed;
+			if (speed > lane.edge.getFreeFlowSpeedAtPos(this.headPosition)) {
+				speed = lane.edge.getFreeFlowSpeedAtPos(this.headPosition);
 			}
 			if (speed < 0) {
 				speed = 0;
@@ -727,9 +727,9 @@ public class Vehicle {
 		for (int i = 0; i < routeLegs.size(); i++) {
 			Edge edge = routeLegs.get(i).edge;
 			if(i == 0){
-				bestTT += ((edge.length - startHeadPosition)/edge.freeFlowSpeed);
+				bestTT += ((edge.length - startHeadPosition)/edge.getFreeFlowSpeedAtPos(this.headPosition));
 			}else{
-				bestTT += (edge.length/edge.freeFlowSpeed);
+				bestTT += (edge.length/edge.getFreeFlowSpeedAtPos(this.headPosition));
 			}
 		}
 		return bestTT;

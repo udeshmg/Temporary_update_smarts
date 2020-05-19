@@ -42,7 +42,7 @@ public class RouteLeg {
 		super();
 		this.edge = edge;
 		this.stopover = stopover;
-		this.speed = edge.freeFlowSpeed;
+		this.speed = edge.getFreeFlowSpeedAtPos();
 	}
 
 	public int getLane() {

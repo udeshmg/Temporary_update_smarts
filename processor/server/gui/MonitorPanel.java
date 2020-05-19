@@ -1040,6 +1040,7 @@ public class MonitorPanel extends JPanel {
 				final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edgeAtPoint.index, 0, "", 0, null, null);
 				roadEdgeAtMousePoint = edgeObjects
 						.get(Collections.binarySearch(edgeObjects, dummyEdge, new EdgeObjectComparator()));
+				updateEdgeObject(roadEdgeAtMousePoint);
 				roadIntersectionAtMousePoint = null;
 			}
 		} else {
@@ -1066,6 +1067,9 @@ public class MonitorPanel extends JPanel {
 			final EdgeObject dummyEdge = new EdgeObject(0, 0, 0, 0, edgeAtPoint.index, 0, "", 0, null, null);
 			roadEdgeAtMousePoint = edgeObjects
 					.get(Collections.binarySearch(edgeObjects, dummyEdge, new EdgeObjectComparator()));
+			updateEdgeObject(roadEdgeAtMousePoint);
+			processor.getRoadNetwork().edges.get(roadEdgeAtMousePoint.index);
+
 			roadIntersectionAtMousePoint = null;
 		}
 		else{
@@ -1186,7 +1190,7 @@ public class MonitorPanel extends JPanel {
 			note += (int) edge.length + "m, ";
 			note += "'" + edge.startNode.index + "' to '" + edge.endNode.index + "', ";
 			note += "Idx " + edge.index + ", ";
-			note += (int) (edge.freeFlowSpeed * 3.6) + "kmh";
+			note += (int) (edge.getFreeFlowSpeedAtPos() * 3.6) + " " + ( edge.getFreeFlowSpeedAtPos(0)* 3.6 ) + "kmh";
 
 			List<DrawingObject.LaneObject> laneObjs = new ArrayList<>();
 			for (Lane lane : edge.getLanes()) {
@@ -1217,6 +1221,38 @@ public class MonitorPanel extends JPanel {
 				lightObjects.add(lightObject);
 			}
 		}
+	}
+
+	public void updateEdgeObject(EdgeObject edgeObject){
+		double startNodeX, startNodeY, endNodeX, endNodeY;
+		int numLanes;
+		Edge edge = processor.getRoadNetwork().edges.get(edgeObject.index);
+
+		startNodeX = edge.startNode.lon;
+		startNodeY = edge.startNode.lat;
+		endNodeX = edge.endNode.lon;
+		endNodeY = edge.endNode.lat;
+		numLanes = edge.getLaneCount();
+		String note = "";
+		if (edge.name.length() > 0) {
+			note += "\"" + edge.name + "\", ";
+		}
+		note += edge.type.name() + ", ";
+		note += numLanes + " lane(s), ";
+		note += (int) edge.length + "m, ";
+		note += "'" + edge.startNode.index + "' to '" + edge.endNode.index + "', ";
+		note += "Idx " + edge.index + ", ";
+		note += (int) (edge.getFreeFlowSpeedAtPos() * 3.6) + " " + ( edge.getFreeFlowSpeedAtPos(0)* 3.6 ) + "kmh";
+
+		List<DrawingObject.LaneObject> laneObjs = new ArrayList<>();
+		for (Lane lane : edge.getLanes()) {
+			DrawingObject.LaneObject laneObject = new DrawingObject.LaneObject(lane.latStart, lane.lonStart, lane.latEnd, lane.lonEnd);
+			laneObjs.add(laneObject);
+		}
+		// Create simplified edge object
+
+		edgeObject.note = note;
+
 	}
 
 	void loadIconImages() {

@@ -25,7 +25,13 @@ public class Edge {
 	/**
 	 * Free flow speed of vehicles
 	 */
-	public double freeFlowSpeed, maxFreeFlowSpeed, minFreeFlowSpeed;
+	private double freeFlowSpeed, maxFreeFlowSpeed, minFreeFlowSpeed, defaultFreeFlowSpeed;
+
+	/**
+	 * Variable speed controlled distance as a ratio to total road length
+	 */
+
+	public double headPositionOfVSL = 0.75; //
 
 	/**
 	 * Number of vehicles that can be filled into this edge based on average
@@ -147,6 +153,8 @@ public class Edge {
 	private double numVehiclesStraight = 0;
 	private double numVehiclesLeft = 0;
 
+	private double speedUnitChange = 4.167; //minimum speed change in ms (15kmh)
+
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
 			final List<String> busRoutesRef, final int numRightLanes, final int numLeftLanes,
@@ -158,8 +166,9 @@ public class Edge {
 		this.name = name;
 		freeFlowSpeed = maxspeed;
 		currentSpeed = freeFlowSpeed;
-		maxFreeFlowSpeed = freeFlowSpeed + 2.78*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
-		minFreeFlowSpeed = freeFlowSpeed - 2.78*2; //50kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		maxFreeFlowSpeed = freeFlowSpeed + speedUnitChange*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		minFreeFlowSpeed = freeFlowSpeed - speedUnitChange*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		defaultFreeFlowSpeed = maxspeed;
 		isRoundabout = roundabout;
 		this.tramRoutesRef.addAll(tramRoutesRef);
 		this.busRoutesRef.addAll(busRoutesRef);
@@ -177,7 +186,22 @@ public class Edge {
 	}
 
 	public void changeFreeFlowSpeed(int speedChange){ // calculated in 10ms
-		freeFlowSpeed = Math.min(maxFreeFlowSpeed, minFreeFlowSpeed + speedChange*2.78);
+		freeFlowSpeed = Math.min(maxFreeFlowSpeed, minFreeFlowSpeed + speedChange*speedUnitChange);
+	}
+
+
+	public double getFreeFlowSpeedAtPos(double headposition){
+		if (headposition < headPositionOfVSL*length){
+			return freeFlowSpeed;
+		}
+		else {
+			return defaultFreeFlowSpeed;
+		}
+	}
+
+	public double getFreeFlowSpeedAtPos(){
+		return defaultFreeFlowSpeed;
+
 	}
 
 	public boolean allBlocked(){

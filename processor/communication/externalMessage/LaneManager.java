@@ -42,7 +42,7 @@ public class LaneManager implements ExternalSimulationListener {
     public void init() {
         context = new ZContext();
         socket = context.createSocket(ZMQ.REP);
-        socket.bind("tcp://localhost:5555");
+        socket.bind("tcp://localhost:5556");
         System.out.println("Created the server-side connection from SMARTS");
     }
 

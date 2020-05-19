@@ -128,7 +128,7 @@ public class Simulation {
 			if (numVehiclesOnEdge > 0) {
 				edge.currentSpeed = accumulatedVehicleSpeed / numVehiclesOnEdge;
 			} else {
-				edge.currentSpeed = edge.freeFlowSpeed;
+				edge.currentSpeed = edge.getFreeFlowSpeedAtPos();
 			}
 		}
 		return vehicles;
@@ -439,7 +439,7 @@ public class Simulation {
 	public void resetExistingNetwork(){
 		// Reset existing network
 		for (final Edge edge : trafficNetwork.edges) {
-			edge.currentSpeed = edge.freeFlowSpeed;
+			edge.currentSpeed = edge.getFreeFlowSpeedAtPos();
 		}
 	}
 

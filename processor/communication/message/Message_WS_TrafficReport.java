@@ -105,7 +105,7 @@ public class Message_WS_TrafficReport {
 				sVehicle.headwayMultiplier = v.getHeadWayMultiplier();
 				sVehicle.edgeIndex = v.lane.edge.index;
 				sVehicle.laneIndex = v.lane.index;
-				sVehicle.originalEdgeMaxSpeed = v.lane.edge.freeFlowSpeed;
+				sVehicle.originalEdgeMaxSpeed = v.lane.edge.getFreeFlowSpeedAtPos(v.headPosition);
 				sVehicle.isAffectedByPriorityVehicle = v.isAffectedByPriorityVehicle;
 				sVehicle.displacement = v.getDisplacement();
 				list.add(sVehicle);

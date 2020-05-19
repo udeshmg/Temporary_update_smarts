@@ -58,13 +58,13 @@ public class Settings {
 	public int numGridCols = 0;//Number of columns in the virtual grid covering simulation area
 	public double maxGridCellWidthHeightInMeters = 500;//A cell should not be too large for load balancing purpose
 	public static String serverAddress = "127.0.0.1";
-	public static int serverListeningPortForWorkers = 50000;//Server's port for listening connection request initiated by worker
+	public static int serverListeningPortForWorkers = 50001; //Server's port for listening connection request initiated by worker
 
 	/*
 	 * Input
 	 */
 	@Expose() public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/singleRoad.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -150,7 +150,7 @@ public class Settings {
 
 	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
-	@Expose() public int numODPairs = 20;
+	@Expose() public int numODPairs = 1;
 	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
@@ -167,7 +167,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Demand/ver2/";
+	public String defaultDownloadDirectory = "download/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;

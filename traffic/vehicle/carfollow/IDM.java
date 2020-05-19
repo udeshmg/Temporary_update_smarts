@@ -56,7 +56,7 @@ public class IDM {
 		 * Desired speed
 		 */
 		// Must be within vehicle capability and road speed limit
-		double v0 = vehicle.lane.edge.freeFlowSpeed;
+		double v0 = vehicle.lane.edge.getFreeFlowSpeedAtPos(vehicle.headPosition);
 		if (v0 > vehicle.type.maxSpeed) {
 			v0 = vehicle.type.maxSpeed;
 		}
