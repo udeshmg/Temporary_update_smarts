@@ -7,7 +7,6 @@ import java.util.*;
 import common.Settings;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
-import traffic.TrafficNetwork;
 import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -667,7 +666,11 @@ public class Vehicle {
 					final Edge nextEdge = nextLeg.edge;
 					Lane newLane = decision.getEndLane();
 
+					// update Road and Lane
+					lane.edge.addToVehicleLeft();
 					updateLane(newLane);
+
+
 					// Remember the cluster of traffic lights
 					if (nextEdge.startNode.idLightNodeGroup != 0) {
 						idLightGroupPassed = nextEdge.startNode.idLightNodeGroup;
@@ -693,7 +696,9 @@ public class Vehicle {
 		}
 	}
 
+	public void countVehiclesLeavingLight(){
 
+	}
 
 	public double getHeadWayMultiplier() {
 		return headWayMultiplier;

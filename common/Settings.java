@@ -63,8 +63,8 @@ public class Settings {
 	/*
 	 * Input
 	 */
-	@Expose() public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/singleRoad.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/bottleneck_shortened_ramp_slowed.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -149,14 +149,14 @@ public class Settings {
 	 */
 
 	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
+	@Expose() public int demandGenerationTimeInterval = 50; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 1;
 	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
 
 
-	@Expose() public boolean isExternalListenerUsed = true;
+	@Expose() public boolean isExternalListenerUsed = false;
 	/**
 	 * OD Distribution
 	 */

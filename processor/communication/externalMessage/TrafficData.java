@@ -41,7 +41,7 @@ public class TrafficData {
             for (Lane lane : edge.getLanes()){
                 numVehicles += lane.getVehicles().size();
                 for (Vehicle v : lane.getVehicles()){
-                    numVehicles++;
+                    //numVehicles++;
                     if (v.edgeBeforeTurnRight == edge){
                         numVehiclesRight++;
                     }
@@ -52,7 +52,8 @@ public class TrafficData {
                         numVehiclesStraight++;
                     }
 
-                    if (v.speed < 5){
+                    //if (v.headPosition > v.lane.edge.length*v.lane.edge.headPositionOfVSL){
+                    if (v.speed < 0.1){
                         numVehiclesStopped++;
                     }
                     else{
@@ -73,6 +74,8 @@ public class TrafficData {
             roadExt.setNumVehiclesStopped(numVehiclesStopped);
             roadExt.setNumVehiclesOnMove(numVehiclesOnMove);
 
+            roadExt.setSignalColor(edge.getTrafficLightColor());
+            roadExt.setExitFlow(edge.getNumVehiclesLeftThisRoad());
             //traffic details
             trafficData.add(roadExt);
         }

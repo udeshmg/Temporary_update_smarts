@@ -227,6 +227,8 @@ public class Simulation {
 		sendTrafficData();
 		waitForActionsFromExternalClient();
 
+		//System.out.println("Vehicles: " + trafficNetwork.edges.get(1).getNumVehiclesCurrent());
+
 		// Clear one-step data
 		clearOneStepData();
 
@@ -305,7 +307,7 @@ public class Simulation {
 				for (Lane lane : edge.getLanes()) {
 					numVehicles += lane.getVehicles().size();
 					for (Vehicle v : lane.getVehicles()) {
-						numVehicles++;
+						//numVehicles++;
 						if (v.edgeBeforeTurnRight == edge) {
 							numVehiclesRight++;
 						} else if (v.edgeBeforeTurnLeft == edge) {

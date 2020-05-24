@@ -4,6 +4,7 @@ import common.Settings;
 import processor.SimulationProcessor;
 
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * Copyright (c) 2019, The University of Melbourne.
@@ -38,10 +39,11 @@ public class ConsoleUI {
     public void acceptInitialConfigFromConsole() {
         // Let user input number of workers
         System.out.println("Please specify the number of workers.");
-        Settings.numWorkers = Integer.parseInt(sc.nextLine());
+        //Settings.numWorkers = Integer.parseInt(sc.nextLine());
         while (Settings.numWorkers <= 0) {
             System.out.println("Please specify the number of workers.");
-            Settings.numWorkers = Integer.parseInt(sc.nextLine());
+            //Settings.numWorkers = Integer.parseInt(sc.nextLine()); TODO: Only one worker is used
+            Settings.numWorkers = 1;
         }
         processor.onClose();
         // Inform user next step
@@ -69,11 +71,13 @@ public class ConsoleUI {
 
     public void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
-        processor.getSettings().inputSimulationScript = sc.nextLine();
-        while (!processor.loadScript()) {
-            System.out.println("Please specify the simulation script path.");
-            processor.getSettings().inputSimulationScript = sc.nextLine();
-        }
+        //TODO: Script can be directly set through settings file
+        //processor.getSettings().inputSimulationScript = sc.nextLine();
+        //while (!processor.loadScript()) {
+        //    System.out.println("Please specify the simulation script path.");
+        //    processor.getSettings().inputSimulationScript = sc.nextLine();
+        //}
+        processor.loadScript();
         acceptSimStartCommandFromConsole();
     }
 

@@ -58,13 +58,19 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     }
 
     @Override
-    /** public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
+    public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
         if (true) {
             if (currentStep % 18000 < 15000) {
-                numVehicles =  getPoissonRandom(15, rand);
+                if (counter == 0) numVehicles = rand.nextInt(50); //  getPoissonRandom(15, rand);
+                if (counter == 1) {
+                    if (currentStep % 180 < 5)
+                        numVehicles = rand.nextInt(50);
+                    else
+                        numVehicles = rand.nextInt(5);
+                }
             }
             else {
                 numVehicles = 0; //demandMatrix[trafficType][counter];
@@ -108,8 +114,8 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
 
         if ((currentTime/freq)%2 == 0) trafficType = 1;
         else trafficType = 0;
-    }**/
-    public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
+    }
+    /**public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
@@ -139,6 +145,6 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
             if ((currentTime/freq)%2 == 0) trafficType = 0;
             else trafficType = 1;
         }
-    }
+    }**/
 
 }

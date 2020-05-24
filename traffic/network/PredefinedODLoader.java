@@ -30,9 +30,9 @@ public class PredefinedODLoader extends ODDistributor {
 
     //private int [][][] odMatrix = {{{20,14}, {14,20}}};
     //private int [][][] odMatrix ={{{7,0}}};
-    private int [][][] odMatrix ={{{5,0}}};
+    //private int [][][] odMatrix ={{{5,0}}};
 
-    //private int [][][] odMatrix ={{{4,1}, {5,1}}};
+    private int [][][] odMatrix ={{{4,0}}};
 
     @Override
     public Node[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeNow) {

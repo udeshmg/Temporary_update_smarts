@@ -45,7 +45,7 @@ public class FixedSchedule extends TLScheduleHandler{
         for (TrafficLightCluster cluster : clusters) {
             TrafficLightSchedule existing = cluster.getLightSchedule();
             List<Phase> phases = phaseHandler.getPhaseList(cluster, timeNow);
-            updateSchedule(existing, phases, timeNow, horizon);
+            if (phases.size() > 0) { updateSchedule(existing, phases, timeNow, horizon); }
         }
     }
 

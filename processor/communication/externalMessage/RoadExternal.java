@@ -31,6 +31,26 @@ public class RoadExternal {
     private double endLat;
     private double endLon;
 
+    private String signalColor;
+
+    private double exitFlow;
+
+    public double getExitFlow() {
+        return exitFlow;
+    }
+
+    public void setExitFlow(double exitFlow) {
+        this.exitFlow = exitFlow;
+    }
+
+    public String getSignalColor() {
+        return signalColor;
+    }
+
+    public void setSignalColor(String signalColor) {
+        this.signalColor = signalColor;
+    }
+
     public void updateMvgData(double numVehiclesMvg, double numVehiclesStraightMvg,
                               double numVehiclesRightMvg, double numVehiclesLeftMvg){
         this.numVehiclesMvg = numVehiclesMvg;

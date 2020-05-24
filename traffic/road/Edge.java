@@ -69,6 +69,12 @@ public class Edge {
 	private Map<Movement, LightColor> lightColorMap;
 
 	/**
+	 *  Keep a count of vehicles left at last green light phase
+	 */
+
+	private int numVehiclesLeftThisRoad;
+
+	/**
 	 * Tram edge parallel to this edge and is with tram stop.
 	 */
 	public Edge parallelTramEdgeWithTramStop = null;
@@ -123,7 +129,7 @@ public class Edge {
 	 * Maximum vehicles at the end of lane can handle:
 	 * this is used when lane numbers are different in two roads
 	 */
-	public int maxVehiclesAtTheEnd = 5;
+	public int maxVehiclesAtTheEnd = 10;
 
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
 	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
@@ -153,12 +159,42 @@ public class Edge {
 	private double numVehiclesStraight = 0;
 	private double numVehiclesLeft = 0;
 
-	private double speedUnitChange = 4.167; //minimum speed change in ms (15kmh)
+
+	private int numVehiclesCurrent = 0;
+	private int numVehiclesRightCurrent  = 0;
+	private int numVehiclesStraightCurrent  = 0;
+	private int numVehiclesLeftCurrent  = 0;
+
+	private double speedUnitChange = 2.78; //minimum speed change in ms (15kmh)
 
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
 			final List<String> busRoutesRef, final int numRightLanes, final int numLeftLanes,
 			final int numRightOnlyLanes, final int numLeftOnlyLanes) {
+		super();
+		this.importedStartNodeIndex = importedStartNodeIndex;
+		this.importedEndNodeIndex = importedEndNodeIndex;
+		this.type = RoadType.valueOf(type);
+		this.name = name;
+		freeFlowSpeed = maxspeed;
+		currentSpeed = freeFlowSpeed;
+		maxFreeFlowSpeed = freeFlowSpeed + speedUnitChange*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		minFreeFlowSpeed = freeFlowSpeed - speedUnitChange*2; //20kmh from freeFlowSpeed: 2.78ms -> 10kmh.
+		defaultFreeFlowSpeed = maxspeed;
+		isRoundabout = roundabout;
+		this.tramRoutesRef.addAll(tramRoutesRef);
+		this.busRoutesRef.addAll(busRoutesRef);
+		this.numLeftLanes = numLeftLanes;
+		this.numLeftOnlyLanes = numLeftOnlyLanes;
+		this.numRightLanes = numRightLanes;
+		this.numRightOnlyLanes = numRightOnlyLanes;
+		this.lightColorMap = new HashMap<>();
+	}
+
+	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
+				final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
+				final List<String> busRoutesRef, final int numRightLanes, final int numLeftLanes,
+				final int numRightOnlyLanes, final int numLeftOnlyLanes, Settings settings) {
 		super();
 		this.importedStartNodeIndex = importedStartNodeIndex;
 		this.importedEndNodeIndex = importedEndNodeIndex;
@@ -220,6 +256,48 @@ public class Edge {
 		this.numVehiclesRight = alpha*this.numVehiclesRight + (1-alpha)*numVehiclesRight;
 		this.numVehiclesStraight = alpha*this.numVehiclesStraight + (1-alpha)*numVehiclesStraight;
 		this.numVehiclesLeft = alpha*this.numVehiclesLeft + (1-alpha)*numVehiclesLeft;
+	}
+
+
+	public  void getCurrentVehicleNumber(){
+		numVehiclesCurrent = 0;
+		numVehiclesRightCurrent  = 0;
+		numVehiclesStraightCurrent  = 0;
+		numVehiclesLeftCurrent  = 0;
+
+		for (Lane lane : this.getLanes()) {
+			numVehiclesCurrent += lane.getVehicles().size();
+			for (Vehicle v : lane.getVehicles()) {
+				//numVehicles++;
+				if (v.edgeBeforeTurnRight == this) {
+					numVehiclesRightCurrent++;
+				} else if (v.edgeBeforeTurnLeft == this) {
+					numVehiclesLeftCurrent++;
+				} else {
+					numVehiclesStraightCurrent++;
+				}
+			}
+		}
+	}
+
+	public int getNumVehiclesCurrent() {
+		getCurrentVehicleNumber();
+		return numVehiclesCurrent;
+	}
+
+	public int getNumVehiclesRightCurrent() {
+		getCurrentVehicleNumber();
+		return numVehiclesRightCurrent;
+	}
+
+	public int getNumVehiclesStraightCurrent() {
+		getCurrentVehicleNumber();
+		return numVehiclesStraightCurrent;
+	}
+
+	public int getNumVehiclesLeftCurrent() {
+		getCurrentVehicleNumber();
+		return numVehiclesLeftCurrent;
 	}
 
 	public int getLaneCount(){
@@ -576,7 +654,7 @@ public class Edge {
 
 		//When merging from higher lane to lower lane in a different road segment
 		if ((vehicle.lane.edge.getLaneCount() > lane.edge.getLaneCount()) && (vehicle.lane.laneNumber >= lane.edge.getLaneCount()-1)){
-			return hasSpaceInEndOfAllLane(lane);
+			//return hasSpaceInEndOfAllLane(lane);
 		}
 
 		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);
@@ -599,6 +677,9 @@ public class Edge {
 	}
 
 	public void setMovementLight(Movement movement, LightColor light){
+		if (light == LightColor.GYR_G && lightColorMap.get(movement) != LightColor.GYR_G){
+			clearVehicleLeftRoadCounter();
+		}
 		lightColorMap.put(movement, light);
 	}
 
@@ -608,5 +689,22 @@ public class Edge {
 
 	public void setEdgeLaneMap(LinkedHashMap<Edge, Integer> edgeLaneMap) {
 		this.edgeLaneMap = edgeLaneMap;
+	}
+
+	public void addToVehicleLeft(){ numVehiclesLeftThisRoad++; }
+
+	public int getNumVehiclesLeftThisRoad(){
+		return numVehiclesLeftThisRoad;
+	}
+
+	private void clearVehicleLeftRoadCounter(){
+		numVehiclesLeftThisRoad = 0;
+	}
+
+	public String getTrafficLightColor(){
+		for (LightColor lightColor : lightColorMap.values()){
+			return lightColor.color;
+		}
+		return "G";
 	}
 }
