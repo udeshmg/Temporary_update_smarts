@@ -39,6 +39,7 @@ public class Simulation {
 	SimulationListener simulationListener = null;
 	ExternalSimulationListener extListner = null;
 	boolean extListnerInitCalled = false;
+	ArrayList<RoadControl> roadControlsToServer = new ArrayList<>();
 	Settings settings;
 
 	public Simulation(Settings settings,int startStep, String roadGraph,
@@ -288,6 +289,7 @@ public class Simulation {
 						if (edge.speed != 0){
 							trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
 						}
+						roadControlsToServer.add(edge);
 					}
 				}
 			}
@@ -325,14 +327,14 @@ public class Simulation {
 
 
 
-	public ArrayList<Integer> getLaneChanges(){
-		ArrayList<Integer> indexes = new ArrayList<>();
+	public ArrayList<RoadControl> getRoadChanges(){
+		ArrayList<RoadControl> roadIndexes = new ArrayList<>();
 
-		for (Integer index : laneChangedEdgeIndex){
-			indexes.add(index);
+		for (RoadControl road : roadControlsToServer){
+			roadIndexes.add(road);
 		}
-		laneChangedEdgeIndex.clear();
-		return indexes;
+		roadControlsToServer.clear();
+		return roadIndexes;
 	}
 
 	public  void markLanesToChange(){

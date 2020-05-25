@@ -1234,6 +1234,7 @@ public class MonitorPanel extends JPanel {
 		endNodeY = edge.endNode.lat;
 		numLanes = edge.getLaneCount();
 		String note = "";
+
 		if (edge.name.length() > 0) {
 			note += "\"" + edge.name + "\", ";
 		}
@@ -1251,7 +1252,6 @@ public class MonitorPanel extends JPanel {
 		}
 		// Create simplified edge object
 
-		edgeObject.note = note;
 
 	}
 
@@ -2107,6 +2107,8 @@ public class MonitorPanel extends JPanel {
 		for (int i = 0; i < edgeObj.laneBlocks.length; i++) {
 			edgeObj.laneBlocks[i] = false;
 		}
+
+		edgeObj.updateNote(edge);
 
 
 	}

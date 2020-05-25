@@ -108,7 +108,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	public void sendTrafficReportInServerlessMode() {
 		if ((simulation.getStep() + 1) % settings.trafficReportStepGapInServerlessMode == 0) {
-			senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getLaneChanges()));
+			senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getRoadChanges()));
 			simulation.clearReportedTrafficData();
 		}
 	}
@@ -421,7 +421,7 @@ public class Worker implements MessageHandler, Runnable {
 
 	public void onSWServerBasedSimulate(Message_SW_ServerBased_Simulate msg){
 		simulation.simulateOneStep(this, msg.isNewNonPubVehiclesAllowed, msg.isNewTramsAllowed, msg.isNewBusesAllowed);
-		senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getLaneChanges()));
+		senderForServer.send(new Message_WS_TrafficReport(settings, name, simulation.getStep(), simulation.getTrafficNetwork(), simulation.getRoadChanges()));
 		simulation.clearReportedTrafficData();
 	}
 

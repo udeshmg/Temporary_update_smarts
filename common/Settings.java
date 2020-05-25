@@ -156,7 +156,7 @@ public class Settings {
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
 
 
-	@Expose() public boolean isExternalListenerUsed = false;
+	@Expose() public boolean isExternalListenerUsed = true;
 	/**
 	 * OD Distribution
 	 */

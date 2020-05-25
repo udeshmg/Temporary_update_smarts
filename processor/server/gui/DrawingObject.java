@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.util.Comparator;
 import java.util.List;
 
+import traffic.road.Edge;
 import traffic.road.RoadType;
 
 public class DrawingObject {
@@ -38,7 +39,22 @@ public class DrawingObject {
 			this.lanes = lanes;
 		}
 
+		public void updateNote(Edge edge){
+			note = "";
+			if (edge.name.length() > 0) {
+				note += "\"" + edge.name + "\", ";
+			}
+			note += edge.type.name() + ", ";
+			note += numLanes + " lane(s), ";
+			note += (int) edge.length + "m, ";
+			note += "'" + edge.startNode.index + "' to '" + edge.endNode.index + "', ";
+			note += "Idx " + edge.index + ", ";
+			note += (int) (edge.getFreeFlowSpeedAtPos() * 3.6) + " " + ( edge.getFreeFlowSpeedAtPos(0)* 3.6 ) + "kmh";
+		}
+
 	}
+
+
 
 	public static class EdgeObjectComparator implements Comparator<EdgeObject> {
 		@Override
