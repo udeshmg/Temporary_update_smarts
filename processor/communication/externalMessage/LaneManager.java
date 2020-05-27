@@ -75,9 +75,9 @@ public class LaneManager implements ExternalSimulationListener {
     }
 
     @Override
-    public void getTrafficData(TrafficNetwork trafficNetwork) {
+    public void getTrafficData(TrafficNetwork trafficNetwork, double timeNow) {
         TrafficData trafficData = new TrafficData();
-        trafficData.setTrafficData(trafficNetwork);
+        trafficData.setTrafficData(trafficNetwork, timeNow);
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
 
@@ -90,9 +90,9 @@ public class LaneManager implements ExternalSimulationListener {
         }
     }
 
-    public void sendTrafficData(TrafficNetwork trafficNetwork) {
+    public void sendTrafficData(TrafficNetwork trafficNetwork, double timeNow) {
         TrafficData trafficData = new TrafficData();
-        trafficData.setTrafficData(trafficNetwork);
+        trafficData.setTrafficData(trafficNetwork, timeNow);
         Gson gson = new Gson();
         JsonElement jsonToSend = gson.toJsonTree(trafficData);
         String toSend = jsonToSend.toString();

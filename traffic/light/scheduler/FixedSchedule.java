@@ -35,7 +35,7 @@ public class FixedSchedule extends TLScheduleHandler{
 
     public FixedSchedule(){
         fixedPeriods = new TreeMap<>();
-        fixedPeriods.put(LightColor.GYR_G, 30.0);
+        fixedPeriods.put(LightColor.GYR_G, 20.0);
         fixedPeriods.put(LightColor.GYR_Y, 10.0);
         fixedPeriods.put(LightColor.GYR_R, 5.0);
     }

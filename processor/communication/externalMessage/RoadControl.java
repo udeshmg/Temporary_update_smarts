@@ -6,6 +6,7 @@ public class RoadControl {
     public int speed = 0;
 
     public RoadControl(int index, boolean laneChange, int speed) {
+        this.index = index;
         this.laneChange = laneChange;
         this.speed = speed;
     }

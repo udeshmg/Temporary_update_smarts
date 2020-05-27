@@ -33,6 +33,12 @@ public class RoadExternal {
 
     private String signalColor;
 
+    private double timeToGreen;
+
+
+
+    private double timeToRed;
+
     private double exitFlow;
 
     public double getExitFlow() {
@@ -213,5 +219,21 @@ public class RoadExternal {
 
     public void setNumVehiclesStraightMvg(double numVehiclesStraightMvg) {
         this.numVehiclesStraightMvg = numVehiclesStraightMvg;
+    }
+
+    public double getTimeToGreen() {
+        return timeToGreen;
+    }
+
+    public void setTimeToGreen(double timeToGreen) {
+        this.timeToGreen = timeToGreen;
+    }
+
+    public double getTimeToRed() {
+        return timeToRed;
+    }
+
+    public void setTimeToRed(double timeToRed) {
+        this.timeToRed = timeToRed;
     }
 }

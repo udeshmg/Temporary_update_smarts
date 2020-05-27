@@ -13,8 +13,8 @@ public interface ExternalSimulationListener {
     void init();
     void getRoadGraph(RoadNetwork roadNetwork);
     void getMessage(Message_WS_TrafficReport trafficReport);
-    void getTrafficData(TrafficNetwork trafficNetwork);
-    void sendTrafficData(TrafficNetwork trafficNetwork);
+    void getTrafficData(TrafficNetwork trafficNetwork, double timeNow);
+    void sendTrafficData(TrafficNetwork trafficNetwork, double timeNow);
     void setSettings(Settings settings);
     void waitForAction();
     static ExternalSimulationListener getInstance(){return null;};

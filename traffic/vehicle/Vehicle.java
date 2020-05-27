@@ -7,6 +7,7 @@ import java.util.*;
 import common.Settings;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
+import traffic.light.LightPeriod;
 import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -45,6 +46,7 @@ public class Vehicle {
 	public double spdOfImpedingObject = 0;
 	public double timeOfLastLaneChange = 0;
 	public boolean isRoadBlockedAhead = false;
+	public double speedLimit = 0;
 	/**
 	 * The ID of the latest light group. This vehicle will ignore other traffic
 	 * lights in the same group if it passes one of the lights in the group.
@@ -213,6 +215,11 @@ public class Vehicle {
 		final Edge edge = leg.edge;
 		final Lane lane = laneDecider.getNextEdgeLane(this);// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0();
+
+		if (edge.index == 2) {
+			findTrafficLightSyncedSpeedLimit(edge);
+		} else { speedLimit = edge.getFreeFlowSpeedAtPos(); }
+
 		if (pos >= 0) {
 			this.lane = lane;
 			headPosition = pos;
@@ -223,6 +230,29 @@ public class Vehicle {
 			return true;
 		}
 		return false;
+	}
+
+
+	public void findTrafficLightSyncedSpeedLimit(Edge edge){
+
+		if (edge.getTimeNextGreen() == 0){
+			double earliestTimeToReach = (edge.length - headPosition)/edge.getFreeFlowSpeedAtPos();
+			// If vehicle can pass the intersection before signal turns Read assign max speed
+			// Otherwise slowdown
+			if (earliestTimeToReach < (edge.getTimeNextRed())){
+				speedLimit = edge.getFreeFlowSpeedAtPos();
+			}
+			else{
+				speedLimit = (edge.length - headPosition)/(edge.getTimeNextRed()+50);
+				//speedLimit = edge.getFreeFlowSpeedAtPos()*0.5;
+			}
+		} else {
+			double speed = (edge.length*edge.headPositionOfVSL - headPosition)/(edge.getTimeNextGreen());
+
+			if (speed > edge.getFreeFlowSpeedAtPos()) {
+				speedLimit = edge.getFreeFlowSpeedAtPos();
+			} else { speedLimit = speed; }
+		}
 	}
 
 	public boolean isStartFromParking(double timeNow){
@@ -356,6 +386,13 @@ public class Vehicle {
 			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			// Update vehicle speed, which must be between 0 and free-flow speed
 			speed += acceleration / settings.numStepsPerSecond;
+
+
+			if (lane.edge.index == 2)
+				findTrafficLightSyncedSpeedLimit(lane.edge);
+			else
+				speedLimit = lane.edge.getFreeFlowSpeedAtPos();
+
 			if (speed > lane.edge.getFreeFlowSpeedAtPos(this.headPosition)) {
 				speed = lane.edge.getFreeFlowSpeedAtPos(this.headPosition);
 			}
@@ -369,6 +406,16 @@ public class Vehicle {
 				speed = 0;
 				acceleration = 0;
 			}
+
+			// Enable when TrafficLight-Synced speed limit is enabled
+			if ((speed > speedLimit) & (headPosition < lane.edge.headPositionOfVSL*lane.edge.length)){
+				speed = speedLimit;
+			}
+
+			if (headPosition > lane.edge.headPositionOfVSL*lane.edge.length*0.9)
+				if ( lane.edge.getTimeNextGreen() < 10) { // To safely cross the intersection
+					speed +=  this.driverProfile.IDM_a;
+				}
 
 			/*
 			 * Move forward in the current lane
@@ -669,6 +716,11 @@ public class Vehicle {
 					// update Road and Lane
 					lane.edge.addToVehicleLeft();
 					updateLane(newLane);
+
+					if (lane.edge.index == 2)
+						findTrafficLightSyncedSpeedLimit(lane.edge);
+					else
+						speedLimit = lane.edge.getFreeFlowSpeedAtPos();
 
 
 					// Remember the cluster of traffic lights

@@ -45,6 +45,9 @@ public class TrafficLightSchedule implements IntersectionControlSchedule{
         for (Movement movement : movementList) {
             LightColor color = getLight(movement, timeNow);
             movement.getControlEdge().setMovementLight(movement, color);
+
+            movement.getControlEdge().setTimeNextGreen(timeForTrafficSignal(movement, timeNow, LightColor.GYR_G));
+            movement.getControlEdge().setTimeNextRed(timeForTrafficSignal(movement, timeNow, LightColor.GYR_R));
         }
     }
 
@@ -60,6 +63,23 @@ public class TrafficLightSchedule implements IntersectionControlSchedule{
             return LightColor.KEEP_RED;
         }
     }
+
+    public double timeForTrafficSignal(Movement movement, double time, LightColor color){
+        for (LightPeriod lightPeriod : schedule){
+            if ((lightPeriod.getPhase().hasMovement(movement)) && lightPeriod.getColor() == color){
+                double timeToSignal  = lightPeriod.getStart() - time;
+                if ( timeToSignal > 0){
+                    return timeToSignal;
+                }
+                else return 0;
+            }
+        }
+        return 100;
+    }
+
+
+
+
 
     @Override
     public boolean isAllowedToPass(Vehicle vehicle) {

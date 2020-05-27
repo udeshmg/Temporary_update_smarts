@@ -3,6 +3,7 @@ package processor.worker;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import common.Settings;
@@ -233,9 +234,14 @@ public class Simulation {
 		// Clear one-step data
 		clearOneStepData();
 
-		//if (step % 18000 == 0){
-		//	resetTraffic();
-		//}
+		/*if (step % 1000 == 0){
+			System.out.println("Enter the speed factor: ");
+			Scanner scan = new Scanner(System.in);
+			int speedFactor = scan.nextInt();
+			System.out.println("Received: " + speedFactor);
+			trafficNetwork.edges.get(2).changeFreeFlowSpeed(speedFactor);
+			roadControlsToServer.add(new RoadControl(2, false, speedFactor));
+		}*/
 
 	}
 	public void waitForInit(){
@@ -245,7 +251,7 @@ public class Simulation {
 				extListner.waitForAction();
 				extListner.getRoadDirChange();
 
-				extListner.sendTrafficData(trafficNetwork);
+				extListner.sendTrafficData(trafficNetwork, timeNow);
 				extListnerInitCalled = true;
 
 				System.out.println("Initialize complete");
@@ -255,7 +261,7 @@ public class Simulation {
 
 	public void waitForActionsFromExternalClient(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.laneUpdateInterval == 1) {
+			if (step % settings.extListenerUpdateInterval == 1) {
 				System.out.println("Waiting...");
 				extListner.waitForAction();
 			}
@@ -265,8 +271,8 @@ public class Simulation {
 
 	public void sendTrafficData(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.laneUpdateInterval == 0 & step > 0) {
-				extListner.sendTrafficData(trafficNetwork);
+			if (step % settings.extListenerUpdateInterval == 0 & step > 0) {
+				extListner.sendTrafficData(trafficNetwork, timeNow);
 			}
 		}
 	}
@@ -337,13 +343,6 @@ public class Simulation {
 		return roadIndexes;
 	}
 
-	public  void markLanesToChange(){
-		for (final Edge edge : trafficNetwork.edges){
-			if (edge.index == 292){
-				edge.getLastLane().isDirectionChanging = true;
-			}
-		}
-	}
 
 	void moveVehiclesAroundBorder(List<Fellow> connectedFellows, double timeNow, List<Edge> pspBorderEdges){
 		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(timeNow, pspBorderEdges);

@@ -40,7 +40,7 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
     }
 
     @Override
-    public void getTrafficData(TrafficNetwork trafficNetwork) {
+    public void getTrafficData(TrafficNetwork trafficNetwork, double timeNow) {
         for (Edge edge : trafficNetwork.edges){
             edge.projectVehicles = 0;
         }
@@ -68,7 +68,7 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
     }
 
     @Override
-    public void sendTrafficData(TrafficNetwork trafficNetwork) {
+    public void sendTrafficData(TrafficNetwork trafficNetwork, double timeNow) {
 
     }
 

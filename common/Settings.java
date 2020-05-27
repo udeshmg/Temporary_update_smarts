@@ -39,7 +39,7 @@ public class Settings {
 	@Expose() public double numStepsPerSecond = 5;//This determines the step length.
 	@Expose() public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
 	@Expose() public int trafficReportStepGapInServerlessMode = 1;
-	@Expose() public int laneUpdateInterval = 300; // lane update time interval in steps
+	@Expose() public int extListenerUpdateInterval = 50; // lane update time interval in steps
 
 	/*
 	 * Display
@@ -149,14 +149,14 @@ public class Settings {
 	 */
 
 	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 50; // Frequency of traffic generation in steps
+	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 1;
 	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
 
 
-	@Expose() public boolean isExternalListenerUsed = true;
+	@Expose() public boolean isExternalListenerUsed = false;
 	/**
 	 * OD Distribution
 	 */

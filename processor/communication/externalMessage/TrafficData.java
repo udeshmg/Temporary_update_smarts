@@ -1,10 +1,12 @@
 package processor.communication.externalMessage;
 
-import common.Settings;
 import traffic.TrafficNetwork;
+import traffic.light.LightColor;
+import traffic.light.Movement;
+import traffic.light.TrafficLightCluster;
 import traffic.road.Edge;
 import traffic.road.Lane;
-import traffic.road.RoadNetwork;
+import traffic.road.Node;
 import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
 
@@ -22,7 +24,7 @@ public class TrafficData {
     }
 
 
-    public void setTrafficData(TrafficNetwork trafficNetwork){
+    public void setTrafficData(TrafficNetwork trafficNetwork, double timeNow) {
         for (Edge edge : trafficNetwork.edges) {
             RoadExternal roadExt = new RoadExternal();
             roadExt.setIndex(edge.index);
@@ -38,25 +40,22 @@ public class TrafficData {
             int numVehiclesStopped = 0;
             int numVehiclesOnMove = 0;
 
-            for (Lane lane : edge.getLanes()){
+            for (Lane lane : edge.getLanes()) {
                 numVehicles += lane.getVehicles().size();
-                for (Vehicle v : lane.getVehicles()){
+                for (Vehicle v : lane.getVehicles()) {
                     //numVehicles++;
-                    if (v.edgeBeforeTurnRight == edge){
+                    if (v.edgeBeforeTurnRight == edge) {
                         numVehiclesRight++;
-                    }
-                    else if (v.edgeBeforeTurnLeft == edge){
+                    } else if (v.edgeBeforeTurnLeft == edge) {
                         numVehiclesLeft++;
-                    }
-                    else {
+                    } else {
                         numVehiclesStraight++;
                     }
 
                     //if (v.headPosition > v.lane.edge.length*v.lane.edge.headPositionOfVSL){
-                    if (v.speed < 0.1){
+                    if (v.speed < 0.1) {
                         numVehiclesStopped++;
-                    }
-                    else{
+                    } else {
                         numVehiclesOnMove++;
                     }
                 }
@@ -76,10 +75,31 @@ public class TrafficData {
 
             roadExt.setSignalColor(edge.getTrafficLightColor());
             roadExt.setExitFlow(edge.getNumVehiclesLeftThisRoad());
+            roadExt.setTimeToGreen(mapTrafficLightsToEdges(trafficNetwork, edge, timeNow, LightColor.GYR_G));
+            roadExt.setTimeToRed(mapTrafficLightsToEdges(trafficNetwork, edge, timeNow, LightColor.GYR_R));
             //traffic details
             trafficData.add(roadExt);
         }
 
+        setVehicleData(trafficNetwork);
+
+    }
+
+    public double mapTrafficLightsToEdges(TrafficNetwork trafficNetwork, Edge edge, double timeNow, LightColor color){
+
+        Node node = edge.endNode;
+        TrafficLightCluster trafficLightCluster = trafficNetwork.lightCoordinator.clusterMap.get(node);
+
+        for (Movement movement : trafficLightCluster.getMovements()){
+            if ( movement.getControlEdge() == edge){
+                return trafficLightCluster.getLightSchedule().timeForTrafficSignal(movement, timeNow, color);
+            }
+        }
+        return 300.0;
+
+    }
+
+    public void setVehicleData(TrafficNetwork trafficNetwork){
         for (Vehicle v : trafficNetwork.vehicles){
             if (v.getNextRouteLegs().size() > 1) {
                 ArrayList<Integer> pathInInt = new ArrayList<>();

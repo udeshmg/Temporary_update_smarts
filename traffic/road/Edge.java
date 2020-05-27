@@ -31,7 +31,7 @@ public class Edge {
 	 * Variable speed controlled distance as a ratio to total road length
 	 */
 
-	public double headPositionOfVSL = 0.75; //
+	public double headPositionOfVSL = 0.92; //
 
 	/**
 	 * Number of vehicles that can be filled into this edge based on average
@@ -67,6 +67,12 @@ public class Edge {
 	 * Color of traffic light at the end of this edge.
 	 */
 	private Map<Movement, LightColor> lightColorMap;
+
+	/**
+	 * Keep the time to next green light and red light
+	 */
+
+	private double timeNextGreen = 0, timeNextRed = 0;
 
 	/**
 	 *  Keep a count of vehicles left at last green light phase
@@ -152,6 +158,22 @@ public class Edge {
 
 	public double getNumVehiclesLeft() {
 		return numVehiclesLeft;
+	}
+
+	public double getTimeNextGreen() {
+		return timeNextGreen;
+	}
+
+	public void setTimeNextGreen(double timeNextGreen) {
+		this.timeNextGreen = timeNextGreen;
+	}
+
+	public double getTimeNextRed() {
+		return timeNextRed;
+	}
+
+	public void setTimeNextRed(double timeNextRed) {
+		this.timeNextRed = timeNextRed;
 	}
 
 	private double numVehicles = 0;
