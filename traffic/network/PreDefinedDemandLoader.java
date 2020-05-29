@@ -63,8 +63,8 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         selectTrafficType(currentStep);
         int numVehicles = 0;
         if (true) {
-            if (currentStep % 18000 < 15000) {
-                if (counter == 0) numVehicles = rand.nextInt(50); //  getPoissonRandom(15, rand);
+            if (currentStep % 18000 < 12000) {
+                if (counter == 0) numVehicles = rand.nextInt(10); //  getPoissonRandom(15, rand);
                 if (counter == 1) {
                     if (currentStep % 180 < 5)
                         numVehicles = rand.nextInt(50);

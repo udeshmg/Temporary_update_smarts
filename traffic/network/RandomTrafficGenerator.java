@@ -13,6 +13,8 @@ public class RandomTrafficGenerator extends TrafficGenerator {
         super(odDistributor, temporalDistributor, vehicleTypeDistributor);
     }
 
+
+
     @Override
     public ArrayList<ODDemand> getGeneratedTraffic(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeStep) {
         ArrayList<ODDemand> ODMatrix = new ArrayList<>();

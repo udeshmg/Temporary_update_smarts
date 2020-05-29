@@ -28,13 +28,13 @@ import java.util.Random;
  */
 public class UniformTemporalDistributor extends TemporalDistributor{
 
-
+    private int numVehicles = 0;
 
     @Override
     public int getCurrentVehicleLimit(int amount, int currentStep, int maxStep) {
 
         if (currentStep < 12000) {
-            return getRandom().nextInt(amount);
+            return getRandom().nextInt(numVehicles);
         }
         else{
             return 0;
@@ -42,7 +42,8 @@ public class UniformTemporalDistributor extends TemporalDistributor{
     }
 
     @Override
-    public void getSettings(Settings settings) {
-
+    public void getSettings(Settings settings){
+        this.numVehicles = settings.demandPerOneInterval;
     }
+
 }

@@ -31,7 +31,7 @@ public class Edge {
 	 * Variable speed controlled distance as a ratio to total road length
 	 */
 
-	public double headPositionOfVSL = 0.92; //
+	public double headPositionOfVSL = 0.8; //
 
 	/**
 	 * Number of vehicles that can be filled into this edge based on average
