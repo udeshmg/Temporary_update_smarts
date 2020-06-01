@@ -529,7 +529,7 @@ public class Edge {
 			}
 		}
 
-		if ( vehicleCount < maxVehiclesAtTheEnd){
+		if ( vehicleCount < maxVehiclesAtTheEnd*getLaneCount()){
 			return true;
 		}
 		else {
@@ -552,7 +552,7 @@ public class Edge {
 
 		//When merging from higher lane to lower lane in a different road segment
 		if ((vehicle.lane.edge.getLaneCount() > lane.edge.getLaneCount()) && (vehicle.lane.laneNumber >= lane.edge.getLaneCount()-1)){
-			return hasSpaceInEndOfAllLane(lane);
+			//return hasSpaceInEndOfAllLane(lane);
 		}
 
 		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);

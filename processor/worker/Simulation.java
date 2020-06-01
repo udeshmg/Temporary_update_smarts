@@ -252,7 +252,7 @@ public class Simulation {
 
 	public void waitForActionsFromExternalClient(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.laneUpdateInterval == 1) {
+			if (step % settings.extListenerUpdateInterval == 1) {
 				System.out.println("Waiting...");
 				extListner.waitForAction();
 			}
@@ -262,7 +262,7 @@ public class Simulation {
 
 	public void sendTrafficData(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.laneUpdateInterval == 0 & step > 0) {
+			if (step % settings.extListenerUpdateInterval == 0 & step > 0) {
 				extListner.sendTrafficData(trafficNetwork);
 			}
 		}
