@@ -1,6 +1,7 @@
 package common;
 
 import java.nio.file.FileAlreadyExistsException;
+import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -149,14 +150,14 @@ public class Settings {
 	 */
 
 	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
+	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 20;
 	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
+	@Expose() public int movingAverageInterval = 30; // time-step in which vehicle details are sampled
 
 
-	@Expose() public boolean isExternalListenerUsed = false;
 	/**
 	 * OD Distribution
 	 */
@@ -182,6 +183,8 @@ public class Settings {
 	public int gridlockDetectionTime = 600;
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
+
+	@Expose() public boolean isExternalListenerUsed = false;
 	@Expose() public String externalListner = "CLLA";
 
 	/**

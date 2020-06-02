@@ -297,7 +297,7 @@ public class IDM {
 
 		boolean correctLane = true;
 		if (frontVehicle != null){
-			if ((vehicle.lane.edge != frontVehicle.lane.edge) && (vehicle.lane.laneNumber > laneBeingChecked.laneNumber)){
+			if ((vehicle.lane.edge != frontVehicle.lane.edge) ){
 				correctLane = false;
 			}
 		}

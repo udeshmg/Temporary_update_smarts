@@ -88,6 +88,7 @@ public class LaneManager implements ExternalSimulationListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        trafficNetwork.clearPaths();
     }
 
     public void sendTrafficData(TrafficNetwork trafficNetwork) {
@@ -121,6 +122,7 @@ public class LaneManager implements ExternalSimulationListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        trafficNetwork.clearPaths();
     }
 
     @Override

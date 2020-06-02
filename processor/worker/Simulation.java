@@ -10,11 +10,13 @@ import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.communication.externalMessage.RoadControl;
 import processor.communication.externalMessage.RoadIndex;
+import processor.communication.externalMessage.VehiclePathExternal;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
 import processor.communication.message.SerializableWorkerMetadata;
 import traffic.TrafficNetwork;
 import traffic.road.*;
+import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
 
 /**
@@ -40,6 +42,7 @@ public class Simulation {
 	ExternalSimulationListener extListner = null;
 	boolean extListnerInitCalled = false;
 	Settings settings;
+
 
 	public Simulation(Settings settings,int startStep, String roadGraph,
 					  int numLocalRandomPrivateVehicles, int numLocalRandomTrams, int numLocalRandomBuses,
@@ -283,7 +286,7 @@ public class Simulation {
 							laneChangedEdgeIndex.add(oppositeEdgeIndex);
 						}
 
-						if (edge.speed != 0){
+						if (edge.speed > 0){
 							trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
 						}
 					}
@@ -296,7 +299,7 @@ public class Simulation {
 
 
 	public void updateVehicleNumbers(){
-		if (step%30 == 0) {
+		if (step%settings.movingAverageInterval == 0) {
 			for (Edge edge : trafficNetwork.edges) {
 				int numVehicles = 0;
 				int numVehiclesRight = 0;
@@ -313,6 +316,9 @@ public class Simulation {
 						} else {
 							numVehiclesStraight++;
 						}
+
+						trafficNetwork.addVehiclePaths(v);
+
 					}
 
 				}

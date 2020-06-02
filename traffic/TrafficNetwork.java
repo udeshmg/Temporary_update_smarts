@@ -7,6 +7,7 @@ import java.util.*;
 
 import common.Settings;
 import processor.SimulationListener;
+import processor.communication.externalMessage.VehiclePathExternal;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableRouteLeg;
 import processor.communication.message.SerializableWorkerMetadata;
@@ -97,6 +98,8 @@ public class TrafficNetwork extends RoadNetwork {
 	List<Vehicle> finishedVehicles = new ArrayList<>();
 
 	private PriorityQueue<Vehicle> tripMakingVehicles;
+
+	private ArrayList<VehiclePathExternal> paths = new ArrayList<>();
 
 	/**
 	 * Initialize traffic network.
@@ -870,6 +873,31 @@ public class TrafficNetwork extends RoadNetwork {
 				}
 				inwardEdge.setEdgeLaneMap(edgeLaneMap);
 			}
+		}
+	}
+
+	public void clearPaths(){
+		paths.clear();
+	}
+
+	public ArrayList<VehiclePathExternal> getVehiclePaths(){
+		return paths;
+	}
+
+	public void addVehiclePaths(Vehicle v){
+		if (v.getNextRouteLegs().size() > 1) {
+			ArrayList<Integer> pathInInt = new ArrayList<>();
+			for (RouteLeg routeLeg : v.getNextRouteLegs()) {
+				pathInInt.add(routeLeg.edge.startNode.index);
+			}
+			if (v.getNextRouteLegs().size() > 1) {
+				Edge lastEdge = v.getNextRouteLegs().get(v.getNextRouteLegs().size() - 1).edge;
+				pathInInt.add(lastEdge.endNode.index);
+			}
+
+			int vehicleFraction = settings.extListenerUpdateInterval/settings.movingAverageInterval;
+
+			paths.add(new VehiclePathExternal(pathInInt, 1));
 		}
 	}
 

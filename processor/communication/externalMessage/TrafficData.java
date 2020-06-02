@@ -77,20 +77,7 @@ public class TrafficData {
             trafficData.add(roadExt);
         }
 
-        for (Vehicle v : trafficNetwork.vehicles){
-            if (v.getNextRouteLegs().size() > 1) {
-                ArrayList<Integer> pathInInt = new ArrayList<>();
-                for (RouteLeg routeLeg : v.getNextRouteLegs()) {
-                    pathInInt.add(routeLeg.edge.startNode.index);
-                }
-                if (v.getNextRouteLegs().size() > 1) {
-                    Edge lastEdge = v.getNextRouteLegs().get(v.getNextRouteLegs().size() - 1).edge;
-                    pathInInt.add(lastEdge.endNode.index);
-                }
+        paths = trafficNetwork.getVehiclePaths();
 
-
-                paths.add(new VehiclePathExternal(pathInInt, 1));
-            }
-        }
     }
 }

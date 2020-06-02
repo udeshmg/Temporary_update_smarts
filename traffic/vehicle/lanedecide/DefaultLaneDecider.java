@@ -44,6 +44,8 @@ public class DefaultLaneDecider extends LaneDecider {
                 Lane newLane = null;
                 if (nextEdge.getLaneCount() <= vehicle.lane.laneNumber) {
                     newLane = nextEdge.getLane(nextEdge.getLaneCount() - 1);
+
+
                 } else if (nextEdge.getLane(vehicle.lane.laneNumber).isDirectionChanging){
                     newLane = nextEdge.getLane(nextEdge.getLaneCount() - 2);
                 } else {

@@ -273,4 +273,19 @@ public class Lane {
 			}
 		}
 	}
+
+	/**
+	 * This methods finds number of vehicles at the end of the lane
+	 */
+
+	public int spaceLeftAtEnd(){
+		int vehicleCount = 0;
+		for(Vehicle v : vehicles){
+			if (v.headPosition < this.edge.getStartIntersectionSize()){
+				vehicleCount++;
+			}
+		}
+
+		return vehicleCount;
+	}
 }

@@ -40,6 +40,22 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
 
     }
 
+    private  void setDemandMatrix(){ //TODO: Implement if more than one traffic type
+        demandMatrix = new int[2][maxCounter];
+
+        for (int i = 0; i < maxCounter; i++){
+            if (i%2 == 0) {
+                demandMatrix[0][i] = demand;
+                demandMatrix[1][i] = 2;
+            } else {
+                demandMatrix[0][i] = 2;
+                demandMatrix[1][i] = demand;
+            }
+        }
+
+
+    }
+
     @Override
     public void getSettings(Settings settings){
         this.maxCounter = settings.numODPairs;
@@ -47,6 +63,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         this.demand = settings.demandPerOneInterval;
         this.isUnidirectional = settings.isUnidirectional;
         this.trafficGenarateDuration = settings.trafficGenerateDuration;
+        setDemandMatrix();
     }
 
     public int getFreq() {
