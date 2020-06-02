@@ -131,12 +131,12 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         selectTrafficType(currentStep);
         int numVehicles = 0;
         if (currentStep < trafficGenarateDuration) {
-            //if (currentStep % freq ) {
-            //    numVehicles = 0;
-            //}
-            // else {
-                numVehicles = demandMatrix[trafficType][counter];
-            //}
+            if (currentStep % freq < 250 ) {
+                numVehicles = 0;
+            }
+             else {
+              numVehicles = demandMatrix[trafficType][counter];
+            }
         }
         else
             numVehicles = 0;
