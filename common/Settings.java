@@ -149,10 +149,10 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
+	@Expose() public int demandPerOneInterval = 16; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 20;
-	@Expose() public int demandChangedFreq = 4500; // in steps
+	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
 	@Expose() public int movingAverageInterval = 30; // time-step in which vehicle details are sampled
@@ -168,7 +168,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Demand/ver2/";
+	public String defaultDownloadDirectory = "download/Demand/Demand_Amount/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -184,7 +184,7 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
-	@Expose() public boolean isExternalListenerUsed = true;
+	@Expose() public boolean isExternalListenerUsed = false;
 	@Expose() public String externalListner = "CLLA";
 
 	/**
@@ -198,8 +198,8 @@ public class Settings {
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_";
-		else return externalListner+"_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_";
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
+		else return externalListner+"_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
 	}
 
 	public TrafficGenerator getTrafficGenerator() {
