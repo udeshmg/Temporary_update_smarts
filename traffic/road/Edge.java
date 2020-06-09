@@ -33,6 +33,8 @@ public class Edge {
 
 	public double headPositionOfVSL = 0.8; //
 
+	public double headPositionVSLFreeZone = 0.3; //
+
 	/**
 	 * Number of vehicles that can be filled into this edge based on average
 	 * vehicle speed.

@@ -169,6 +169,9 @@ public class IDM {
 			}else if (factor == SlowdownFactor.QUEUE_SPILLBACK) {
 				updateImpedingObject_QueueSpillback(vehicle, examinedDist, indexLegOnRouteBeingChecked, impObj);
 			}
+			else if (factor == SlowdownFactor.EARLY_STOP){
+
+			}
 			if (impObj.headPosition < 0) {
 				examinedDist += vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked).length;
 				// Proceeds to the next leg on route if look-ahead distance is
@@ -556,6 +559,43 @@ public class IDM {
 			if(current == decision.getStartLane().edge && edgeBeingChecked == decision.getEndLane().edge){
 				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection) && vehicle.isNotWithinIntersections()){
 				//if ( !edgeBeingChecked.hasSpaceInEndOfAllLane(decision.getEndLane())){
+					//slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
+					slowdownObj.headPosition = examinedDist - current.headPositionOfVSL + vehicle.driverProfile.IDM_s0;
+					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
+					slowdownObj.speed = 0;
+//					slowdownObj.length = current.getEndIntersectionSize() + edgeBeingChecked.getStartIntersectionSize() - vehicle.driverProfile.IDM_s0;
+					slowdownObj.length = 0;
+					slowdownObj.factor = SlowdownFactor.QUEUE_SPILLBACK;
+				}
+			}
+		}
+	}
+
+
+	void updateImpedingObject_EarlyStop(final Vehicle vehicle, final double examinedDist,
+										final int indexLegOnRouteBeingChecked, final ImpedingObject slowdownObj) {
+		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
+		if(vehicle.getDecision() != null){
+			Vehicle.IntersectionDecision decision = vehicle.getDecision();
+			Edge current = vehicle.getCurrentEdge();
+			if(current == decision.getStartLane().edge && edgeBeingChecked == decision.getEndLane().edge){
+
+				if ( vehicle.headPosition < current.headPositionOfVSL){
+
+					double timeToNextRed = current.getTimeNextRed();
+					double numVehiclesFront = vehicle.lane.getVehiclesAboveHeadPosition(vehicle.headPosition).size();
+
+
+
+					if (!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection)){
+
+					}
+
+
+				}
+
+				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection) && vehicle.isNotWithinIntersections()){
+					//if ( !edgeBeingChecked.hasSpaceInEndOfAllLane(decision.getEndLane())){
 					slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
 					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 					slowdownObj.speed = 0;

@@ -47,6 +47,7 @@ public class Vehicle {
 	public double timeOfLastLaneChange = 0;
 	public boolean isRoadBlockedAhead = false;
 	public double speedLimit = 0;
+	public boolean stopAtTrafficLight = false;
 	/**
 	 * The ID of the latest light group. This vehicle will ignore other traffic
 	 * lights in the same group if it passes one of the lights in the group.
@@ -76,6 +77,8 @@ public class Vehicle {
 	private Node start;
 	private Node end;
 	private Settings settings;
+
+
 
 	public Vehicle(Settings settings){
 		this.settings = settings;
@@ -234,29 +237,47 @@ public class Vehicle {
 	}
 
 
+	public boolean isPlatoonLeaderStops(){
+		for (Vehicle v : lane.getVehiclesAboveHeadPosition(this.headPosition)){
+			if (v.stopAtTrafficLight){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void findTrafficLightSyncedSpeedLimit(Edge edge){
 
-		if (getRouteLegs().size() -  1 == this.indexLegOnRoute){
+		stopAtTrafficLight = false;
+		if (getRouteLegs().size() -  1 == this.indexLegOnRoute || headPosition < edge.length*edge.headPositionVSLFreeZone){
 			speedLimit =  edge.getFreeFlowSpeedAtPos(); // do not limit speed in last route leg as this vehicle does not stop at traffic signal
 		}
 		else {
+
+
+			double expectedQLength =  this.lane.getVehiclesAboveHeadPosition(this.headPosition).size() * this.length * 2;
+			double earliestTimeToReach = (edge.length - headPosition) / edge.getFreeFlowSpeedAtPos();
+
 			if (edge.getTimeNextGreen() == 0) {
-				double earliestTimeToReach = (edge.length - headPosition) / edge.getFreeFlowSpeedAtPos();
-				// If vehicle can pass the intersection before signal turns Read assign max speed
+
+				// If vehicle can pass the intersection before signal turns Red, assign max speed
 				// Otherwise slowdown
-				if (earliestTimeToReach < (edge.getTimeNextRed())) {
+				if ( (earliestTimeToReach < (edge.getTimeNextRed())-4) && !isPlatoonLeaderStops() ) {
 					speedLimit = edge.getFreeFlowSpeedAtPos();
+
 				} else {
-					speedLimit = (edge.length - headPosition) / (edge.getTimeNextRed() + 50);
+					speedLimit = (edge.length - headPosition - expectedQLength) / (edge.getTimeNextRed() + 50);
+					stopAtTrafficLight = true;
 					//speedLimit = edge.getFreeFlowSpeedAtPos()*0.5;
 				}
 			} else {
-				double speed = (edge.length * edge.headPositionOfVSL - headPosition) / Math.max(edge.getTimeNextGreen() - 3, 0.01);
+				double speed = (edge.length * edge.headPositionOfVSL - expectedQLength - headPosition) / Math.max(edge.getTimeNextGreen() - 3, 0.01);
 
 				if (speed > edge.getFreeFlowSpeedAtPos()) {
 					speedLimit = edge.getFreeFlowSpeedAtPos();
 				} else {
 					speedLimit = speed;
+					stopAtTrafficLight = true;
 				}
 			}
 		}
@@ -395,10 +416,7 @@ public class Vehicle {
 			speed += acceleration / settings.numStepsPerSecond;
 
 
-			//if (lane.edge.index == 2)
-				findTrafficLightSyncedSpeedLimit(lane.edge);
-			//else
-			//	speedLimit = lane.edge.getFreeFlowSpeedAtPos();
+			findTrafficLightSyncedSpeedLimit(lane.edge);
 
 			if (speed > lane.edge.getFreeFlowSpeedAtPos(this.headPosition)) {
 				speed = lane.edge.getFreeFlowSpeedAtPos(this.headPosition);
