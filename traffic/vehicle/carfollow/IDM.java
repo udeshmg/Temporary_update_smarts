@@ -430,7 +430,10 @@ public class IDM {
 			boolean stopAtLight = false;
 			if(movement != null) {
 				LightColor movementLight = targetEdge.getMovementLight(movement);
-				if ((movementLight == LightColor.GYR_R) || (movementLight == LightColor.KEEP_RED)) {
+				/*if (targetEdge.getTimeNextGreen() < 8){
+					stopAtLight = false;
+				}
+				else*/ if ((movementLight == LightColor.GYR_R) || (movementLight == LightColor.KEEP_RED)) {
 					stopAtLight = true;
 				} else if (movementLight == LightColor.GYR_Y) {
 					if (VehicleUtil.getBrakingDistance(vehicle) <= ((examinedDist + targetEdge.length) - vehicle.headPosition)) {
