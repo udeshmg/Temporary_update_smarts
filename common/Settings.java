@@ -149,7 +149,7 @@ public class Settings {
 	 */
 
 	@Expose() public int demandPerOneInterval = 50; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 30; // Frequency of traffic generation in steps
+	@Expose() public int demandGenerationTimeInterval = 90; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 1;
 	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;

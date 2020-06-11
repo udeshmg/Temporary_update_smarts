@@ -111,9 +111,12 @@ public class VehicleUtil {
 	 * Get the braking distance for stopping a vehicle completely.
 	 */
 	public static double getBrakingDistance(final Vehicle vehicle) {
-		return (vehicle.speed * vehicle.speed) / 2.0 / vehicle.driverProfile.IDM_b;
+		return (vehicle.speed * vehicle.speed) / (2.0 * vehicle.driverProfile.IDM_b);
 	}
 
+	public static double getExpectedDistanceInTime(final  Vehicle vehicle, double timeDuration){
+	    return vehicle.speed*timeDuration + Math.pow( vehicle.driverProfile.IDM_a, 2)/2;
+    }
 
 	public static boolean isNeedLaneChangeForTurn(Edge edgeBeingChecked, Vehicle vehicle, boolean isDriveOnLeft){
         int laneNumberBeingChecked = RoadUtil.getLaneNumberForTargetEdge(edgeBeingChecked, vehicle.lane.edge,

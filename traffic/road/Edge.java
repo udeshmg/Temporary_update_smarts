@@ -74,7 +74,7 @@ public class Edge {
 	 * Keep the time to next green light and red light
 	 */
 
-	private double timeNextGreen = 0, timeNextRed = 0;
+	private double timeNextGreen = 0, timeNextRed = 0, timeNextYellow = 0;
 
 	/**
 	 *  Keep a count of vehicles left at last green light phase
@@ -160,6 +160,14 @@ public class Edge {
 
 	public double getNumVehiclesLeft() {
 		return numVehiclesLeft;
+	}
+
+	public double getTimeNextYellow() {
+		return timeNextYellow;
+	}
+
+	public void setTimeNextYellow(double timeNextYellow) {
+		this.timeNextYellow = timeNextYellow;
 	}
 
 	public double getTimeNextGreen() {

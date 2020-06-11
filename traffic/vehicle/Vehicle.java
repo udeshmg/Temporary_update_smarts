@@ -248,11 +248,20 @@ public class Vehicle {
 
 	public void findTrafficLightSyncedSpeedLimit(Edge edge){
 
-		if (getRouteLegs().size() -  1 == this.indexLegOnRoute){
+		if (getRouteLegs().size() -  1 == this.indexLegOnRoute || this.headPosition < edge.length * edge.headPositionVSLFreeZone){
 			speedLimit =  edge.getFreeFlowSpeedAtPos(); // do not limit speed in last route leg as this vehicle does not stop at traffic signal
 		}
 		else {
-			if (edge.getTimeNextGreen() == 0) {
+			if (edge.getTimeNextRed() == 0) {
+				double speed = (edge.length * edge.headPositionOfVSL - headPosition) / Math.max(edge.getTimeNextGreen() - 5, 0.01);
+
+				if (speed > edge.getFreeFlowSpeedAtPos()) {
+					speedLimit = edge.getFreeFlowSpeedAtPos();
+				} else {
+					speedLimit = speed;
+				}
+			}
+			else  {
 				double earliestTimeToReach = (edge.length - headPosition) / edge.getFreeFlowSpeedAtPos();
 				// If vehicle can pass the intersection before signal turns Read assign max speed
 				// Otherwise slowdown
@@ -261,14 +270,6 @@ public class Vehicle {
 				} else {
 					speedLimit = (edge.length - headPosition) / (edge.getTimeNextRed() + 50);
 					//speedLimit = edge.getFreeFlowSpeedAtPos()*0.5;
-				}
-			} else {
-				double speed = (edge.length * edge.headPositionOfVSL - headPosition) / Math.max(edge.getTimeNextGreen() - 3, 0.01);
-
-				if (speed > edge.getFreeFlowSpeedAtPos()) {
-					speedLimit = edge.getFreeFlowSpeedAtPos();
-				} else {
-					speedLimit = speed;
 				}
 			}
 		}
@@ -429,9 +430,9 @@ public class Vehicle {
 			}
 
 			if (headPosition > lane.edge.headPositionOfVSL*lane.edge.length) {
-				if (lane.edge.getTimeNextGreen() < 10) { // To safely cross the intersection
-					speed +=  this.driverProfile.IDM_a;
-				}
+				//if (lane.edge.getTimeNextGreen() < 10) { // To safely cross the intersection
+					speed +=  this.driverProfile.IDM_a / settings.numStepsPerSecond;
+				//}
 			}
 
 			/*

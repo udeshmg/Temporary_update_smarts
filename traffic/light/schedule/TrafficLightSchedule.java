@@ -47,7 +47,12 @@ public class TrafficLightSchedule implements IntersectionControlSchedule{
             movement.getControlEdge().setMovementLight(movement, color);
 
             movement.getControlEdge().setTimeNextGreen(timeForTrafficSignal(movement, timeNow, LightColor.GYR_G));
-            movement.getControlEdge().setTimeNextRed(timeForTrafficSignal(movement, timeNow, LightColor.GYR_R));
+            movement.getControlEdge().setTimeNextYellow(timeForTrafficSignal(movement, timeNow, LightColor.GYR_Y));
+
+            if ( movement.getControlEdge().getTimeNextYellow() != 0 && movement.getControlEdge().getTimeNextGreen() != 0)
+                movement.getControlEdge().setTimeNextRed(0); // Red signal is in KEEP_RED state
+            else
+                movement.getControlEdge().setTimeNextRed(timeForTrafficSignal(movement, timeNow, LightColor.GYR_R));
         }
     }
 
