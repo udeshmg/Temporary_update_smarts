@@ -394,7 +394,19 @@ public class IDM {
 	/**
 	 * Find impeding object that is a traffic light.
 	 */
+
 	void updateImpedingObject_Light(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
+									final ImpedingObject slowdownObj){
+
+		if (settings.speedLimitController == "VSL")
+			updateImpedingObject_Light_VSL(vehicle, examinedDist, targetEdge, slowdownObj);
+		else if (settings.speedLimitController == "EARLY_STOP")
+			updateImpedingObject_Light_EarlyStop(vehicle, examinedDist, targetEdge, slowdownObj);
+		else
+			updateImpedingObject_Light_Normal(vehicle, examinedDist, targetEdge, slowdownObj);
+	}
+
+	void updateImpedingObject_Light_Normal(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
 									final ImpedingObject slowdownObj) {
 		/*
 		 * Checks traffic light at the end of the target lane's edge.
@@ -407,6 +419,66 @@ public class IDM {
 		    if(vehicle.headPosition > targetEdge.length - targetEdge.getEndIntersectionSize()){
 		        return;
             }
+			Movement movement = vehicle.getCurrentMovement();
+			if (vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge) {
+				LightColor movementLight = targetEdge.getMovementLight(movement);
+				if(movementLight == LightColor.GYR_Y) {
+					return;
+				}
+
+			}
+			// Ignore other lights if vehicle already passed one of the lights
+			// in the same group
+			if (targetEdge.endNode.idLightNodeGroup == vehicle.idLightGroupPassed) {
+				return;
+			}
+
+			// Flags the event that vehicle is within certain distance to light
+			if (targetEdge.endNode.light && (((examinedDist + targetEdge.length)
+					- vehicle.headPosition) < settings.trafficLightDetectionDistance)) {
+				targetEdge.isDetectedVehicleForLight = true;
+			}
+
+			boolean stopAtLight = false;
+			if(movement != null) {
+				LightColor movementLight = targetEdge.getMovementLight(movement);
+				/*if (targetEdge.getTimeNextGreen() < 8){
+					stopAtLight = false;
+				}
+				else*/ if ((movementLight == LightColor.GYR_R) || (movementLight == LightColor.KEEP_RED)) {
+					stopAtLight = true;
+				} else if (movementLight == LightColor.GYR_Y) {
+					if (VehicleUtil.getBrakingDistance(vehicle) <= ((examinedDist + targetEdge.length) - vehicle.headPosition)) {
+						stopAtLight = true;
+					}
+				}
+			}
+
+			if (stopAtLight) {
+				slowdownObj.speed = 0;
+				//TODO put a fix where edge lengths are shorter
+				slowdownObj.headPosition = examinedDist + targetEdge.length - (targetEdge.getEndIntersectionSize() - vehicle.driverProfile.IDM_s0);
+				slowdownObj.type = VehicleType.VIRTUAL_STATIC;
+				slowdownObj.length = 0;
+				//vehicle keeps the gap of IDM_S0 but here vehicles should go to the stop line
+				slowdownObj.factor = SlowdownFactor.LIGHT;
+			}
+		}
+	}
+
+	void updateImpedingObject_Light_VSL(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
+									final ImpedingObject slowdownObj) {
+		/*
+		 * Checks traffic light at the end of the target lane's edge.
+		 */
+		if (settings.trafficLightTiming != TrafficLightTiming.NONE) {
+			if (vehicle.type == VehicleType.PRIORITY) {
+				// Priority vehicle ignores any traffic light
+				return;
+			}
+			if(vehicle.headPosition > targetEdge.length * targetEdge.headPositionOfVSL){
+				return;
+			}
 			Movement movement = vehicle.getCurrentMovement();
 			if (vehicle.edgeBeforeTurnLeft == vehicle.lane.edge || vehicle.edgeBeforeTurnRight == vehicle.lane.edge) {
 				LightColor movementLight = targetEdge.getMovementLight(movement);
@@ -455,7 +527,8 @@ public class IDM {
 		}
 	}
 
-	void updateImpedingObject_Light_modified(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
+
+	void updateImpedingObject_Light_EarlyStop(final Vehicle vehicle, final double examinedDist, final Edge targetEdge,
 									final ImpedingObject slowdownObj) {
 		/*
 		 * Checks traffic light at the end of the target lane's edge.

@@ -183,6 +183,7 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 	@Expose() public String externalListner = "CLLA";
+	@Expose() public String speedLimitController = "VSL";
 
 	/**
 	 * External Listener Settings

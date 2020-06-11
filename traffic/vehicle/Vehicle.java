@@ -402,13 +402,24 @@ public class Vehicle {
 			findEdgeBeforeNextTurn();
 			//Update headway if there is a guidance on safety
 			updateHeadway();
+
+
+			if (settings.speedLimitController == "VSL") {
+				findTrafficLightSyncedSpeedLimit(lane.edge);
+			}
+
+
 			// Find impeding objects and compute acceleration based on the objects
 			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			// Update vehicle speed, which must be between 0 and free-flow speed
 			speed += acceleration / settings.numStepsPerSecond;
 
+			if (settings.speedLimitController == "VSL") {
+				if ((speed > speedLimit) & (headPosition < lane.edge.headPositionOfVSL * lane.edge.length)) {
+					speed = Math.max(0, speed - driverProfile.IDM_b / settings.numStepsPerSecond);
+				}
+			}
 
-			findTrafficLightSyncedSpeedLimit(lane.edge);
 
 			if (speed > lane.edge.getFreeFlowSpeedAtPos(this.headPosition)) {
 				speed = lane.edge.getFreeFlowSpeedAtPos(this.headPosition);
@@ -425,15 +436,13 @@ public class Vehicle {
 			}
 
 			// Enable when TrafficLight-Synced speed limit is enabled
-			if ((speed > speedLimit) & (headPosition < lane.edge.headPositionOfVSL*lane.edge.length)){
-				speed = speedLimit;
-			}
 
-			if (headPosition > lane.edge.headPositionOfVSL*lane.edge.length) {
+
+			//if (headPosition > lane.edge.headPositionOfVSL*lane.edge.length) {
 				//if (lane.edge.getTimeNextGreen() < 10) { // To safely cross the intersection
-					speed +=  this.driverProfile.IDM_a / settings.numStepsPerSecond;
+					//speed +=  this.driverProfile.IDM_a / settings.numStepsPerSecond;
 				//}
-			}
+			//}
 
 			/*
 			 * Move forward in the current lane
