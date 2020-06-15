@@ -223,6 +223,8 @@ public class Simulation {
 				timeNow);
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
+		
+		if (step%settings.movingAverageInterval == 0) trafficNetwork.updateStatistics();
 		updateVehicleNumbers();
 		//sendTrafficDataToExternal();
 

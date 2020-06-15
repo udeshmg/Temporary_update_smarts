@@ -221,6 +221,7 @@ public class Vehicle {
 			speed = 0;
 			lane.addVehicleToLane(this);
 			edge.setNextVehicleToGetIntoTheLane(null);
+			edge.setInflowPerStep();
 			return true;
 		}
 		return false;
@@ -666,6 +667,9 @@ public class Vehicle {
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
 					final Edge nextEdge = nextLeg.edge;
 					Lane newLane = decision.getEndLane();
+
+
+					nextEdge.setInflowPerStep();
 
 					updateLane(newLane);
 					// Remember the cluster of traffic lights

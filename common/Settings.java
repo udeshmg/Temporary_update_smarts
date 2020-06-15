@@ -112,7 +112,7 @@ public class Settings {
 	/*
 	 * Routing
 	 */
-	public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA;//Routing algorithm
+	@Expose() public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA_PLF;//Routing algorithm
 	public double minLengthOfRouteStartEndEdge = 20;//In meters. This may affect whether there is enough space to insert vehicle.
 	public List<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
 	public List<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
@@ -149,13 +149,13 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 16; // Amount of vehicles to generate at single time step
+	@Expose() public int demandPerOneInterval = 30; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 20;
 	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
-	@Expose() public int movingAverageInterval = 30; // time-step in which vehicle details are sampled
+	@Expose() public int movingAverageInterval = 300; // time-step in which vehicle details are sampled
 
 
 	/**

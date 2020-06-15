@@ -16,11 +16,7 @@ import traffic.light.LightCoordinator;
 import traffic.light.TrafficLightTiming;
 import traffic.network.ODDemand;
 import traffic.road.*;
-import traffic.routing.Dijkstra;
-import traffic.routing.RandomAStar;
-import traffic.routing.ReferenceBasedSearch;
-import traffic.routing.RouteLeg;
-import traffic.routing.Routing;
+import traffic.routing.*;
 import traffic.vehicle.DriverProfile;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleType;
@@ -269,6 +265,8 @@ public class TrafficNetwork extends RoadNetwork {
 			routingAlgorithm = new Dijkstra(this);
 		} else if (settings.routingAlgorithm == Routing.Algorithm.RANDOM_A_STAR) {
 			routingAlgorithm = new RandomAStar(this);
+		} else	 if (settings.routingAlgorithm == Routing.Algorithm.DIJKSTRA_PLF){
+			routingAlgorithm = new Dijkstra_LPF(this);
 		}
 
 	}
@@ -898,6 +896,13 @@ public class TrafficNetwork extends RoadNetwork {
 			int vehicleFraction = settings.extListenerUpdateInterval/settings.movingAverageInterval;
 
 			paths.add(new VehiclePathExternal(pathInInt, 1));
+		}
+	}
+
+
+	public void updateStatistics(){
+		for (Edge edge : edges){
+			edge.updateTrafficStatistics();
 		}
 	}
 

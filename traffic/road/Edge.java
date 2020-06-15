@@ -119,12 +119,61 @@ public class Edge {
 	 */
 	public int maxVehiclesAtTheEnd = 10;
 
+
+	/**
+	 * Traffic flow statistics
+	 */
+	private double inflow = 0;
+	private double outflow = 0;
+
+	private double inflow_unnorm = 0;
+	private double outflow_unnorm = 0;
+
+	private int inflowPerStep = 0;
+	private int outflowPerStep = 0;
+
+	private double flowComputeWindow = 0.9;
+	private int numVehicleOutPerLane = 15;
+
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
 	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
 	private List<Vehicle> chanceGivingVehicles = new ArrayList<>();
 	private LinkedHashMap<Edge, Integer> edgeLaneMap;
 
 	public int projectVehicles = 0;
+
+	public double getInflow() {
+		return inflow;
+	}
+
+
+	public double getOutflow() {
+		return outflow;
+	}
+
+	public void setOutflow(double outflow) {
+		this.outflow = outflow;
+	}
+
+	public int getInflowPerStep() {
+		int inflowCurrentStep = inflowPerStep;
+		inflowPerStep = 0;
+		return inflowCurrentStep;
+	}
+
+	public void setInflowPerStep() {
+		this.inflowPerStep++;
+	}
+
+	public int getOutflowPerStep() {
+		int outflowCurrentStep = outflowPerStep;
+		outflowPerStep = 0;
+		return outflowCurrentStep;
+	}
+
+	public void setOutflowPerStep() {
+		this.outflowPerStep++;
+	}
 
 	public double getNumVehicles() {
 		return numVehicles;
@@ -584,5 +633,25 @@ public class Edge {
 
 	public void setEdgeLaneMap(LinkedHashMap<Edge, Integer> edgeLaneMap) {
 		this.edgeLaneMap = edgeLaneMap;
+	}
+
+	private int iterator = 0;
+
+	public void updateTrafficStatistics(){
+		updateFlow();
+		iterator++;
+	}
+
+	public void updateFlow(){
+		//Inflow and Outflow is normalized to per lane
+		inflow_unnorm = flowComputeWindow*inflow_unnorm + (1 - flowComputeWindow)*getInflowPerStep();
+		inflow = inflow_unnorm/(1 - Math.pow(flowComputeWindow, iterator+1));
+
+		computeOutFlow();
+	}
+
+	public void  computeOutFlow(){
+		int fullSignalCycle = endNode.outwardEdges.size() * 45;
+		outflow = ( numVehicleOutPerLane * getLaneCount() * 300 ) / (fullSignalCycle*5);
 	}
 }
