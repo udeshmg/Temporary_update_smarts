@@ -565,7 +565,7 @@ public class IDM {
 			if(movement != null) {
 				LightColor movementLight = targetEdge.getMovementLight(movement);
 				if (movementLight != null) {
-					if (targetEdge.getTimeNextGreen() < 8 && targetEdge.getTimeNextGreen() > 0) {
+					if (targetEdge.getTimeNextGreen() < 5 && targetEdge.getTimeNextGreen() > 0) {
 						stopAtLight = false;
 					} else if ((movementLight == LightColor.GYR_R) || (movementLight == LightColor.KEEP_RED)) {
 						stopAtLight = true;
@@ -698,7 +698,7 @@ public class IDM {
 				if(!edgeBeingChecked.hasSpaceForAvehicleInBack(decision.getEndLane(), vehicle, settings.minTimeSafeToCrossIntersection) && vehicle.isNotWithinIntersections()){
 				//if ( !edgeBeingChecked.hasSpaceInEndOfAllLane(decision.getEndLane())){
 					//slowdownObj.headPosition = examinedDist - current.getEndIntersectionSize() + vehicle.driverProfile.IDM_s0;
-					slowdownObj.headPosition = examinedDist - current.headPositionOfVSL + vehicle.driverProfile.IDM_s0;
+					slowdownObj.headPosition =  examinedDist - current.headPositionOfVSL + vehicle.driverProfile.IDM_s0;;
 					slowdownObj.type = VehicleType.VIRTUAL_STATIC;
 					slowdownObj.speed = 0;
 //					slowdownObj.length = current.getEndIntersectionSize() + edgeBeingChecked.getStartIntersectionSize() - vehicle.driverProfile.IDM_s0;
