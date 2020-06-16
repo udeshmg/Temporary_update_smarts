@@ -119,6 +119,9 @@ public class Simulation {
 					// Update accumulated vehicle speed
 					accumulatedVehicleSpeed += vehicle.speed;
 					vehicle.reRoute(timeNow, trafficNetwork.routingAlgorithm);
+
+					vehicle.dynamicReRoute(timeNow, trafficNetwork.routingAlgorithm);
+
 					if(vehicle.isFinished()){
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
 					}
@@ -223,7 +226,7 @@ public class Simulation {
 				timeNow);
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
-		
+
 		if (step%settings.movingAverageInterval == 0) trafficNetwork.updateStatistics();
 		updateVehicleNumbers();
 		//sendTrafficDataToExternal();

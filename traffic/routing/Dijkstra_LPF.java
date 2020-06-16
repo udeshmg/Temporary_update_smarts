@@ -28,7 +28,10 @@ public class Dijkstra_LPF extends Routing {
 
         public double getTravelTime(){
             double freeFlowTravelTime = edge.length / edge.freeFlowSpeed;
-            double ratio = edge.getInflow()/edge.getOutflow();
+            double ratio = 0;
+            if (edge.getOutflow() != 0)
+                ratio = edge.getInflow()/edge.getOutflow();
+
             //compute LPF
             return freeFlowTravelTime * (1 + 0.15*Math.pow(ratio, 4)); //LPF equation
         }

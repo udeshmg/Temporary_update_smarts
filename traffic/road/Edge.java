@@ -132,7 +132,7 @@ public class Edge {
 	private int inflowPerStep = 0;
 	private int outflowPerStep = 0;
 
-	private double flowComputeWindow = 0.9;
+	private double flowComputeWindow = 0.8;
 	private int numVehicleOutPerLane = 15;
 
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
@@ -491,7 +491,10 @@ public class Edge {
 
 	public double getLaneChangeGiveChancePos(){
 		Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
-		return getLaneChangeWaitingPos() - v.driverProfile.IDM_s0 - v.length - v.driverProfile.IDM_s0 - 0.0001;
+		if (v == null)
+			return -1;
+		else
+			return getLaneChangeWaitingPos() - v.driverProfile.IDM_s0 - v.length - v.driverProfile.IDM_s0 - 0.0001;
 	}
 
 	public double getBeforeTurnLaneChangePos(Vehicle vehicle, boolean isDriveOnLeft){
@@ -554,8 +557,7 @@ public class Edge {
 				Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
 				if(vehicle != v && vehicle.headPosition < getLaneChangeGiveChancePos() && VehicleUtil.isNeedLaneChangeForTurn(lane.edge, vehicle,isDriveOnLeft)){
 					chanceGivingVehicles.add(vehicle);
-				}
-				if(vehicle.headPosition < getLaneChangeGiveChancePos() - vehicle.speed * (vehicle.driverProfile.IDM_T*vehicle.getHeadWayMultiplier())) {
+				} else if(vehicle.headPosition < getLaneChangeGiveChancePos() - vehicle.speed * (vehicle.driverProfile.IDM_T*vehicle.getHeadWayMultiplier())) {
 					chanceGivingVehicles.add(vehicle);
 				}
 			}

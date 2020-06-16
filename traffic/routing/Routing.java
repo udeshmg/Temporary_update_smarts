@@ -12,7 +12,7 @@ import traffic.vehicle.VehicleType;
 
 public abstract class Routing {
 	public enum Algorithm {
-		DIJKSTRA, RANDOM_A_STAR, DIJKSTRA_PLF
+		DIJKSTRA_LPF, RANDOM_A_STAR, DIJKSTRA
 	}
 
 	TrafficNetwork trafficNetwork;

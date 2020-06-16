@@ -1,7 +1,5 @@
 package common;
 
-import java.nio.file.FileAlreadyExistsException;
-import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -112,7 +110,8 @@ public class Settings {
 	/*
 	 * Routing
 	 */
-	@Expose() public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA_PLF;//Routing algorithm
+	@Expose() public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA_LPF;//Routing algorithm
+	@Expose() public boolean isDynamicRerouteAllowed = true; // uses to change the vehicle path
 	public double minLengthOfRouteStartEndEdge = 20;//In meters. This may affect whether there is enough space to insert vehicle.
 	public List<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
 	public List<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
@@ -163,7 +162,7 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	@Expose() public String trafficGenerator = "RushHour";
+	@Expose() public String trafficGenerator = "Random";
 	@Expose() public String odDistributor = "Random";
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -198,8 +197,8 @@ public class Settings {
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
-		else return externalListner+"_"+String.valueOf(demandPerOneInterval)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
+		else return externalListner+"_"+String.valueOf(routingAlgorithm)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
 	}
 
 	public TrafficGenerator getTrafficGenerator() {

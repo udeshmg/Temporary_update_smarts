@@ -7,7 +7,6 @@ import java.util.*;
 import common.Settings;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
-import traffic.TrafficNetwork;
 import traffic.light.Movement;
 import traffic.road.Edge;
 import traffic.road.Lane;
@@ -39,6 +38,7 @@ public class Vehicle {
 	public double earliestTimeToLeaveParking = 0;
 	public double timeTravel = 0;
 	public double timeJamStart = 0;
+	public double lastReRouted = 0;
 	public int numReRoute = 0;
 	public boolean isExternal = false;
 	public boolean isForeground = false;
@@ -587,6 +587,10 @@ public class Vehicle {
 				}
 			}
 
+			//if ((timeNow - timeJamStart) > 60){
+			//	reRoute = true;
+			//}
+
 			if (reRoute) {
 				// Cancel priority lanes
 				setPriorityLanes(false);
@@ -606,18 +610,46 @@ public class Vehicle {
 		}
 	}
 
+	public void dynamicReRoute(double timeNow, Routing routingAlgorithm){
+		/*
+		 * Re-route vehicle in certain situations
+		 */
+		if ((type != VehicleType.TRAM) && (settings.isDynamicRerouteAllowed)) {
+			boolean reRoute = false;
+			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
+			if (indexLegOnRoute < (getRouteLegs().size() - 1) && (headPosition < lane.edge.getEndIntersectionLaneChangeProhibitedPos())) {
+				if ((timeNow - lastReRouted) > 60){
+					reRoute = true;
+				}
+			}
+
+			if (reRoute) {
+				// Cancel priority lanes
+				setPriorityLanes(false);
+
+				// Reroute vehicle
+				boolean reRouted = dynamicReRoute(routingAlgorithm);
+
+				if (reRouted) {
+					// Reset jam start time
+					lastReRouted = timeNow;
+				}
+			}
+		}
+	}
+
 	/**
 	 * Create a new route from a given vehicle's current edge to its
 	 * destination. The new route must be different to the old route.
 	 */
-	private void reRoute(Routing routingAlgorithm) {
+	private boolean reRoute(Routing routingAlgorithm) {
 
 		List<RouteLeg> oldRoute = getRouteLegs();
 		int currentIndexOnOldRoute = indexLegOnRoute;
 
 		// No re-route if vehicle is on last leg
 		if (currentIndexOnOldRoute >= oldRoute.size() - 1) {
-			return;
+			return false;
 		}
 
 		// Copy earlier parts of old route to new route
@@ -634,11 +666,41 @@ public class Vehicle {
 			if (partialRoute != null && partialRoute.get(0).edge != oldRoute.get(currentIndexOnOldRoute + 1).edge) {
 				newRoute.addAll(partialRoute);
 				setRouteLegs(newRoute);
-				break;
+				return true;
 			}
 		}
+		return false;
 
 	}
+
+	private boolean dynamicReRoute(Routing routingAlgorithm) {
+
+		List<RouteLeg> oldRoute = getRouteLegs();
+		int currentIndexOnOldRoute = indexLegOnRoute;
+
+		// No re-route if vehicle is on last leg
+		if (currentIndexOnOldRoute >= oldRoute.size() - 1) {
+			return false;
+		}
+
+		// Copy earlier parts of old route to new route
+		ArrayList<RouteLeg> newRoute = new ArrayList<RouteLeg>();
+		for (int i = 0; i <= currentIndexOnOldRoute; i++) {
+			newRoute.add(oldRoute.get(i));
+		}
+
+		ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute + 1).edge.startNode,
+					oldRoute.get(oldRoute.size() - 1).edge.endNode, type);
+		if (partialRoute != null) {
+			newRoute.addAll(partialRoute);
+			setRouteLegs(newRoute);
+			return true;
+		}
+
+		return false;
+
+	}
+
 
 	public boolean isReachedFellow() {
 		return reachedFellow;

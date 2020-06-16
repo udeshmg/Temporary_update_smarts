@@ -74,6 +74,9 @@ public class TrafficNetwork extends RoadNetwork {
 	ArrayList<Edge> internalTramEndEdges = new ArrayList<>();
 	public ArrayList<Integer> laneIndexOfChangeDir = new ArrayList<>();
 	public Routing routingAlgorithm;
+	public RoutingAlgoFactory routingAlgoFactory;
+
+
 	Random random = new Random();
 	int numInternalVehicleAllTime = 0;
 	public int numInternalNonPublicVehicle = 0;
@@ -108,6 +111,7 @@ public class TrafficNetwork extends RoadNetwork {
 		addTramStopsToParallelNonTramEdges();
 		tripMakingVehicles = new PriorityQueue<>(getTripMakingVehicleComparator());
 		setCrossingIncreasingOrders();
+		routingAlgoFactory = new RoutingAlgoFactory();
 
 	}
 
@@ -261,13 +265,7 @@ public class TrafficNetwork extends RoadNetwork {
 		identifyReferencesOfAllPublicTransportTypesInSourceDestinationWindow();
 		computeAccumulatedDriverProfileDistribution();
 
-		if (settings.routingAlgorithm == Routing.Algorithm.DIJKSTRA) {
-			routingAlgorithm = new Dijkstra(this);
-		} else if (settings.routingAlgorithm == Routing.Algorithm.RANDOM_A_STAR) {
-			routingAlgorithm = new RandomAStar(this);
-		} else	 if (settings.routingAlgorithm == Routing.Algorithm.DIJKSTRA_PLF){
-			routingAlgorithm = new Dijkstra_LPF(this);
-		}
+		routingAlgorithm = routingAlgoFactory.getRoutingAlgo(settings.routingAlgorithm, this);
 
 	}
 
@@ -781,7 +779,7 @@ public class TrafficNetwork extends RoadNetwork {
 			if(!vehicle.isFinished()){
 				if(vehicle.lane != null && vehicle.lane.getFrontVehicleInLane().id == vehicle.id) {
 					if(timeNow - vehicle.getLastSpeedChangeTime() > settings.numStepsPerSecond * 300) {
-						System.out.println("Vehicle Stucked " + vehicle.id);
+						System.out.println("Vehicle Stucked " + vehicle.id + " at: " + vehicle.lane.edge.index);
 					}
 				}
 			}else{

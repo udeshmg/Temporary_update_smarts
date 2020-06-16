@@ -225,7 +225,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		lblRouting.setFont(new Font("Tahoma", Font.PLAIN, 13));
 
 		comboBoxRouting = new JComboBox(new Object[] {});
-		comboBoxRouting.setModel(new DefaultComboBoxModel(new String[] { "DIJKSTRA", "RANDOM_A_STAR" }));
+		comboBoxRouting.setModel(new DefaultComboBoxModel(new String[] { "DIJKSTRA", "RANDOM_A_STAR", "DIJKSTRA_LPF" }));
 		comboBoxRouting.setSelectedIndex(0);
 		comboBoxRouting.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		final GridBagConstraints gbc_chckbxIncludePublicVehicles = new GridBagConstraints();
@@ -632,7 +632,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		settings.numStepsPerSecond = Double.parseDouble(textField_NumStepsPerSec.getText());
 		settings.lookAheadDistance = Double.parseDouble(textField_lookAheadDist.getText());
 		settings.trafficLightTiming = LightUtil.getLightTypeFromString((String) comboBoxTrafficLight.getSelectedItem());
-		settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString((String) comboBoxRouting.getSelectedItem());
+		//settings.routingAlgorithm = RouteUtil.getRoutingAlgorithmFromString((String) comboBoxRouting.getSelectedItem()); TODO: Temp disable from GUI
 
 		gui.processor.setupNewSim();
 		monitor.startSetupProgress();
