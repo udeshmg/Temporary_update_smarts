@@ -891,16 +891,62 @@ public class TrafficNetwork extends RoadNetwork {
 				pathInInt.add(lastEdge.endNode.index);
 			}
 
-			int vehicleFraction = settings.extListenerUpdateInterval/settings.movingAverageInterval;
+			int vehicleFraction = settings.extListenerUpdateInterval/settings.mvgVehicleCount;
 
 			paths.add(new VehiclePathExternal(pathInInt, 1));
 		}
 	}
 
 
-	public void updateStatistics(){
-		for (Edge edge : edges){
-			edge.updateTrafficStatistics();
+	public void updateStatistics(int step){
+
+		/**
+		 * Add stat collectors here
+		 */
+		updateFlow(step);
+		updateVehicleNumbers(step);
+
+	}
+
+	/**
+	 * Stat collectors
+	 */
+
+	public  void updateFlow(int step){
+		if (step%settings.mvgFlow == 0) {
+			for (Edge edge : edges) {
+				edge.updateTrafficStatistics();
+			}
+		}
+	}
+
+
+	public void updateVehicleNumbers(int step){
+		if (step%settings.mvgVehicleCount == 0) {
+			for (Edge edge : edges) {
+				int numVehicles = 0;
+				int numVehiclesRight = 0;
+				int numVehiclesStraight = 0;
+				int numVehiclesLeft = 0;
+				for (Lane lane : edge.getLanes()) {
+					numVehicles += lane.getVehicles().size();
+					for (Vehicle v : lane.getVehicles()) {
+						numVehicles++;
+						if (v.edgeBeforeTurnRight == edge) {
+							numVehiclesRight++;
+						} else if (v.edgeBeforeTurnLeft == edge) {
+							numVehiclesLeft++;
+						} else {
+							numVehiclesStraight++;
+						}
+
+						addVehiclePaths(v);
+
+					}
+
+				}
+				edge.updateVehicleNumbers(numVehicles, numVehiclesStraight, numVehiclesRight, numVehiclesLeft);
+			}
 		}
 	}
 

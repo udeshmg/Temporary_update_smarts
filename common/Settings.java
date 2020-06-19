@@ -112,6 +112,7 @@ public class Settings {
 	 */
 	@Expose() public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA_LPF;//Routing algorithm
 	@Expose() public boolean isDynamicRerouteAllowed = true; // uses to change the vehicle path
+	@Expose() public double routeUpdateInterval  = 60;
 	public double minLengthOfRouteStartEndEdge = 20;//In meters. This may affect whether there is enough space to insert vehicle.
 	public List<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
 	public List<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
@@ -148,13 +149,14 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 30; // Amount of vehicles to generate at single time step
+	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 20;
 	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
 	@Expose() public int trafficGenerateDuration = 12000; // in steps
-	@Expose() public int movingAverageInterval = 300; // time-step in which vehicle details are sampled
+	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
+	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
 
 	/**
@@ -162,7 +164,7 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	@Expose() public String trafficGenerator = "Random";
+	@Expose() public String trafficGenerator = "RushHour";
 	@Expose() public String odDistributor = "Random";
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
@@ -183,22 +185,14 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
-	@Expose() public boolean isExternalListenerUsed = false;
-	@Expose() public String externalListner = "CLLA";
-
-	/**
-	 * External Listener Settings
-	 */
-	public void setSettingsToFile(){
-		// implement seralized settings
-
-	}
+	@Expose() public boolean isExternalListenerUsed = true;
+	@Expose() public String externalListener = "LLA";
 
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
-		else return externalListner+"_"+String.valueOf(routingAlgorithm)+"_"+demandChangedFreq+"_"+demandPerOneInterval;
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+isDynamicRerouteAllowed+"_"+demandPerOneInterval+"_";
+		else return externalListener +"_"+String.valueOf(routingAlgorithm)+"_"+isDynamicRerouteAllowed+"_"+demandPerOneInterval+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {
@@ -211,7 +205,7 @@ public class Settings {
 	}
 
 	public ExternalSimulationListener getExternalSimulationListener(){
-		return dictionary.getExternalSimulationListener(externalListner);
+		return dictionary.getExternalSimulationListener(externalListener);
 	}
 
 	public ODDistributor getODDistributor(){

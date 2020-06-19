@@ -247,9 +247,6 @@ public class Vehicle {
 				laneChangeDecision = laneChange.dynamicLaneChange(this);
 			}
 
-			if (laneChangeDecision == LaneChangeDirection.SAME) {
-				laneChangeDecision = laneChange.dynamicLaneChange(this);
-			}
 
 			if (laneChangeDecision != LaneChangeDirection.SAME) {
 
@@ -618,7 +615,7 @@ public class Vehicle {
 			boolean reRoute = false;
 			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
 			if (indexLegOnRoute < (getRouteLegs().size() - 1) && (headPosition < lane.edge.getEndIntersectionLaneChangeProhibitedPos())) {
-				if ((timeNow - lastReRouted) > 60){
+				if ((timeNow - lastReRouted) > settings.routeUpdateInterval){
 					reRoute = true;
 				}
 			}

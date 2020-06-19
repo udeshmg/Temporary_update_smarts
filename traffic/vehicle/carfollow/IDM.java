@@ -515,7 +515,7 @@ public class IDM {
 		Edge edgeBeingChecked = vehicle.getRouteLegEdge(indexLegOnRouteBeingChecked);
 		if (edgeBeingChecked == vehicle.edgeBeforeTurnLeft || edgeBeingChecked == vehicle.edgeBeforeTurnRight) {
 			// Block vehicle if vehicle's lane cannot be used for turning
-			boolean isNeedToBlock = VehicleUtil.isNeedLaneChangeForTurn(edgeBeingChecked, vehicle, settings.isDriveOnLeft);
+			boolean isNeedToBlock = false; //TODO = VehicleUtil.isNeedLaneChangeForTurn(edgeBeingChecked, vehicle, settings.isDriveOnLeft);
 			if (isNeedToBlock) {
 				slowdownObj.headPosition = examinedDist + edgeBeingChecked.getBeforeTurnLaneChangePos(vehicle, settings.isDriveOnLeft)
 						+ vehicle.driverProfile.IDM_s0; //TODO this should be properly implemented, may not work for realworld networks
@@ -525,9 +525,9 @@ public class IDM {
 				slowdownObj.factor = SlowdownFactor.TURN;
 			} else {
 				slowdownObj.headPosition = examinedDist + edgeBeingChecked.length
-						+ (VehicleType.VIRTUAL_SLOW.maxSpeed * 3);//The virtual object is a few seconds ahead
-				slowdownObj.type = VehicleType.VIRTUAL_SLOW;
-				slowdownObj.speed = VehicleType.VIRTUAL_SLOW.maxSpeed;
+						+ (VehicleType.CAR.maxSpeed * 3);//The virtual object is a few seconds ahead
+				slowdownObj.type = VehicleType.CAR;
+				slowdownObj.speed = VehicleType.CAR.maxSpeed;
 				slowdownObj.length = 0;
 				slowdownObj.factor = SlowdownFactor.TURN;
 			}

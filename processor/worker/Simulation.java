@@ -10,13 +10,11 @@ import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.communication.externalMessage.RoadControl;
 import processor.communication.externalMessage.RoadIndex;
-import processor.communication.externalMessage.VehiclePathExternal;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
 import processor.communication.message.SerializableWorkerMetadata;
 import traffic.TrafficNetwork;
 import traffic.road.*;
-import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
 
 /**
@@ -227,8 +225,7 @@ public class Simulation {
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 
-		if (step%settings.movingAverageInterval == 0) trafficNetwork.updateStatistics();
-		updateVehicleNumbers();
+		trafficNetwork.updateStatistics(step);
 		//sendTrafficDataToExternal();
 
 		// Wait for External agent for send instructions after number of time sreps
@@ -300,37 +297,6 @@ public class Simulation {
 		}
 	}
 
-
-
-
-	public void updateVehicleNumbers(){
-		if (step%settings.movingAverageInterval == 0) {
-			for (Edge edge : trafficNetwork.edges) {
-				int numVehicles = 0;
-				int numVehiclesRight = 0;
-				int numVehiclesStraight = 0;
-				int numVehiclesLeft = 0;
-				for (Lane lane : edge.getLanes()) {
-					numVehicles += lane.getVehicles().size();
-					for (Vehicle v : lane.getVehicles()) {
-						numVehicles++;
-						if (v.edgeBeforeTurnRight == edge) {
-							numVehiclesRight++;
-						} else if (v.edgeBeforeTurnLeft == edge) {
-							numVehiclesLeft++;
-						} else {
-							numVehiclesStraight++;
-						}
-
-						trafficNetwork.addVehiclePaths(v);
-
-					}
-
-				}
-				edge.updateVehicleNumbers(numVehicles, numVehiclesStraight, numVehiclesRight, numVehiclesLeft);
-			}
-		}
-	}
 
 
 

@@ -22,6 +22,7 @@ public class Edge {
 	public Node endNode;
 	public RoadType type;
 	public String name;
+	public Settings settings;
 	/**
 	 * Free flow speed of vehicles
 	 */
@@ -133,7 +134,7 @@ public class Edge {
 	private int outflowPerStep = 0;
 
 	private double flowComputeWindow = 0.8;
-	private int numVehicleOutPerLane = 15;
+	private int numVehicleOutPerLane = 12;
 
 	private Vehicle currentVehicleInBeforeTurnLaneChangePos = null;
 	private Map<Vehicle, Double> laneChangePositions = new HashMap<>();
@@ -199,7 +200,7 @@ public class Edge {
 	public Edge(final int importedStartNodeIndex, final int importedEndNodeIndex, final String type, final String name,
 			final double maxspeed, final boolean roundabout, final List<String> tramRoutesRef,
 			final List<String> busRoutesRef, final int numRightLanes, final int numLeftLanes,
-			final int numRightOnlyLanes, final int numLeftOnlyLanes) {
+			final int numRightOnlyLanes, final int numLeftOnlyLanes, Settings settings) {
 		super();
 		this.importedStartNodeIndex = importedStartNodeIndex;
 		this.importedEndNodeIndex = importedEndNodeIndex;
@@ -217,6 +218,7 @@ public class Edge {
 		this.numRightLanes = numRightLanes;
 		this.numRightOnlyLanes = numRightOnlyLanes;
 		this.lightColorMap = new HashMap<>();
+		this.settings = settings;
 	}
 
 	public void clearVehicles(){
@@ -492,7 +494,7 @@ public class Edge {
 	public double getLaneChangeGiveChancePos(){
 		Vehicle v = currentVehicleInBeforeTurnLaneChangePos;
 		if (v == null)
-			return -1;
+			return getLaneChangeWaitingPos();
 		else
 			return getLaneChangeWaitingPos() - v.driverProfile.IDM_s0 - v.length - v.driverProfile.IDM_s0 - 0.0001;
 	}
@@ -654,6 +656,6 @@ public class Edge {
 
 	public void  computeOutFlow(){
 		int fullSignalCycle = endNode.outwardEdges.size() * 45;
-		outflow = ( numVehicleOutPerLane * getLaneCount() * 300 ) / (fullSignalCycle*5);
+		outflow = ( numVehicleOutPerLane * getLaneCount() * settings.mvgFlow) / (fullSignalCycle*settings.numStepsPerSecond);
 	}
 }

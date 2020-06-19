@@ -546,7 +546,7 @@ public class RoadNetwork {
 					busRoutesRef.clear();
 				}
 				final Edge edge = new Edge(startNodeIndex, endNodeIndex, type, nameEdge, maxspeed, roundabout,
-						tramRoutesRef, busRoutesRef, numRightLanes, numLeftLanes, numRightOnlyLanes, numLeftOnlyLanes);
+						tramRoutesRef, busRoutesRef, numRightLanes, numLeftLanes, numRightOnlyLanes, numLeftOnlyLanes, settings);
 				edges.add(edge);
 				createLanes(edge, numLanes);
 				node.outwardEdges.add(edge);
