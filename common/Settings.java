@@ -62,7 +62,7 @@ public class Settings {
 	/*
 	 * Input
 	 */
-	@Expose() public String inputSimulationScript = "script.txt";//Simulation setup file when GUI is not used
+	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
 	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
@@ -169,7 +169,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Demand/Demand_Amount/";
+	public String defaultDownloadDirectory = "download/Journal/BN/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -186,13 +186,13 @@ public class Settings {
 	public String laneDecide = "UNBALANCED";
 
 	@Expose() public boolean isExternalListenerUsed = true;
-	@Expose() public String externalListener = "LLA";
+	@Expose() public String externalListener = "DLA";
 
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+isDynamicRerouteAllowed+"_"+demandPerOneInterval+"_";
-		else return externalListener +"_"+String.valueOf(routingAlgorithm)+"_"+isDynamicRerouteAllowed+"_"+demandPerOneInterval+"_";
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		else return externalListener +"__9_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {

@@ -891,7 +891,7 @@ public class TrafficNetwork extends RoadNetwork {
 				pathInInt.add(lastEdge.endNode.index);
 			}
 
-			int vehicleFraction = settings.extListenerUpdateInterval/settings.mvgVehicleCount;
+			double vehicleFraction = settings.mvgVehicleCount/settings.extListenerUpdateInterval;
 
 			paths.add(new VehiclePathExternal(pathInInt, 1));
 		}

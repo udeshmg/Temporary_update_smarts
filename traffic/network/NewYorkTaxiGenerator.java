@@ -19,7 +19,10 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
         super();
         tfl = new TrafficLoader();
         setVehicleTypeDistributor(new DefaultVehicleTypeDistributor());
-        tfl.setTimeLimitRead(1080, 1110);
+        tfl.setTimeLimitRead(600, 630);
+
+        setOdDistributor(new PredefinedODLoader(0));
+        setTemporalDistributor(new PreDefinedDemandLoader(1));
     }
 
     @Override

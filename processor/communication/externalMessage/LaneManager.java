@@ -54,7 +54,6 @@ public class LaneManager implements ExternalSimulationListener {
         Gson gson = new Gson();
         RoadExternal rd = new RoadExternal();
         String str = gson.toJson(roadGraph);
-        System.out.println("GSON output: " + str);
 
         sendNReceiveMessage(str);
         try {
@@ -81,7 +80,7 @@ public class LaneManager implements ExternalSimulationListener {
         Gson gson = new Gson();
         String str = gson.toJson(trafficData);
 
-        System.out.println("GSON output: " + str);
+
         sendMessage(str); //update for server side
         try {
             Thread.sleep(100);
@@ -115,13 +114,7 @@ public class LaneManager implements ExternalSimulationListener {
         }
 
 
-        System.out.println("GSON output: " + toSend);
         sendMessage(toSend);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         trafficNetwork.clearPaths();
     }
 

@@ -69,8 +69,32 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
 
     @Override
     public void sendTrafficData(TrafficNetwork trafficNetwork) {
+        for (Edge edge : trafficNetwork.edges){
+            edge.projectVehicles = 0;
+        }
+
+        for (Vehicle v : trafficNetwork.newVehiclesforDemandEstimation){
+            if (v.getNextRouteLegs().size() > 1) {
+                for (RouteLeg routeLeg : v.getNextRouteLegs()){
+                    routeLeg.edge.projectVehicles++;
+                }
+            }
+        }
+        trafficNetwork.newVehiclesforDemandEstimation.clear();
+
+        for (Edge edge : trafficNetwork.edges){
+            Edge oppositeEdge = edge.getOppositeEdge();
+
+            if ((oppositeEdge.projectVehicles/oppositeEdge.getLaneCount()) > 3 * (edge.projectVehicles/edge.getLaneCount())){
+                rdIndex.edges.add(new RoadControl(oppositeEdge.index, true, 0));
+            }
+            else if (( edge.projectVehicles/edge.getLaneCount()) > 3 * (oppositeEdge.projectVehicles/oppositeEdge.getLaneCount())){
+                rdIndex.edges.add(new RoadControl(edge.index, true, 0));
+            }
+        }
 
     }
+
 
     @Override
     public void setSettings(Settings settings) {

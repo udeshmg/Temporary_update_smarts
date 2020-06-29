@@ -7,7 +7,9 @@ import java.util.*;
 import common.Settings;
 import traffic.light.LightColor;
 import traffic.light.Movement;
+import traffic.vehicle.DriverProfile;
 import traffic.vehicle.Vehicle;
+import traffic.vehicle.VehicleType;
 import traffic.vehicle.VehicleUtil;
 
 /**
@@ -144,6 +146,10 @@ public class Edge {
 	public int projectVehicles = 0;
 
 	public double getInflow() {
+		/*computeRoadCapacity();
+		if (capacity < numVehicles){
+			return  outflow*2;
+		}*/
 		return inflow;
 	}
 
@@ -170,6 +176,11 @@ public class Edge {
 		int outflowCurrentStep = outflowPerStep;
 		outflowPerStep = 0;
 		return outflowCurrentStep;
+	}
+
+
+	void computeRoadCapacity(){
+		capacity = ( (length -  getEndIntersectionSize()) / (VehicleType.CAR.length + DriverProfile.HIGHLY_POLITE.IDM_s0 )) * getLaneCount();
 	}
 
 	public void setOutflowPerStep() {
@@ -586,7 +597,7 @@ public class Edge {
 			return true;
 		}
 		else {
-			System.out.println("Blocked by Queue spill-back");
+			//System.out.println("Blocked by Queue spill-back");
 			return false;
 		}
 	}
@@ -595,7 +606,7 @@ public class Edge {
 		Vehicle last = lane.getLastVehicleInLane();
 		double startPos = lane.edge.length - lane.edge.getEndIntersectionSize();
 		if(last != null){
-			startPos = last.headPosition - last.length + last.speed * minTimeSafeToCrossIntersection;
+			startPos = last.headPosition - last.length + last.speed * minTimeSafeToCrossIntersection + Math.pow(last.acceleration, 2)*0.5;
 		}
 		double expectedFill = 0;
 		for (Vehicle v : lane.vehiclesStartedMovingTowards(vehicle)) {

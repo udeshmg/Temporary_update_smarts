@@ -38,7 +38,7 @@ public class ConsoleUI {
     public void acceptInitialConfigFromConsole() {
         // Let user input number of workers
         System.out.println("Please specify the number of workers.");
-        Settings.numWorkers = Integer.parseInt(sc.nextLine());
+        //Settings.numWorkers = Integer.parseInt(sc.nextLine());
         while (Settings.numWorkers <= 0) {
             System.out.println("Please specify the number of workers.");
             Settings.numWorkers = Integer.parseInt(sc.nextLine());
@@ -69,7 +69,7 @@ public class ConsoleUI {
 
     public void acceptSimScriptFromConsole() {
         System.out.println("Please specify the simulation script path.");
-        processor.getSettings().inputSimulationScript = sc.nextLine();
+        //processor.getSettings().inputSimulationScript = sc.nextLine();
         while (!processor.loadScript()) {
             System.out.println("Please specify the simulation script path.");
             processor.getSettings().inputSimulationScript = sc.nextLine();
@@ -79,16 +79,17 @@ public class ConsoleUI {
 
     void acceptSimStartCommandFromConsole() {
         System.out.println("Ready to simulate. Start (y/n)?");
-        String choice = sc.nextLine();
-        if (choice.equals("y") || choice.equals("Y")) {
-            startSimulationFromLoadedScript();
-        } else if (choice.equals("n") || choice.equals("N")) {
-            System.out.println("Quit system.");
-            processor.onClose();
-            System.exit(0);
-        } else {
-            System.out.println("Ready to simulate. Start (y/n)?");
-        }
+        //String choice = sc.nextLine();
+        //if (choice.equals("y") || choice.equals("Y")) {
+        //    startSimulationFromLoadedScript();
+        //} else if (choice.equals("n") || choice.equals("N")) {
+        //    System.out.println("Quit system.");
+        //    processor.onClose();
+        //    System.exit(0);
+        //} else {
+        //    System.out.println("Ready to simulate. Start (y/n)?");
+        //}
+        startSimulationFromLoadedScript(); 
     }
 
 }

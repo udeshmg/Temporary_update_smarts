@@ -135,7 +135,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
                 numVehicles = 0;
             }
              else {
-              numVehicles = demandMatrix[trafficType][counter];
+              numVehicles = demandMatrix[trafficType][0];
             }
         }
         else

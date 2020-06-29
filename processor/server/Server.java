@@ -263,7 +263,6 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 	public void setupNewSim() {
 		data.resetVariablesForSetup();
 		receivedTrafficReportCache.clear();
-		data.initFileOutput();
 
 		if (settings.isVisualize == false) data.loadSettingsFromScript();
 		//data.initRoadNetwork();
@@ -272,6 +271,7 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		if (settings.isNewEnvironment) {
 				changeMap();
 		}
+		data.initFileOutput();
 		assignODWindows();
 		final RouteLoader routeLoader = new RouteLoader(data.getRoadNetwork());
 		List<SerializableExternalVehicle> vehicleList = routeLoader.loadRoutes(settings.inputForegroundVehicleFile, settings.inputBackgroundVehicleFile);
@@ -357,9 +357,9 @@ public class Server implements MessageHandler, Runnable, SimulationProcessor {
 		}
 
 		System.out.println("Simulation stopped.\n");
-		if (workerMetas.size() == settings.numWorkers) {
-			data.prepareForSetupAgain();
-		}
+		//if (workerMetas.size() == settings.numWorkers) {
+		//	data.prepareForSetupAgain();
+		//}
 	}
 
 

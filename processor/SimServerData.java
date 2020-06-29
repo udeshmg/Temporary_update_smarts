@@ -395,14 +395,13 @@ public class SimServerData {
         if (experiment.getOsmMapFile() != null && !experiment.getOsmMapFile().equals("-")) {
             settings.inputOpenStreetMapFile = experiment.getOsmMapFile();
             isNewMap = true;
-        } else {
-            settings.inputOpenStreetMapFile = "";
         }
+
         settings.trafficLightTiming = experiment.getTrafficLightTiming();
-        settings.routingAlgorithm = experiment.getRoutingAlgorithm();
+        if (experiment.getRoutingAlgorithm() != null) settings.routingAlgorithm = experiment.getRoutingAlgorithm();
         settings.trafficReportStepGapInServerlessMode = experiment.getTrafficReportStepGapInServerlessMode();
         settings.isAllowReroute = experiment.isAllowReroute();
-        settings.downloadDirectory = experiment.getDownLoadDirectory();
+        //settings.downloadDirectory = experiment.getDownLoadDirectory();
         settings.testName = experiment.getTestName();
 
         if (experiment.getOdDistributor() != null) settings.odDistributor = experiment.getOdDistributor();
