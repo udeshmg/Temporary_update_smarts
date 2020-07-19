@@ -120,7 +120,7 @@ public class Edge {
 	 * Maximum vehicles at the end of lane can handle:
 	 * this is used when lane numbers are different in two roads
 	 */
-	public int maxVehiclesAtTheEnd = 10;
+	public int maxVehiclesAtTheEnd = 5;
 
 
 	/**

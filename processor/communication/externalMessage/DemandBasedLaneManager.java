@@ -85,10 +85,10 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
         for (Edge edge : trafficNetwork.edges){
             Edge oppositeEdge = edge.getOppositeEdge();
 
-            if ((oppositeEdge.projectVehicles/oppositeEdge.getLaneCount()) > 3 * (edge.projectVehicles/edge.getLaneCount())){
+            if ((oppositeEdge.projectVehicles/oppositeEdge.getLaneCount()) > 5 * (edge.projectVehicles/edge.getLaneCount())){
                 rdIndex.edges.add(new RoadControl(oppositeEdge.index, true, 0));
             }
-            else if (( edge.projectVehicles/edge.getLaneCount()) > 3 * (oppositeEdge.projectVehicles/oppositeEdge.getLaneCount())){
+            else if (( edge.projectVehicles/edge.getLaneCount()) > 5 * (oppositeEdge.projectVehicles/oppositeEdge.getLaneCount())){
                 rdIndex.edges.add(new RoadControl(edge.index, true, 0));
             }
         }

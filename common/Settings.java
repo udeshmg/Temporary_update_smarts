@@ -1,5 +1,6 @@
 package common;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +39,7 @@ public class Settings {
 	@Expose() public double numStepsPerSecond = 5;//This determines the step length.
 	@Expose() public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
 	@Expose() public int trafficReportStepGapInServerlessMode = 1;
-	@Expose() public int extListenerUpdateInterval = 300; // lane update time interval in steps
+
 
 	/*
 	 * Display
@@ -149,7 +150,7 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
+	@Expose() public int demandPerOneInterval = 23; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
 	@Expose() public int numODPairs = 20;
 	@Expose() public int demandChangedFreq = 6000; // in steps
@@ -158,6 +159,7 @@ public class Settings {
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
+	@Expose() public int extListenerUpdateInterval = 300; // lane update time interval in steps
 
 	/**
 	 * OD Distribution
@@ -169,7 +171,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Journal/BN/";
+	public String defaultDownloadDirectory = "download/Journal/Lanes/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -185,8 +187,8 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
-	@Expose() public boolean isExternalListenerUsed = true;
-	@Expose() public String externalListener = "DLA";
+	@Expose() public boolean isExternalListenerUsed = false;
+	@Expose() public String externalListener = "CLLA";
 
 
 

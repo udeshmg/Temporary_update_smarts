@@ -32,11 +32,12 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         rand = new Random(5);
 
         demandMatrix = new int[][]{{demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2},
-            {2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand},
-            {15,1,18,1,16,1,12,1},
-            {1,15,1,18,1,16,1,12},
-            {1,4,3,9,14,3,3},
-            {5,12,12,9,6,12}};
+            {2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand,2,demand}};
+
+
+
+        //demandMatrix = new int[][]{{demand,demand,demand,demand,demand,demand,demand,demand,demand,demand,demand,2,demand,2,demand,2,demand,2,demand,2},
+        //        {demand,demand,demand,demand,demand,demand,demand,demand,demand,demand,2,demand,2,demand,2,demand,2,demand,2,demand}};
 
     }
 
@@ -135,7 +136,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
                 numVehicles = 0;
             }
              else {
-              numVehicles = demandMatrix[trafficType][0];
+              numVehicles = demandMatrix[trafficType][counter];
             }
         }
         else

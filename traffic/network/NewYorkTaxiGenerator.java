@@ -19,7 +19,7 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
         super();
         tfl = new TrafficLoader();
         setVehicleTypeDistributor(new DefaultVehicleTypeDistributor());
-        tfl.setTimeLimitRead(600, 630);
+        tfl.setTimeLimitRead(720, 750);
 
         setOdDistributor(new PredefinedODLoader(0));
         setTemporalDistributor(new PreDefinedDemandLoader(1));
@@ -43,7 +43,7 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
                 ODDemand odDemand = new ODDemand();
                 odDemand.setOrigin(ODpair.get(0));
                 odDemand.setDestination(ODpair.get(1));
-                odDemand.setNumVehicles(10);
+                odDemand.setNumVehicles(20);
                 odDemand.setVehicleType(getVehicleTypeDistributor().getVehicleType());
 
                 odDemands.add(odDemand);
