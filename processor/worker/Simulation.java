@@ -9,7 +9,8 @@ import common.Settings;
 import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import processor.communication.externalMessage.RoadControl;
-import processor.communication.externalMessage.RoadIndex;
+import processor.communication.externalMessage.SimulatorExternalControlObjects;
+import processor.communication.externalMessage.VehicleControl;
 import processor.communication.message.SerializableExternalVehicle;
 import processor.communication.message.SerializableInt;
 import processor.communication.message.SerializableWorkerMetadata;
@@ -278,24 +279,38 @@ public class Simulation {
 
 	public void getActionsFromExtListner(){
 		if (settings.isExternalListenerUsed){
-			RoadIndex roadIndex = extListner.getRoadDirChange();
+			SimulatorExternalControlObjects roadIndex = extListner.getRoadDirChange();
 			if (roadIndex != null) {
-				if (roadIndex.edges != null) {
-					for (RoadControl edge : roadIndex.edges) {
-						if (edge.laneChange) {
-							int oppositeEdgeIndex = trafficNetwork.edges.get(edge.index).getOppositeEdge().index;
-							changeLaneDirection(oppositeEdgeIndex);
-							laneChangedEdgeIndex.add(oppositeEdgeIndex);
-						}
+				setRoadControls(roadIndex.edges);
 
-						if (edge.speed > 0){
-							trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
-						}
-					}
+			}
+		}
+	}
+
+	public void setRoadControls(ArrayList<RoadControl> roadControls){
+		if (roadControls != null){
+			for (RoadControl edge : roadControls) {
+				if (edge.laneChange) {
+					Edge oppositeEdge = trafficNetwork.edges.get(edge.index).getOppositeEdge();
+					oppositeEdge.changeLaneDirection();
+					laneChangedEdgeIndex.add(oppositeEdge.index);
+				}
+
+				if (edge.speed > 0){
+					trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
 				}
 			}
 		}
 	}
+
+	public void setVehicleControls(ArrayList<VehicleControl> vehicleControls){
+		if (vehicleControls != null){
+			for ( VehicleControl vehicleControl : vehicleControls){
+				trafficNetwork.vehicles.get(vehicleControl.getIndex());
+			}
+		}
+	}
+
 
 
 
@@ -310,13 +325,7 @@ public class Simulation {
 		return indexes;
 	}
 
-	public  void markLanesToChange(){
-		for (final Edge edge : trafficNetwork.edges){
-			if (edge.index == 292){
-				edge.getLastLane().isDirectionChanging = true;
-			}
-		}
-	}
+
 
 	void moveVehiclesAroundBorder(List<Fellow> connectedFellows, double timeNow, List<Edge> pspBorderEdges){
 		final ArrayList<Vehicle> vehiclesAroundBorder = moveVehicleForward(timeNow, pspBorderEdges);
@@ -400,14 +409,7 @@ public class Simulation {
 		trafficNetwork.lanes.get(laneIndex).isBlocked = isBlocked;
 	}
 
-	public void changeLaneDirection(int edgeIndex){
-		if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 2) {
-			trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChangeDir();
-		}
-		else {
-			System.out.println("Warning : Cannot change the direction because this is the only lane in Road: " + edgeIndex);
-		}
-	}
+
 
 	public void addTransferredVehicle(Vehicle vehicle){
 		trafficNetwork.addOneTransferredVehicle(vehicle, timeNow);

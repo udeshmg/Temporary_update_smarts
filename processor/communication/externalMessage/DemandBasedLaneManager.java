@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class DemandBasedLaneManager implements ExternalSimulationListener {
 
     private RoadGraphExternal roadGraph = null;
-    private RoadIndex rdIndex = new RoadIndex();
+    private SimulatorExternalControlObjects rdIndex = new SimulatorExternalControlObjects();
 
 
     private static class LaneManagerHelper{
@@ -107,9 +107,9 @@ public class DemandBasedLaneManager implements ExternalSimulationListener {
     }
 
     @Override
-    public RoadIndex getRoadDirChange() {
-        RoadIndex extSend  = this.rdIndex;
-        this.rdIndex = new RoadIndex();
+    public SimulatorExternalControlObjects getRoadDirChange() {
+        SimulatorExternalControlObjects extSend  = this.rdIndex;
+        this.rdIndex = new SimulatorExternalControlObjects();
         return extSend;
     }
 

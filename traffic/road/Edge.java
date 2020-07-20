@@ -124,6 +124,12 @@ public class Edge {
 
 
 	/**
+	 * control region of signalless intersections
+	 */
+
+	public int controlRegionSignalless = 50; //in meters
+	public boolean isSignallessIntersection = true;
+	/**
 	 * Traffic flow statistics
 	 */
 	private double inflow = 0;
@@ -153,6 +159,13 @@ public class Edge {
 		return inflow;
 	}
 
+	public boolean isWithinControlRegion(double headPosition){
+		if (isSignallessIntersection){
+			if ( length - headPosition < controlRegionSignalless) return true;
+			else return false;
+		}
+		return false;
+	}
 
 	public double getOutflow() {
 		return outflow;
@@ -668,5 +681,14 @@ public class Edge {
 	public void  computeOutFlow(){
 		int fullSignalCycle = endNode.outwardEdges.size() * 45;
 		outflow = ( numVehicleOutPerLane * getLaneCount() * settings.mvgFlow) / (fullSignalCycle*settings.numStepsPerSecond);
+	}
+
+	public void changeLaneDirection(){
+		if (getLaneCount() > 2) {
+			getLastLane().markLaneToChangeDir();
+		}
+		else {
+			System.out.println("Warning : Cannot change the direction because this is the only lane in Road: " + index);
+		}
 	}
 }

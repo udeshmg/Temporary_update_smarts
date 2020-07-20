@@ -1,11 +1,8 @@
 package processor.communication.externalMessage;
 
-import common.Settings;
 import traffic.TrafficNetwork;
 import traffic.road.Edge;
 import traffic.road.Lane;
-import traffic.road.RoadNetwork;
-import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
 
 import java.util.ArrayList;
@@ -14,10 +11,12 @@ public class TrafficData {
 
     ArrayList<RoadExternal> trafficData = null;
     ArrayList<VehiclePathExternal> paths = null;
+    ArrayList<VehicleExternal> vehicles = null;
 
     public TrafficData(){
         trafficData = new ArrayList<>();
         paths = new ArrayList<>();
+        vehicles = new ArrayList<>();
 
     }
 
@@ -41,6 +40,9 @@ public class TrafficData {
             for (Lane lane : edge.getLanes()){
                 numVehicles += lane.getVehicles().size();
                 for (Vehicle v : lane.getVehicles()){
+
+                    vehicles.add(new VehicleExternal(v));
+
                     numVehicles++;
                     if (v.edgeBeforeTurnRight == edge){
                         numVehiclesRight++;

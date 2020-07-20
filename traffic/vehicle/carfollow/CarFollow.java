@@ -16,6 +16,10 @@ public class CarFollow {
 		idm = new IDM(settings);
 	}
 
+	public IDM getIdm() {
+		return idm;
+	}
+
 	public double computeAccelerationBasedOnImpedingObjects(final Vehicle vehicle) {
 		return idm.updateBasedOnAllFactors(vehicle);
 	}

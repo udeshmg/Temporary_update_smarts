@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import common.Settings;
-import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import processor.communication.message.Message_WS_TrafficReport;
@@ -13,7 +12,6 @@ import traffic.road.RoadNetwork;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class LaneManager implements ExternalSimulationListener {
 
@@ -33,7 +31,7 @@ public class LaneManager implements ExternalSimulationListener {
     private ZContext context = null;
     private ZMQ.Socket socket = null;
     private RoadGraphExternal roadGraph = null;
-    private RoadIndex rdIndex = null;
+    private SimulatorExternalControlObjects controlledObjs = null;
     private boolean isSettingsSent = false;
 
     private Settings settings = null;
@@ -103,8 +101,8 @@ public class LaneManager implements ExternalSimulationListener {
             JsonElement jsonTrafficData =  obj.get("trafficData");
 
             isSettingsSent = true;
-            Gson gson_settings = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-            JsonElement jsonSettings = gson_settings.toJsonTree(settings);
+            Gson gsonSettings = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+            JsonElement jsonSettings = gsonSettings.toJsonTree(settings);
 
             JsonObject combined = new JsonObject();
             combined.add("trafficData", jsonTrafficData);
@@ -124,15 +122,15 @@ public class LaneManager implements ExternalSimulationListener {
         System.out.println("Action received");
         String data = new String(reply, ZMQ.CHARSET);
         Gson gson = new Gson();
-        RoadIndex rdIndex = gson.fromJson(data, RoadIndex.class);
-        this.rdIndex = rdIndex;
+        SimulatorExternalControlObjects rdIndex = gson.fromJson(data, SimulatorExternalControlObjects.class);
+        this.controlledObjs = rdIndex;
     }
 
 
-    public RoadIndex getRoadDirChange(){
-        RoadIndex extSend = new RoadIndex();
-        extSend = this.rdIndex;
-        this.rdIndex = null;
+    public SimulatorExternalControlObjects getRoadDirChange(){
+        SimulatorExternalControlObjects extSend = new SimulatorExternalControlObjects();
+        extSend = this.controlledObjs;
+        this.controlledObjs = null;
         return extSend;
     }
 
@@ -146,19 +144,12 @@ public class LaneManager implements ExternalSimulationListener {
         byte[] reply = socket.recv();
         String data = new String(reply, ZMQ.CHARSET);
         Gson gson = new Gson();
-        RoadIndex rdIndex = gson.fromJson(data, RoadIndex.class);
-        this.rdIndex = rdIndex;
+        SimulatorExternalControlObjects rdIndex = gson.fromJson(data, SimulatorExternalControlObjects.class);
+        this.controlledObjs = rdIndex;
     }
 
     private void sendMessage(String str){
         socket.send(str.getBytes(ZMQ.CHARSET), 0);
     }
 
-    private void decodeMessageLayer(){
-
-    }
-
-    public void getAvailableControls(String command){
-
-    }
 }

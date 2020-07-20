@@ -477,7 +477,7 @@ public class Worker implements MessageHandler, Runnable {
 	}
 
 	private void onSWChangeLaneDirection(Message_SW_ChangeLaneDirection msg){
-		simulation.changeLaneDirection(msg.edgeIndex);
+		simulation.trafficNetwork.edges.get(msg.edgeIndex).changeLaneDirection();
 	}
 
 }

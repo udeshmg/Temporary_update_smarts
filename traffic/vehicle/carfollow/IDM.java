@@ -74,6 +74,26 @@ public class IDM {
 	}
 
 	/**
+	 * Returns the acceleration based on given paddle command
+	 * command : {-1, 0, 1}
+	 * @param command
+	 * @return acceleration
+	 */
+
+	public static double computeAccelerationBasedOnCommand(final Vehicle vehicle, int command){
+		//de-acceleration
+		if (command == -1){
+			return vehicle.driverProfile.IDM_b;
+		}
+
+		int delta = 4;
+		double v = vehicle.speed;
+		double v0 = vehicle.type.maxSpeed;
+
+		return command * vehicle.driverProfile.IDM_a * (1 - Math.pow(v / v0, delta));
+
+	}
+	/**
 	 * Gets the potential acceleration of vehicle based on a slow-down factor.
 	 * First, the impeding object for this factor is found. Next, the
 	 * acceleration is computed based on the impeding object.

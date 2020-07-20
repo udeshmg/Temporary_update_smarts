@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 import common.Settings;
+import processor.communication.externalMessage.VehicleControl;
 import processor.worker.Fellow;
 import processor.worker.Simulation;
 import traffic.light.Movement;
@@ -75,6 +76,11 @@ public class Vehicle {
 	private Node start;
 	private Node end;
 	private Settings settings;
+
+	/**
+	 * External interface to control acceleration of the vehicle
+	 */
+	private int externalCommandAcc = 0;
 
 	public Vehicle(Settings settings){
 		this.settings = settings;
@@ -352,7 +358,12 @@ public class Vehicle {
 			//Update headway if there is a guidance on safety
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
-			acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
+
+			if (lane.edge.isWithinControlRegion(headPosition)){
+				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
+			} else {
+				acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
+			}
 			// Update vehicle speed, which must be between 0 and free-flow speed
 			speed += acceleration / settings.numStepsPerSecond;
 			if (speed > lane.edge.freeFlowSpeed) {
@@ -958,5 +969,19 @@ public class Vehicle {
 		public Lane getEndLane() {
 			return endLane;
 		}
+
+
+	}
+
+	public void setExternalControls(VehicleControl vehicleControl){
+		externalCommandAcc = vehicleControl.getPaddleCommand();
+	}
+
+	public int getExternalCommandAcc() {
+		return externalCommandAcc;
+	}
+
+	public void setExternalCommandAcc(int externalCommandAcc) {
+		this.externalCommandAcc = externalCommandAcc;
 	}
 }
