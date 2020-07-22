@@ -308,7 +308,7 @@ public class TrafficNetwork extends RoadNetwork {
 	 * 
 	 * @param isNewNonPubVehiclesAllowed
 	 */
-	void createInternalNonPublicVehicles(int numLocalRandomPrivateVehicles, final double timeNow,
+	public void createInternalNonPublicVehicles(int numLocalRandomPrivateVehicles, final double timeNow,
 			boolean isNewNonPubVehiclesAllowed) {
 		if (isNewNonPubVehiclesAllowed) {
 
@@ -743,7 +743,13 @@ public class TrafficNetwork extends RoadNetwork {
 
 	public void releaseTripMakingVehicles(final double timeNow, SimulationListener listener) {
 		Vehicle next = getNextTripMakingVehicle(timeNow);
+
 		while (next != null){
+			//TODO: Change the location
+			int time = (int)(Math.random()* (46-35+1)+35);
+			next.setTimeToReach(timeNow+time);
+			next.setTimeRemain(time);
+
 			next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
 			if(listener != null){
 				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/settings.numStepsPerSecond), this);

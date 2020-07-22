@@ -9,6 +9,7 @@ public class SimulatorExternalControlObjects {
 
     SimulatorExternalControlObjects(){
         edges = new ArrayList<>();
+        vehicles = new ArrayList<>();
     }
 
 }

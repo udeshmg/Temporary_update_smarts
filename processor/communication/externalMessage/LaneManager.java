@@ -95,10 +95,13 @@ public class LaneManager implements ExternalSimulationListener {
         JsonElement jsonToSend = gson.toJsonTree(trafficData);
         String toSend = jsonToSend.toString();
 
+        //System.out.println("String to send: " + toSend);
 
         if (isSettingsSent == false) {
             JsonObject obj = jsonToSend.getAsJsonObject();
             JsonElement jsonTrafficData =  obj.get("trafficData");
+            JsonElement jsonPaths =  obj.get("paths");
+            JsonElement jsonVehicles =  obj.get("vehicles");
 
             isSettingsSent = true;
             Gson gsonSettings = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -106,7 +109,9 @@ public class LaneManager implements ExternalSimulationListener {
 
             JsonObject combined = new JsonObject();
             combined.add("trafficData", jsonTrafficData);
-            combined.add("settings", jsonSettings);
+            combined.add("paths", jsonTrafficData);
+            combined.add("vehicles", jsonPaths);
+            combined.add("settings", jsonVehicles);
 
             toSend = combined.toString();
         }

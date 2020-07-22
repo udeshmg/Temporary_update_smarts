@@ -4,6 +4,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.google.gson.annotations.Expose;
 import processor.SimulationListener;
@@ -64,7 +65,7 @@ public class Settings {
 	 * Input
 	 */
 	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/SingleLane.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -145,21 +146,20 @@ public class Settings {
 	public double trafficLightDetectionDistance = 30;//In meters. How far a vehicle can see a light.
 	public double maxLightGroupRadius = 10;//In meters. Controls size of the area where a cluster of lights can be identified.
 
-
 	/**
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 23; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
-	@Expose() public int numODPairs = 20;
+	@Expose() public int demandPerOneInterval = 1; // Amount of vehicles to generate at single time step
+	@Expose() public int demandGenerationTimeInterval = 1; // Frequency of traffic generation in steps
+	@Expose() public int numODPairs = 1;
 	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
-	@Expose() public int trafficGenerateDuration = 12000; // in steps
+	@Expose() public int trafficGenerateDuration = 1; // in steps
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
-	@Expose() public int extListenerUpdateInterval = 300; // lane update time interval in steps
+	@Expose() public int extListenerUpdateInterval = 1; // lane update time interval in steps
 
 	/**
 	 * OD Distribution
@@ -171,7 +171,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Journal/Lanes/";
+	public String defaultDownloadDirectory = "download/RQ2/Vehicles/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -187,7 +187,7 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
-	@Expose() public boolean isExternalListenerUsed = false;
+	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
 
 

@@ -40,6 +40,7 @@ public class Simulation {
 	SimulationListener simulationListener = null;
 	ExternalSimulationListener extListner = null;
 	boolean extListnerInitCalled = false;
+	ArrayList<RoadControl> roadControlsToServer = new ArrayList<>();
 	Settings settings;
 
 
@@ -204,6 +205,8 @@ public class Simulation {
 			boolean isNewTramsAllowed, boolean isNewBusesAllowed) {
 		pause();
 		waitForInit();
+
+
 		updateLaneDirections();
 
 		moveVehiclesAroundBorder(worker.connectedFellows, timeNow, pspBorderEdges);
@@ -220,9 +223,11 @@ public class Simulation {
 		trafficNetwork.releaseVehicleFromParking(timeNow, simulationListener);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
-		trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
-				numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
-				timeNow);
+		if (step == 0) {
+			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+					timeNow);
+		}
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 
@@ -230,15 +235,24 @@ public class Simulation {
 		//sendTrafficDataToExternal();
 
 		// Wait for External agent for send instructions after number of time sreps
+
+
 		sendTrafficData();
 		waitForActionsFromExternalClient();
+
+		if (trafficNetwork.vehicles.get(0).isEpisodeDone()){
+			resetTraffic();
+			trafficNetwork.createInternalNonPublicVehicles(1, step/settings.numStepsPerSecond, true);
+		}
+
 
 		// Clear one-step data
 		clearOneStepData();
 
-		//if (step % 18000 == 0){
-		//	resetTraffic();
-		//}
+
+
+
+
 
 	}
 	public void waitForInit(){
@@ -258,7 +272,7 @@ public class Simulation {
 
 	public void waitForActionsFromExternalClient(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.extListenerUpdateInterval == 1) {
+			if ((step-1) % settings.extListenerUpdateInterval == 0) {
 				System.out.println("Waiting...");
 				extListner.waitForAction();
 			}
@@ -268,7 +282,7 @@ public class Simulation {
 
 	public void sendTrafficData(){
 		if (settings.isExternalListenerUsed){
-			if (step % settings.extListenerUpdateInterval == 0 & step > 0) {
+			if ((step-1) % settings.extListenerUpdateInterval == 0 & (step-1) > 0) {
 				extListner.sendTrafficData(trafficNetwork);
 			}
 		}
@@ -279,9 +293,10 @@ public class Simulation {
 
 	public void getActionsFromExtListner(){
 		if (settings.isExternalListenerUsed){
-			SimulatorExternalControlObjects roadIndex = extListner.getRoadDirChange();
-			if (roadIndex != null) {
-				setRoadControls(roadIndex.edges);
+			SimulatorExternalControlObjects controls = extListner.getRoadDirChange();
+			if (controls != null) {
+				setRoadControls(controls.edges);
+				setVehicleControls(controls.vehicles);
 
 			}
 		}
@@ -299,6 +314,7 @@ public class Simulation {
 				if (edge.speed > 0){
 					trafficNetwork.edges.get(edge.index).changeFreeFlowSpeed(edge.speed);
 				}
+				roadControlsToServer.add(edge);
 			}
 		}
 	}
@@ -306,23 +322,23 @@ public class Simulation {
 	public void setVehicleControls(ArrayList<VehicleControl> vehicleControls){
 		if (vehicleControls != null){
 			for ( VehicleControl vehicleControl : vehicleControls){
-				trafficNetwork.vehicles.get(vehicleControl.getIndex());
+				if ( trafficNetwork.vehicles.size() > 0 ) {
+					trafficNetwork.vehicles.get(vehicleControl.getIndex()-1).setExternalControls(vehicleControl);
+				}
 			}
 		}
 	}
 
 
 
+	public ArrayList<RoadControl> getRoadChanges(){
+		ArrayList<RoadControl> roadIndexes = new ArrayList<>();
 
-
-	public ArrayList<Integer> getLaneChanges(){
-		ArrayList<Integer> indexes = new ArrayList<>();
-
-		for (Integer index : laneChangedEdgeIndex){
-			indexes.add(index);
+		for (RoadControl road : roadControlsToServer){
+			roadIndexes.add(road);
 		}
-		laneChangedEdgeIndex.clear();
-		return indexes;
+		roadControlsToServer.clear();
+		return roadIndexes;
 	}
 
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import common.Settings;
+import processor.communication.externalMessage.RoadControl;
 import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.road.Edge;
@@ -32,7 +33,7 @@ public class Message_WS_TrafficReport {
 	public int numInternalTrams;
 	public int numInternalBuses;
 	public ArrayList<SerializableLaneIndex> laneIndexes = new ArrayList<>();
-	public ArrayList<SerializableLaneIndex> edgesToUpdate = new ArrayList<>();
+	public ArrayList<SerializableRoadData> edgesToUpdate = new ArrayList<>();
 
 	public Message_WS_TrafficReport() {
 
@@ -42,7 +43,7 @@ public class Message_WS_TrafficReport {
 									final LightCoordinator lightCoordinator, final ArrayList<Vehicle> newVehiclesSinceLastReport,
 									List<Vehicle> vehiclesFinished,final int step,
 									final int numInternalNonPubVehicles, final int numInternalTrams, final int numInternalBuses,
-									final ArrayList<Integer> laneIndexes, final  ArrayList<Integer> edgesToUpdate) {
+									final ArrayList<Integer> laneIndexes, final  ArrayList<RoadControl> edgesToUpdate) {
 		this.workerName = workerName;
 		if (settings.isVisualize || settings.isOutputTrajectory) {
 			vehicleList = getDetailOfActiveVehiclesOnRoad(vehiclesOnRoad);
@@ -59,14 +60,22 @@ public class Message_WS_TrafficReport {
 		this.numInternalTrams = numInternalTrams;
 		this.numInternalBuses = numInternalBuses;
 		this.laneIndexes = addLaneIndexes(laneIndexes);
-		this.edgesToUpdate = addLaneIndexes(edgesToUpdate);
+		this.edgesToUpdate = addRoadControls(edgesToUpdate);
 	}
 
-	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork, final ArrayList<Integer> edgesToUpdate){
+	public Message_WS_TrafficReport(Settings settings, final String workerName, final int step, final TrafficNetwork trafficNetwork, final ArrayList<RoadControl> edgesToUpdate){
 		this(settings, workerName, trafficNetwork.vehicles, trafficNetwork.lightCoordinator,
 				trafficNetwork.newVehiclesSinceLastReport, trafficNetwork.getFinishedVehicles(), step,
 				trafficNetwork.numInternalNonPublicVehicle,
 				trafficNetwork.numInternalTram, trafficNetwork.numInternalBus, trafficNetwork.laneIndexOfChangeDir, edgesToUpdate);
+	}
+
+	ArrayList<SerializableRoadData> addRoadControls(final ArrayList<RoadControl> roads){
+		ArrayList<SerializableRoadData> l = new ArrayList<>();
+		for (final RoadControl roadControl : roads){
+			l.add(new SerializableRoadData(roadControl));
+		}
+		return l;
 	}
 
 	ArrayList<SerializableLaneIndex> addLaneIndexes(final ArrayList<Integer> lanes){

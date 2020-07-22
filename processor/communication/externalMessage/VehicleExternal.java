@@ -10,17 +10,21 @@ public class VehicleExternal {
 
     private int vid = 0;
     private double headPosition = 0;
-    private double headPoistionFromEnd = 0;
+    private double headPositionFromEnd = 0;
     private double speed = 0;
     private int edgeId = 0;
+    private boolean done = false;
+    private double timeRemain = 0;
 
 
     public VehicleExternal(final Vehicle vehicle){
         this.headPosition = vehicle.headPosition;
-        this.headPoistionFromEnd = vehicle.lane.edge.length - vehicle.headPosition;
+        this.headPositionFromEnd = vehicle.lane.edge.length - vehicle.headPosition;
         this.speed = vehicle.speed;
         this.edgeId = vehicle.lane.edge.index;
         this.vid = vehicle.vid;
+        this.done = vehicle.isEpisodeDone();
+        this.timeRemain = vehicle.getTimeRemain();
     }
 
     public int getVid() {
@@ -31,12 +35,12 @@ public class VehicleExternal {
         this.vid = vid;
     }
 
-    public double getHeadPoistionFromEnd() {
-        return headPoistionFromEnd;
+    public double getHeadPositionFromEnd() {
+        return headPositionFromEnd;
     }
 
-    public void setHeadPoistionFromEnd(double headPoistionFromEnd) {
-        this.headPoistionFromEnd = headPoistionFromEnd;
+    public void setHeadPositionFromEnd(double headPositionFromEnd) {
+        this.headPositionFromEnd = headPositionFromEnd;
     }
 
     public double getHeadPosition() {

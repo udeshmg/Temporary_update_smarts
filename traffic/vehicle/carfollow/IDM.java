@@ -83,7 +83,7 @@ public class IDM {
 	public static double computeAccelerationBasedOnCommand(final Vehicle vehicle, int command){
 		//de-acceleration
 		if (command == -1){
-			return vehicle.driverProfile.IDM_b;
+			return -vehicle.driverProfile.IDM_b;
 		}
 
 		int delta = 4;

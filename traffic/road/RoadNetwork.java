@@ -673,4 +673,16 @@ public class RoadNetwork {
 		}
 	}
 
+	public void updateLaneDirection(Integer edgeIndex){
+		Edge edge =  this.edges.get(edgeIndex);
+		Lane lane = edge.getLane(edge.getLaneCount()-1);
+		lane.isDirectionChanging = true;
+	}
+
+
+	public void updateSpeed(Integer edgeIndex, Integer speed){
+		Edge edge =  this.edges.get(edgeIndex);
+		edge.changeFreeFlowSpeed(speed);
+	}
+
 }

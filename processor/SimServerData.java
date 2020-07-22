@@ -143,7 +143,7 @@ public class SimServerData {
                                  final int step, ArrayList<SerializableRouteDump> randomRoutes,
                                  ArrayList<Serializable_Finished_Vehicle> finished, int numInternalNonPubVehicles,
                                  int numInternalTrams, int numInternalBuses, ArrayList<SerializableLaneIndex> laneList,
-                                 ArrayList<SerializableLaneIndex> edgeList) {
+                                 ArrayList<SerializableRoadData> edgeList) {
         // Update GUI
         if (settings.isVisualize) {
             gui.updateObjectData(vehicleList, lightList, workerName, numWorkers, step);
@@ -176,15 +176,18 @@ public class SimServerData {
         numInternalBusesAtAllWorkers += numInternalBuses;
 
         if (settings.isVisualize) updateLanes(laneList);
-        getChangedLanesFromWorker(edgeList);
+        getChangedRoadsFromWorker(edgeList);
     }
 
-    private void getChangedLanesFromWorker(ArrayList<SerializableLaneIndex> laneIndexes){
-        ArrayList<Integer> edges = new ArrayList<>();
-        for (SerializableLaneIndex index :laneIndexes){
-            edges.add(index.index);
+    private void getChangedRoadsFromWorker(ArrayList<SerializableRoadData> roadIndexes){
+
+        for (SerializableRoadData roadData : roadIndexes){
+            if (roadData.laneIncreased)  getRoadNetwork().updateLaneDirection(roadData.index);
+            if (roadData.speed >= 0) getRoadNetwork().updateSpeed(roadData.index, roadData.speed);
+
+            // Update gui after changes
+            gui.updateEdgeObjects(getRoadNetwork().edges.get(roadData.index));
         }
-        getRoadNetwork().updateLaneDirections(edges);
     }
 
 

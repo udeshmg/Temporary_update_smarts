@@ -89,6 +89,15 @@ public class Vehicle {
 		this.laneDecider = settings.getLaneDecider();
 	}
 
+
+	/**
+	 * Following variables are used to track external statistics
+	 */
+
+	private boolean isEpisodeDone = false;
+	private double timeToReach = 30; // in seconds
+	private double timeRemain = 0;
+
 	/**
 	 * This method tries to find a start position for a vehicle such that the
 	 * vehicle will be unlikely to collide with an existing vehicle. For
@@ -350,6 +359,7 @@ public class Vehicle {
 	}
 
 	public void moveForward(double timeNow){
+		findEpisodeFinished(timeNow);
 		if(active) {
 			// Reset priority vehicle effect flag
 			isAffectedByPriorityVehicle = false;
@@ -359,7 +369,9 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
-			if (lane.edge.isWithinControlRegion(headPosition)){
+
+
+			if (settings.isExternalListenerUsed){
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
 			} else {
 				acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
@@ -983,5 +995,41 @@ public class Vehicle {
 
 	public void setExternalCommandAcc(int externalCommandAcc) {
 		this.externalCommandAcc = externalCommandAcc;
+	}
+
+
+	/**
+	 * Methods for external Updates
+	 */
+
+	public void findEpisodeFinished(double timeNow){
+		if ( timeNow >= timeToReach || Math.abs(lane.edge.length - headPosition) < 4.5) {
+			isEpisodeDone = true;
+		}
+		timeRemain = timeToReach - timeNow;
+	}
+
+	public boolean isEpisodeDone() {
+		return isEpisodeDone;
+	}
+
+	public void setEpisodeDone(boolean episodeDone) {
+		isEpisodeDone = episodeDone;
+	}
+
+	public double getTimeToReach() {
+		return timeToReach;
+	}
+
+	public void setTimeToReach(double timeToReach) {
+		this.timeToReach = timeToReach;
+	}
+
+	public double getTimeRemain() {
+		return timeRemain;
+	}
+
+	public void setTimeRemain(double timeRemain) {
+		this.timeRemain = timeRemain;
 	}
 }
