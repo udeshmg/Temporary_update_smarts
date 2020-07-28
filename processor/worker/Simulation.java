@@ -273,7 +273,7 @@ public class Simulation {
 	public void waitForActionsFromExternalClient(){
 		if (settings.isExternalListenerUsed){
 			if ((step-1) % settings.extListenerUpdateInterval == 0) {
-				System.out.println("Waiting...");
+				//System.out.println("Waiting...");
 				extListner.waitForAction();
 			}
 			getActionsFromExtListner();

@@ -217,7 +217,7 @@ public class ControlPanel_MiscConfig extends JPanel {
 		comboBoxTrafficLight = new JComboBox(new Object[] {});
 		comboBoxTrafficLight.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		comboBoxTrafficLight.setModel(new DefaultComboBoxModel(new String[] { TrafficLightTiming.DYNAMIC.name(),
-				TrafficLightTiming.FIXED.name(), TrafficLightTiming.NONE.name() }));
+				TrafficLightTiming.NONE.name(), TrafficLightTiming.NONE.name() }));
 		comboBoxTrafficLight.setSelectedIndex(1);
 
 		final JLabel lblRouting = new JLabel("Routing algorithm for new routes");

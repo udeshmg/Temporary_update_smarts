@@ -359,7 +359,7 @@ public class Vehicle {
 	}
 
 	public void moveForward(double timeNow){
-		findEpisodeFinished(timeNow);
+
 		if(active) {
 			// Reset priority vehicle effect flag
 			isAffectedByPriorityVehicle = false;
@@ -369,7 +369,7 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
-
+			findEpisodeFinished(timeNow);
 
 			if (settings.isExternalListenerUsed){
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
