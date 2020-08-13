@@ -15,6 +15,7 @@ public class VehicleExternal {
     private int edgeId = 0;
     private boolean done = false;
     private double timeRemain = 0;
+    private boolean is_success = false;
 
 
     public VehicleExternal(final Vehicle vehicle){
@@ -25,6 +26,7 @@ public class VehicleExternal {
         this.vid = vehicle.vid;
         this.done = vehicle.isEpisodeDone();
         this.timeRemain = vehicle.getTimeRemain();
+        this.is_success = vehicle.isIs_success();
     }
 
     public int getVid() {

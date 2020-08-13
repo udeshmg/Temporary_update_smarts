@@ -95,6 +95,7 @@ public class Vehicle {
 	 */
 
 	private boolean isEpisodeDone = false;
+	private boolean is_success = false;
 	private double timeToReach = 30; // in seconds
 	private double timeRemain = 0;
 
@@ -1005,7 +1006,14 @@ public class Vehicle {
 	public void findEpisodeFinished(double timeNow){
 		if ( timeNow >= timeToReach || Math.abs(lane.edge.length - headPosition) < 4.5) {
 			isEpisodeDone = true;
+			if ( timeNow >= (timeToReach-2) && Math.abs(lane.edge.length - headPosition) < 4.5){
+				is_success = true;
+			}
+			else {
+				is_success = false;
+			}
 		}
+
 		timeRemain = timeToReach - timeNow;
 	}
 
@@ -1031,5 +1039,14 @@ public class Vehicle {
 
 	public void setTimeRemain(double timeRemain) {
 		this.timeRemain = timeRemain;
+	}
+
+
+	public boolean isIs_success() {
+		return is_success;
+	}
+
+	public void setIs_success(boolean is_success) {
+		this.is_success = is_success;
 	}
 }

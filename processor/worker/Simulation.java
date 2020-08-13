@@ -240,7 +240,8 @@ public class Simulation {
 		sendTrafficData();
 		waitForActionsFromExternalClient();
 
-		if (trafficNetwork.vehicles.get(0).isEpisodeDone()){
+		if (trafficNetwork.vehicles.get(0).isEpisodeDone() &&
+				((step-1) % settings.extListenerUpdateInterval == 0 & (step-1) > 0) ){
 			resetTraffic();
 			trafficNetwork.createInternalNonPublicVehicles(1, step/settings.numStepsPerSecond, true);
 		}

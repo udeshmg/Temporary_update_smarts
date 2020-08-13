@@ -746,7 +746,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		while (next != null){
 			//TODO: Change the location
-			int time = 45; //(int)(Math.random()* (46-35+1)+35);
+			int time = (int)(Math.random()*(45-30+1)+30);
 			next.setTimeToReach(timeNow+time);
 			next.setTimeRemain(time);
 

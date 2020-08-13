@@ -159,7 +159,7 @@ public class Settings {
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
-	@Expose() public int extListenerUpdateInterval = 1; // lane update time interval in steps
+	@Expose() public int extListenerUpdateInterval = 5; // lane update time interval in steps
 
 	/**
 	 * OD Distribution
