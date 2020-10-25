@@ -1,0 +1,458 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-103682' action='modify' visible='true' lat='40.74632724026' lon='-74.05276623859'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 0' />
+  </node>
+  <node id='-103684' action='modify' visible='true' lat='40.74276549767' lon='-74.0527621317'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 0' />
+  </node>
+  <node id='-103686' action='modify' visible='true' lat='40.73920356434' lon='-74.0527580248'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 0' />
+  </node>
+  <node id='-103688' action='modify' visible='true' lat='40.73564144027' lon='-74.05275391791'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 0' />
+  </node>
+  <node id='-103704' action='modify' visible='true' lat='40.7319837037' lon='-74.05272106276'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 0' />
+  </node>
+  <node id='-103706' action='modify' visible='true' lat='40.74632724026' lon='-74.04806505527'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 1' />
+  </node>
+  <node id='-103708' action='modify' visible='true' lat='40.74276549767' lon='-74.04806094838'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 1' />
+  </node>
+  <node id='-103710' action='modify' visible='true' lat='40.73920356434' lon='-74.04805684148'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 1' />
+  </node>
+  <node id='-103712' action='modify' visible='true' lat='40.73564144027' lon='-74.04805273459'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 1' />
+  </node>
+  <node id='-103728' action='modify' visible='true' lat='40.7319837037' lon='-74.04801987944'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 1' />
+  </node>
+  <node id='-103730' action='modify' visible='true' lat='40.74632724026' lon='-74.04336387195'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 2' />
+  </node>
+  <node id='-103732' action='modify' visible='true' lat='40.74276549767' lon='-74.04335976506'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 2' />
+  </node>
+  <node id='-103734' action='modify' visible='true' lat='40.73920356434' lon='-74.04335565816'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 2' />
+  </node>
+  <node id='-103736' action='modify' visible='true' lat='40.73564144027' lon='-74.04335155127'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 2' />
+  </node>
+  <node id='-103752' action='modify' visible='true' lat='40.7319837037' lon='-74.04331869612'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 2' />
+  </node>
+  <node id='-103754' action='modify' visible='true' lat='40.74632724026' lon='-74.03866268863'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 3' />
+  </node>
+  <node id='-103756' action='modify' visible='true' lat='40.74276549767' lon='-74.03865858174'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 3' />
+  </node>
+  <node id='-103758' action='modify' visible='true' lat='40.73920356434' lon='-74.03865447484'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 3' />
+  </node>
+  <node id='-103760' action='modify' visible='true' lat='40.73564144027' lon='-74.03865036795'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 3' />
+  </node>
+  <node id='-103776' action='modify' visible='true' lat='40.7319837037' lon='-74.0386175128'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 3' />
+  </node>
+  <node id='-103778' action='modify' visible='true' lat='40.74632724026' lon='-74.03396150531'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 4' />
+  </node>
+  <node id='-103780' action='modify' visible='true' lat='40.74276549767' lon='-74.03395739842'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 4' />
+  </node>
+  <node id='-103782' action='modify' visible='true' lat='40.73920356434' lon='-74.03395329152'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 4' />
+  </node>
+  <node id='-103784' action='modify' visible='true' lat='40.73564144027' lon='-74.03394918463'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 4' />
+  </node>
+  <node id='-103800' action='modify' visible='true' lat='40.7319837037' lon='-74.03391632948'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 4' />
+  </node>
+  <node id='-103802' action='modify' visible='true' lat='40.74632724026' lon='-74.02926032199'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 5' />
+  </node>
+  <node id='-103804' action='modify' visible='true' lat='40.74276549767' lon='-74.0292562151'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 5' />
+  </node>
+  <node id='-103806' action='modify' visible='true' lat='40.73920356434' lon='-74.0292521082'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 5' />
+  </node>
+  <node id='-103808' action='modify' visible='true' lat='40.73564144027' lon='-74.02924800131'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 5' />
+  </node>
+  <node id='-103824' action='modify' visible='true' lat='40.7319837037' lon='-74.02921514616'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 5' />
+  </node>
+  <node id='-103826' action='modify' visible='true' lat='40.74632724026' lon='-74.02455913867'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 6' />
+  </node>
+  <node id='-103828' action='modify' visible='true' lat='40.74276549767' lon='-74.02455503177'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 6' />
+  </node>
+  <node id='-103830' action='modify' visible='true' lat='40.73920356434' lon='-74.02455092488'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 6' />
+  </node>
+  <node id='-103832' action='modify' visible='true' lat='40.73564144027' lon='-74.02454681799'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 6' />
+  </node>
+  <node id='-103848' action='modify' visible='true' lat='40.7319837037' lon='-74.02451396284'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 6' />
+  </node>
+  <node id='-103850' action='modify' visible='true' lat='40.74632724026' lon='-74.01985795535'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 7' />
+  </node>
+  <node id='-103852' action='modify' visible='true' lat='40.74276549767' lon='-74.01985384845'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 7' />
+  </node>
+  <node id='-103854' action='modify' visible='true' lat='40.73920356434' lon='-74.01984974156'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 7' />
+  </node>
+  <node id='-103856' action='modify' visible='true' lat='40.73564144027' lon='-74.01984563467'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 7' />
+  </node>
+  <node id='-103872' action='modify' visible='true' lat='40.7319837037' lon='-74.01981277952'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 7' />
+  </node>
+  <node id='-103946' action='modify' visible='true' lat='40.74632724026' lon='-74.01444319446'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 11 11' />
+  </node>
+  <node id='-103948' action='modify' visible='true' lat='40.74276549767' lon='-74.01443908756'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 10 11' />
+  </node>
+  <node id='-103950' action='modify' visible='true' lat='40.73920356434' lon='-74.01443498067'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 9 11' />
+  </node>
+  <node id='-103952' action='modify' visible='true' lat='40.73564144027' lon='-74.01443087378'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 8 11' />
+  </node>
+  <node id='-103968' action='modify' visible='true' lat='40.7319837037' lon='-74.01439801863'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='name' v='n 0 11' />
+  </node>
+  <way id='-103969' action='modify' visible='true'>
+    <nd ref='-103682' />
+    <nd ref='-103706' />
+    <nd ref='-103730' />
+    <nd ref='-103754' />
+    <nd ref='-103778' />
+    <nd ref='-103802' />
+    <nd ref='-103826' />
+    <nd ref='-103850' />
+    <nd ref='-103946' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-103970' action='modify' visible='true'>
+    <nd ref='-103684' />
+    <nd ref='-103708' />
+    <nd ref='-103732' />
+    <nd ref='-103756' />
+    <nd ref='-103780' />
+    <nd ref='-103804' />
+    <nd ref='-103828' />
+    <nd ref='-103852' />
+    <nd ref='-103948' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-103971' action='modify' visible='true'>
+    <nd ref='-103686' />
+    <nd ref='-103710' />
+    <nd ref='-103734' />
+    <nd ref='-103758' />
+    <nd ref='-103782' />
+    <nd ref='-103806' />
+    <nd ref='-103830' />
+    <nd ref='-103854' />
+    <nd ref='-103950' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-103972' action='modify' visible='true'>
+    <nd ref='-103688' />
+    <nd ref='-103712' />
+    <nd ref='-103736' />
+    <nd ref='-103760' />
+    <nd ref='-103784' />
+    <nd ref='-103808' />
+    <nd ref='-103832' />
+    <nd ref='-103856' />
+    <nd ref='-103952' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-103980' action='modify' visible='true'>
+    <nd ref='-103704' />
+    <nd ref='-103728' />
+    <nd ref='-103752' />
+    <nd ref='-103776' />
+    <nd ref='-103800' />
+    <nd ref='-103824' />
+    <nd ref='-103848' />
+    <nd ref='-103872' />
+    <nd ref='-103968' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-103981' action='modify' visible='true'>
+    <nd ref='-103682' />
+    <nd ref='-103684' />
+    <nd ref='-103686' />
+    <nd ref='-103688' />
+    <nd ref='-103704' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103982' action='modify' visible='true'>
+    <nd ref='-103706' />
+    <nd ref='-103708' />
+    <nd ref='-103710' />
+    <nd ref='-103712' />
+    <nd ref='-103728' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103983' action='modify' visible='true'>
+    <nd ref='-103730' />
+    <nd ref='-103732' />
+    <nd ref='-103734' />
+    <nd ref='-103736' />
+    <nd ref='-103752' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103984' action='modify' visible='true'>
+    <nd ref='-103754' />
+    <nd ref='-103756' />
+    <nd ref='-103758' />
+    <nd ref='-103760' />
+    <nd ref='-103776' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103985' action='modify' visible='true'>
+    <nd ref='-103778' />
+    <nd ref='-103780' />
+    <nd ref='-103782' />
+    <nd ref='-103784' />
+    <nd ref='-103800' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103986' action='modify' visible='true'>
+    <nd ref='-103802' />
+    <nd ref='-103804' />
+    <nd ref='-103806' />
+    <nd ref='-103808' />
+    <nd ref='-103824' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103987' action='modify' visible='true'>
+    <nd ref='-103826' />
+    <nd ref='-103828' />
+    <nd ref='-103830' />
+    <nd ref='-103832' />
+    <nd ref='-103848' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103988' action='modify' visible='true'>
+    <nd ref='-103850' />
+    <nd ref='-103852' />
+    <nd ref='-103854' />
+    <nd ref='-103856' />
+    <nd ref='-103872' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-103992' action='modify' visible='true'>
+    <nd ref='-103946' />
+    <nd ref='-103948' />
+    <nd ref='-103950' />
+    <nd ref='-103952' />
+    <nd ref='-103968' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='2' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='40' />
+    <tag k='maxspeed:backward' v='40' />
+    <tag k='maxspeed:forward' v='40' />
+    <tag k='name' v='col' />
+  </way>
+</osm>

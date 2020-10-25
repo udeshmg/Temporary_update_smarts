@@ -1,0 +1,21 @@
+maxNumSteps 100
+numRandomBackgroundPrivateVehicles 10
+numRandomBackgroundTrams 10
+numRandomBackgroundBuses 10
+foregroundVehicleFile sampleRoute.text
+backgroundVehicleFile -
+outputInitialRoute ALL
+outputTravelTime ALL
+outputTrajectory ALL
+outputSimulationLog false
+allowReroute false
+numRuns 1
+lookAheadDistance 100
+numStepsPerSecond 1
+serverBased false
+openStreetMapFile -
+trafficLightTiming FIXED
+routingAlgorithm DIJKSTRA
+trafficReportStepGapInServerlessMode 1
+driveOnLeft true
+###

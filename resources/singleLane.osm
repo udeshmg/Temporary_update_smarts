@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-126413' action='modify' visible='true' lat='40.73920356434' lon='-74.0527580248'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 9 0' />
+  </node>
+  <node id='-126415' action='modify' visible='true' lat='40.74276549767' lon='-74.04806094838'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 10 1' />
+  </node>
+  <node id='-126417' action='modify' visible='true' lat='40.73920356434' lon='-74.04805684148'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 9 1' />
+  </node>
+  <node id='-126419' action='modify' visible='true' lat='40.73564144027' lon='-74.04805273459'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 8 1' />
+  </node>
+  <node id='-126421' action='modify' visible='true' lat='40.74276549767' lon='-74.04335976506'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 10 2' />
+  </node>
+  <node id='-126423' action='modify' visible='true' lat='40.73920356434' lon='-74.04335565816'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 9 2' />
+  </node>
+  <node id='-126425' action='modify' visible='true' lat='40.73564144027' lon='-74.04335155127'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 8 2' />
+  </node>
+  <node id='-126427' action='modify' visible='true' lat='40.73920356434' lon='-74.03865447484'>
+    <tag k='crossing' v='traffic_signals' />
+    <tag k='highway' v='traffic_signals' />
+    <tag k='lanes' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='n 9 3' />
+  </node>
+  <way id='-126428' action='modify' visible='true'>
+    <nd ref='-126413' />
+    <nd ref='-126417' />
+    <nd ref='-126423' />
+    <nd ref='-126427' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='1' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='row' />
+  </way>
+  <way id='-126429' action='modify' visible='true'>
+    <nd ref='-126415' />
+    <nd ref='-126417' />
+    <nd ref='-126419' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='1' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='col' />
+  </way>
+  <way id='-126430' action='modify' visible='true'>
+    <nd ref='-126421' />
+    <nd ref='-126423' />
+    <nd ref='-126425' />
+    <tag k='highway' v='tertiary' />
+    <tag k='lanes' v='1' />
+    <tag k='lanes:backward' v='1' />
+    <tag k='lanes:forward' v='1' />
+    <tag k='maxspeed' v='80' />
+    <tag k='maxspeed:backward' v='80' />
+    <tag k='maxspeed:forward' v='80' />
+    <tag k='name' v='col' />
+  </way>
+</osm>
