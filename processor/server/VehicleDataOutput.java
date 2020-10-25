@@ -57,6 +57,8 @@ public class VehicleDataOutput {
         sb.append(vehicle.actualTravelTime+",");
         sb.append(timeNow+",");
         sb.append(vehicle.routeLength+",");
+        sb.append(vehicle.timeOnDirectionalTraffic+",");
+        sb.append(vehicle.timeOnDirectionalTraffic_speed+",");
         sb.append(vehicle.route+ System.getProperty("line.separator"));
         outputStringToFile(fos, sb.toString());
     }

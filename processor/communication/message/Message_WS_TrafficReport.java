@@ -178,7 +178,8 @@ public class Message_WS_TrafficReport {
 			Serializable_Finished_Vehicle finishedVehicle = new Serializable_Finished_Vehicle(vehicle.id, vehicle.vid,
 					vehicle.getRouteLeg(0).edge.startNode.index,
 					vehicle.getRouteLeg(vehicle.getRouteLegCount()-1).edge.endNode.index,
-					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), vehicle.getRouteString());
+					vehicle.getBestTravelTime(), timeNow - vehicle.timeRouteStart, vehicle.getRouteLength(), vehicle.getRouteString(),
+					vehicle.getTimeOnDirectionalTraffic(), vehicle.getTimeOnDirectionalTraffic_speed());
 			finishedVehicles.add(finishedVehicle);
 		}
 		return finishedVehicles;

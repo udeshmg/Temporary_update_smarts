@@ -46,6 +46,8 @@ public class Vehicle {
 	public double spdOfImpedingObject = 0;
 	public double timeOfLastLaneChange = 0;
 	public boolean isRoadBlockedAhead = false;
+	public double timeOnDirectionalTraffic = 0;
+	public double timeOnDirectionalTraffic_speed = 0;
 	/**
 	 * The ID of the latest light group. This vehicle will ignore other traffic
 	 * lights in the same group if it passes one of the lights in the group.
@@ -76,7 +78,7 @@ public class Vehicle {
 	private Node end;
 	private Settings settings;
 
-	public Vehicle(Settings settings){
+	public Vehicle(Settings settings) {
 		this.settings = settings;
 		this.carFollow = new CarFollow(settings);
 		this.laneChange = new LaneChange(settings);
@@ -124,18 +126,18 @@ public class Vehicle {
 				double safePosFromLaneVehicle = vehicleToCheck.headPosition +
 						vehicleToCheck.getUnsafeDistanceForVehiclesFromParking() + driverProfile.IDM_s0;
 				if (gapFront - length > safePosFromLaneVehicle) {
-					gaps.add(new double[] { gapFront, safePosFromLaneVehicle + length });
+					gaps.add(new double[]{gapFront, safePosFromLaneVehicle + length});
 				}
 				gapFront = vehicleToCheck.headPosition - (vehicleToCheck.length + driverProfile.IDM_s0);
 				if (gapFront < headPosSpaceBack) {
 					break;
 				}
 			}
-			if(gapFront > headPosSpaceBack){
-				gaps.add(new double[] { gapFront, headPosSpaceBack });
+			if (gapFront > headPosSpaceBack) {
+				gaps.add(new double[]{gapFront, headPosSpaceBack});
 			}
 		} else {
-			gaps.add(new double[] { headPosSpaceFront, headPosSpaceBack });
+			gaps.add(new double[]{headPosSpaceFront, headPosSpaceBack});
 		}
 		double minGapBack = currentEdge.getStartIntersectionSize() + driverProfile.IDM_s0 + length;
 		double minGapFront = currentEdge.getEndIntersectionSize() + driverProfile.IDM_s0;
@@ -152,14 +154,14 @@ public class Vehicle {
 		}
 	}
 
-	public double getNonCollidingHeadPosSpaceBack(Edge current){
+	public double getNonCollidingHeadPosSpaceBack(Edge current) {
 		Node incomingJunc = current.startNode;
 		List<Edge> inEdges = incomingJunc.inwardEdges;
 		double maxHeadPos = current.getStartIntersectionSize();
 		for (Edge inEdge : inEdges) {
 			Lane lane = inEdge.getLane(0);
 			Vehicle first = lane.getFrontVehicleInLane();
-			if(first != null) {
+			if (first != null) {
 				Edge next = first.getNextEdge();
 				if (next != null && next.index == current.index) {
 					double remainingDist = getUnsafeDistanceForVehiclesFromParking() - (inEdge.length - first.headPosition);
@@ -172,12 +174,12 @@ public class Vehicle {
 		return maxHeadPos;
 	}
 
-	public double getUnsafeDistanceForVehiclesFromParking(){
+	public double getUnsafeDistanceForVehiclesFromParking() {
 		return speed * (driverProfile.IDM_T * headWayMultiplier);
 	}
 
 
-	public List<double[]> getValidGaps(List<double[]> gaps, double laneLength, double minGapBack, double minGapFront){
+	public List<double[]> getValidGaps(List<double[]> gaps, double laneLength, double minGapBack, double minGapFront) {
 		double effectiveLength = laneLength - minGapBack - minGapFront;
 		List<double[]> validGaps = new ArrayList<>();
 		for (double[] gap : gaps) {
@@ -227,15 +229,15 @@ public class Vehicle {
 		return false;
 	}
 
-	public boolean isStartFromParking(double timeNow){
+	public boolean isStartFromParking(double timeNow) {
 		return active && (lane == null) && (timeNow >= earliestTimeToLeaveParking);
 	}
 
-	public boolean isStartTripMaking(double timeNow){
+	public boolean isStartTripMaking(double timeNow) {
 		return active && (timeNow >= timeRouteStart);
 	}
 
-	public void changeLane(final double timeNow){
+	public void changeLane(final double timeNow) {
 		if (!((lane == null) || !active || (type == VehicleType.TRAM)
 				|| ((timeNow - timeOfLastLaneChange) < driverProfile.minLaneChangeTimeGap))) {
 
@@ -328,23 +330,24 @@ public class Vehicle {
 		}
 	}
 
-	public List<RouteLeg> getRouteInLookAheadDistance(){
+	public List<RouteLeg> getRouteInLookAheadDistance() {
 		List<RouteLeg> legsAhead = new ArrayList<>();
 		double examinedDist = 0;
 		for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
 			final Edge e1 = routeLegs.get(i).edge;
 			examinedDist += e1.length;
-			if((examinedDist - headPosition) < settings.lookAheadDistance){
+			if ((examinedDist - headPosition) < settings.lookAheadDistance) {
 				legsAhead.add(routeLegs.get(i));
-			}else{
+			} else {
 				break;
 			}
 		}
 		return legsAhead;
 	}
 
-	public void moveForward(double timeNow){
-		if(active) {
+
+	public void moveForward(double timeNow) {
+		if (active) {
 			// Reset priority vehicle effect flag
 			isAffectedByPriorityVehicle = false;
 			// Update information regarding turning
@@ -374,7 +377,7 @@ public class Vehicle {
 			 */
 			headPosition += speed / settings.numStepsPerSecond;
 
-			if(speed > 0){
+			if (speed > 0) {
 				lastSpeedChangeTime = timeNow;
 			}
 
@@ -390,36 +393,45 @@ public class Vehicle {
 			takeIntersectionDecision();
 			updateLaneChangeConflictData();
 
-			if((indexLegOnRoute == getRouteLegCount() - 1) && (headPosition >= lane.edge.length - lane.edge.getEndIntersectionSize())){
+			//check for directional traffic
+			if (lane.edge.getNumVehicles()/lane.edge.getLaneCount() * 0.5 >=
+					lane.edge.getOppositeEdge().getNumVehicles()/lane.edge.getOppositeEdge().getLaneCount()) {
+				timeOnDirectionalTraffic += (1 / settings.numStepsPerSecond);
+				if (lane.edge.currentSpeed > 0.1) {
+					timeOnDirectionalTraffic_speed += (1 / settings.numStepsPerSecond);
+				}
+			}
+
+			if ((indexLegOnRoute == getRouteLegCount() - 1) && (headPosition >= lane.edge.length - lane.edge.getEndIntersectionSize())) {
 				markAsFinished();
 				timeTravel = timeNow - timeRouteStart;
 			}
 		}
 	}
 
-	public void updateHeadway(){
+	public void updateHeadway() {
 		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
 		setHeadWayMultiplier(routeLeg.getHeadwayMultiplier(headPosition, settings.safetyHeadwayMultiplier));
 	}
 
-	public double getInstructedAcc(double timeNow){
+	public double getInstructedAcc(double timeNow) {
 		RouteLeg routeLeg = routeLegs.get(indexLegOnRoute);
-		double deltaT = 1/settings.numStepsPerSecond;
+		double deltaT = 1 / settings.numStepsPerSecond;
 		double s = routeLeg.getTargetPosition(timeNow + deltaT);
-		if(s < 0){
+		if (s < 0) {
 			return Double.POSITIVE_INFINITY;
 		}
 		double deltaS = s - headPosition;
-		return (2 * (deltaS - speed * deltaT))/Math.pow(deltaT, 2);
+		return (2 * (deltaS - speed * deltaT)) / Math.pow(deltaT, 2);
 	}
 
-	public void updateLaneChangeConflictData(){
-		if(laneBeforeChange != null){
-			if(laneBeforeChange != lane || headPosition > lane.edge.getEndIntersectionLaneChangeProhibitedPos()){
+	public void updateLaneChangeConflictData() {
+		if (laneBeforeChange != null) {
+			if (laneBeforeChange != lane || headPosition > lane.edge.getEndIntersectionLaneChangeProhibitedPos()) {
 				//The vehicle has changed the lane or gone beyond the waiting position
 				laneBeforeChange = null;
 				lane.edge.updateLaneChangeConflicts(settings.isDriveOnLeft);
-			}else if(headPosition > lane.edge.getLaneChangeGiveChancePos()){
+			} else if (headPosition > lane.edge.getLaneChangeGiveChancePos()) {
 				lane.edge.findChanceGivingVehicle(settings.isDriveOnLeft);
 			}
 		}
@@ -430,14 +442,14 @@ public class Vehicle {
 
 	}
 
-	public void takeIntersectionDecision(){
+	public void takeIntersectionDecision() {
 		Edge current = lane.edge;
-		if(hasNextEdge()) {
+		if (hasNextEdge()) {
 			if (headPosition > current.getEndIntersectionLaneChangeProhibitedPos()) {
 				Lane next = laneDecider.getNextEdgeLane(this);
 				//SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
 				decision = new IntersectionDecision(lane, next);
-			}else if(headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)){
+			} else if (headPosition > current.getStartIntersectionLaneChangeProhibitedPos(this)) {
 				Lane next = laneDecider.getNextEdgeLane(this);
 				//SimpleCurve curve = VehicleUtil.getIntersectionCurve(this);
 				decision = null; //new IntersectionDecision(lane, next); //new IntersectionDecision(lane, next);
@@ -449,8 +461,8 @@ public class Vehicle {
 		return decision;
 	}
 
-	public void blockAtTramStop(){
-		if (active && lane!= null && type == VehicleType.TRAM) {
+	public void blockAtTramStop() {
+		if (active && lane != null && type == VehicleType.TRAM) {
 			final double brakingDist = VehicleUtil.getBrakingDistance(this);
 			double examinedDist = 0;
 			for (int j = indexLegOnRoute; j < routeLegs.size(); j++) {
@@ -469,12 +481,12 @@ public class Vehicle {
 		}
 	}
 
-	public void updateLane(Lane lane){
-		if(this.lane != null) {
+	public void updateLane(Lane lane) {
+		if (this.lane != null) {
 			this.lane.removeVehicle(this);
 		}
 		this.lane = lane;
-		if(lane != null) {
+		if (lane != null) {
 			lane.addVehicleToLane(this);
 		}
 	}
@@ -507,10 +519,10 @@ public class Vehicle {
 	}
 
 	/*
-	* Get Route legs to visit
-	*/
+	 * Get Route legs to visit
+	 */
 
-	public ArrayList<RouteLeg> getNextRouteLegs(){
+	public ArrayList<RouteLeg> getNextRouteLegs() {
 		ArrayList<RouteLeg> nextRouteLegs = new ArrayList<>();
 		if (routeLegs != null) {
 			for (int i = indexLegOnRoute; i < routeLegs.size(); i++) {
@@ -520,46 +532,46 @@ public class Vehicle {
 		return nextRouteLegs;
 	}
 
-	public Edge getCurrentEdge(){
+	public Edge getCurrentEdge() {
 		RouteLeg routeLeg = getCurrentLeg();
-		if(routeLeg != null) {
+		if (routeLeg != null) {
 			return routeLeg.edge;
 		}
 		return null;
 	}
 
-	public RouteLeg getCurrentLeg(){
-		if(indexLegOnRoute > -1 && indexLegOnRoute < routeLegs.size()) {
+	public RouteLeg getCurrentLeg() {
+		if (indexLegOnRoute > -1 && indexLegOnRoute < routeLegs.size()) {
 			return routeLegs.get(indexLegOnRoute);
 		}
 		return null;
 	}
 
-	public RouteLeg getRouteLeg(int indexOfRouteLeg){
-		if(indexOfRouteLeg > -1 && indexOfRouteLeg < routeLegs.size()) {
+	public RouteLeg getRouteLeg(int indexOfRouteLeg) {
+		if (indexOfRouteLeg > -1 && indexOfRouteLeg < routeLegs.size()) {
 			return routeLegs.get(indexOfRouteLeg);
 		}
 		return null;
 	}
 
-	public Edge getRouteLegEdge(int indexOfRouteLeg){
+	public Edge getRouteLegEdge(int indexOfRouteLeg) {
 		RouteLeg routeLeg = getRouteLeg(indexOfRouteLeg);
-		if(routeLeg != null){
+		if (routeLeg != null) {
 			return routeLeg.edge;
 		}
 		return null;
 	}
 
-	public List<RouteLeg> getRouteLegs(){
+	public List<RouteLeg> getRouteLegs() {
 		return Collections.unmodifiableList(routeLegs);
 	}
 
-	public void setRouteLegs(List<RouteLeg> routeLegs){
+	public void setRouteLegs(List<RouteLeg> routeLegs) {
 		this.routeLegs = routeLegs;
 		laneDecider.computeLanes(this);
 	}
 
-	public int getRouteLegCount(){
+	public int getRouteLegCount() {
 		return routeLegs.size();
 	}
 
@@ -569,6 +581,14 @@ public class Vehicle {
 
 	public void markAsFinished() {
 		this.finished = true;
+	}
+
+	public double getTimeOnDirectionalTraffic() {
+		return timeOnDirectionalTraffic;
+	}
+
+	public double getTimeOnDirectionalTraffic_speed(){
+	 	return timeOnDirectionalTraffic_speed;
 	}
 
 	public void reRoute(double timeNow, Routing routingAlgorithm){

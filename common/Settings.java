@@ -64,7 +64,7 @@ public class Settings {
 	 * Input
 	 */
 	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/map_preprocessed.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -166,12 +166,12 @@ public class Settings {
 	 */
 	//public static ODDistributor odDistributor = new RandomODDistributor();
 	//public static TemporalDistributor temporalDistributor = new UniformTemporalDistributor();
-	@Expose() public String trafficGenerator = "RushHour";
+	@Expose() public String trafficGenerator = "NYCTaxi";
 	@Expose() public String odDistributor = "Random";
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Journal/Lanes/";
+	public String defaultDownloadDirectory = "download/Journal/temp/7am/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -187,7 +187,7 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
-	@Expose() public boolean isExternalListenerUsed = false;
+	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
 
 

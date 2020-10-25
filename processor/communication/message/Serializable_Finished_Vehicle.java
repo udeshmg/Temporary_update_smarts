@@ -29,6 +29,8 @@ public class Serializable_Finished_Vehicle {
     public double bestTravelTime;
     public double actualTravelTime;
     public double routeLength;
+    public double timeOnDirectionalTraffic;
+    public double timeOnDirectionalTraffic_speed;
     public String route;
 
     public Serializable_Finished_Vehicle() {
@@ -42,7 +44,23 @@ public class Serializable_Finished_Vehicle {
         this.bestTravelTime = bestTravelTime;
         this.actualTravelTime = actualTravelTime;
         this.routeLength = routeLength;
+        this.timeOnDirectionalTraffic = 0;
+        this.timeOnDirectionalTraffic_speed = 0;
         this.route = route;
     }
+
+    public Serializable_Finished_Vehicle(String id, int vid, int source, int destination, double bestTravelTime, double actualTravelTime, double routeLength, String route, double timeOnDirectionalTraffic, double timeOnDirectionalTraffic_speed) {
+        this.id = id;
+        this.vid = vid;
+        this.source = source;
+        this.destination = destination;
+        this.bestTravelTime = bestTravelTime;
+        this.actualTravelTime = actualTravelTime;
+        this.routeLength = routeLength;
+        this.timeOnDirectionalTraffic = timeOnDirectionalTraffic;
+        this.timeOnDirectionalTraffic_speed = timeOnDirectionalTraffic_speed;
+        this.route = route;
+    }
+
 
 }

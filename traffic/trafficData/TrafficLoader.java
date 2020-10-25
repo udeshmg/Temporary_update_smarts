@@ -14,6 +14,7 @@ public class TrafficLoader {
     private double lastTimeRead = 0;
     private double startTimeRead = 0;
     private double endTimeRead = 60;
+    private String date = "1/06/2015";
 
     public TrafficLoader(){
 
@@ -23,6 +24,7 @@ public class TrafficLoader {
             e.printStackTrace();
         }
         readHeader();
+        this.date = "1/06/2015";
     }
 
     public double getStartTimeRead() {
@@ -32,6 +34,10 @@ public class TrafficLoader {
     public void setTimeLimitRead(double startTimeRead, double endTimeRead) {
         this.startTimeRead = startTimeRead;
         this.endTimeRead = endTimeRead;
+    }
+
+    public void  setDate(String date){
+        this.date = date;
     }
 
     public TrafficLoader(int startTimeRead){
@@ -97,6 +103,10 @@ public class TrafficLoader {
         Boolean hourReached = false;
         Boolean minuteReached = false;
         int multiplier = 1;
+
+        if (!time.contains(this.date)) {
+            return 0;
+        }
 
         for (int i = 0; i < time.length(); i++) {
 
