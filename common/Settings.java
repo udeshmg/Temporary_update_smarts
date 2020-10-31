@@ -64,8 +64,8 @@ public class Settings {
 	/*
 	 * Input
 	 */
-	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/SingleLane.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputSimulationScript = "./resources/Script.txt";//Simulation setup file when GUI is not used
+	@Expose() public String inputOpenStreetMapFile = "./resources/singleLane.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions

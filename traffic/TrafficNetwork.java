@@ -20,7 +20,7 @@ import traffic.routing.*;
 import traffic.vehicle.DriverProfile;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.VehicleType;
-
+import java.util.Random;
 /**
  * A trafficNetwork contains vehicles and traffic lights on top of a road
  * network. The main functionalities of this class include initializing traffic
@@ -99,7 +99,8 @@ public class TrafficNetwork extends RoadNetwork {
 	private PriorityQueue<Vehicle> tripMakingVehicles;
 
 	private ArrayList<VehiclePathExternal> paths = new ArrayList<>();
-
+	long seed = 25;
+	Random randomTimingGenerator = new Random(seed);
 	/**
 	 * Initialize traffic network.
 	 */
@@ -746,7 +747,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 		while (next != null){
 			//TODO: Change the location
-			int time = (int)(Math.random()*(45-30+1)+30);
+			int time = randomTimingGenerator.nextInt(15)+30;
 			next.setTimeToReach(timeNow+time);
 			next.setTimeRemain(time);
 

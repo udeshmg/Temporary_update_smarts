@@ -90,7 +90,7 @@ public class IDM {
 		double v = vehicle.speed;
 		double v0 = vehicle.type.maxSpeed;
 
-		return command * vehicle.driverProfile.IDM_a * (1 - Math.pow(v / v0, delta));
+		return command*vehicle.driverProfile.IDM_a * (1 - Math.pow(v / v0, delta));
 
 	}
 	/**

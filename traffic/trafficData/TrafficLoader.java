@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class TrafficLoader {
 
-    public final String SAMPLE_CSV_FILE_PATH = "C:/Users/pgunarathna/PycharmProjects/trafficSimulator/NycData/yellow_tripdata_2015-06.csv";
+    public final String SAMPLE_CSV_FILE_PATH = "/home/student.unimelb.edu.au/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/yellow_tripdata_2015-06.csv";
     public BufferedReader fileReader = null;
     private double lastTimeRead = 0;
     private double startTimeRead = 0;

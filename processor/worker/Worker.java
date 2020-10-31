@@ -401,7 +401,7 @@ public class Worker implements MessageHandler, Runnable {
 		if (settings.isVisualize) {
 			progressTimer.scheduleAtFixedRate(progressTimerTask, 500, random.nextInt(1000) + 1);
 		}
-		simulation.createVehicles(msg.externalRoutes);
+		//simulation.createVehicles(msg.externalRoutes);
 		progressTimerTask.cancel();
 		progressTimer.cancel();
 		// Let server know that setup is done

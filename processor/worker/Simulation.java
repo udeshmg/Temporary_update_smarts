@@ -227,6 +227,9 @@ public class Simulation {
 			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
 					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
 					timeNow);
+			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+					timeNow);
 		}
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
@@ -234,17 +237,36 @@ public class Simulation {
 		trafficNetwork.updateStatistics(step);
 		//sendTrafficDataToExternal();
 
-		// Wait for External agent for send instructions after number of time sreps
-
-
-		sendTrafficData();
-		waitForActionsFromExternalClient();
-
-		if (trafficNetwork.vehicles.get(0).isEpisodeDone() &&
-				((step-1) % settings.extListenerUpdateInterval == 0 & (step-1) > 0) ){
-			resetTraffic();
-			trafficNetwork.createInternalNonPublicVehicles(1, step/settings.numStepsPerSecond, true);
+		// Wait for External agent for send instructions after number of time steps
+		Vehicle targetVehicle = null;
+		for (Vehicle v : trafficNetwork.vehicles){
+			if (v.vid == 2){
+				targetVehicle = v;
+			}
 		}
+
+
+		if (targetVehicle.lane != null) {
+			waitForActionsFromExternalClient();
+			sendTrafficData();
+		}
+
+
+		if (targetVehicle != null) {
+			if (targetVehicle.isEpisodeDone() &&
+					((step - 1) % settings.extListenerUpdateInterval == 0 & (step - 1) > 0)) {
+				resetTraffic();
+				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+			}
+		}
+		else {
+			resetTraffic();
+			trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+			trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+		}
+
+
 
 
 		// Clear one-step data
@@ -283,7 +305,7 @@ public class Simulation {
 
 	public void sendTrafficData(){
 		if (settings.isExternalListenerUsed){
-			if ((step-1) % settings.extListenerUpdateInterval == 0 & (step-1) > 0) {
+			if ((step-1) % settings.extListenerUpdateInterval == 0) {
 				extListner.sendTrafficData(trafficNetwork);
 			}
 		}

@@ -22,6 +22,11 @@ import traffic.vehicle.lanechange.LaneChange;
 import traffic.vehicle.lanechange.LaneChangeDirection;
 import traffic.vehicle.lanechange.MOBILInput;
 import traffic.vehicle.lanedecide.LaneDecider;
+import traffic.vehicle.vehicleController.ControllerFactory;
+import traffic.vehicle.vehicleController.VehicleController;
+
+import javax.xml.stream.FactoryConfigurationError;
+
 
 public class Vehicle {
 	public String id = "";
@@ -77,6 +82,9 @@ public class Vehicle {
 	private Node end;
 	private Settings settings;
 
+	VehicleController controller = null;
+	ControllerFactory controllerFactory = new ControllerFactory();
+
 	/**
 	 * External interface to control acceleration of the vehicle
 	 */
@@ -87,6 +95,7 @@ public class Vehicle {
 		this.carFollow = new CarFollow(settings);
 		this.laneChange = new LaneChange(settings);
 		this.laneDecider = settings.getLaneDecider();
+		this.controller = controllerFactory.getController(this, settings);
 	}
 
 
@@ -98,6 +107,13 @@ public class Vehicle {
 	private boolean is_success = false;
 	private double timeToReach = 30; // in seconds
 	private double timeRemain = 0;
+	private boolean isIntersectionConstraints = false;
+	private double intersectionVisibleLength = 380; //In meters
+	private Edge targetEdge = null;
+	public boolean crashed = false;
+
+	private double gap = 0;
+	private double frontVehicleSpeed = 0.0;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -210,12 +226,12 @@ public class Vehicle {
 	public void park(final boolean isNewVehicle, final double timeNow) {
 		speed = 0;
 		acceleration = 0;
-		routeLegs.get(indexLegOnRoute).edge.addParkedVehicle(this);
 		if (isNewVehicle) {
 			earliestTimeToLeaveParking = timeRouteStart + routeLegs.get(0).stopover;
 		} else {
 			earliestTimeToLeaveParking = timeNow + routeLegs.get(indexLegOnRoute).stopover;
 		}
+		routeLegs.get(indexLegOnRoute).edge.addParkedVehicle(this);
 		if (lane != null) {
 			lane.removeVehicle(this);
 			lane = null;
@@ -372,7 +388,10 @@ public class Vehicle {
 
 			findEpisodeFinished(timeNow);
 
-			if (settings.isExternalListenerUsed){
+			if (settings.isExternalListenerUsed) {
+				if (this.vid == 1){
+					externalCommandAcc = controller.computePaddleCommand(this);
+				}
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
 			} else {
 				acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
@@ -735,8 +754,8 @@ public class Vehicle {
 		if (active) {
 			double overshootDist = headPosition - lane.edge.length;
 
-			if (overshootDist >= 0) {
-
+			if (overshootDist >= 0){
+				//setIntersectionConstraints(false);
 				// Cancel priority lanes
 				setPriorityLanes(false);
 
@@ -957,6 +976,19 @@ public class Vehicle {
 		return null;
 	}
 
+
+	public int computeAcceleration(Vehicle vehicle) {
+		if (vehicle.headPosition < 100){
+			if (vehicle.speed < 20) return 1;
+			else return 0;
+		}
+		else if (vehicle.headPosition < 150) {
+			if (vehicle.speed > 1) return -1;
+			else return 0;
+		}
+		else return 1;
+	}
+
 	public class IntersectionDecision{
 		private Lane startLane;
 		private Lane endLane;
@@ -998,12 +1030,61 @@ public class Vehicle {
 		this.externalCommandAcc = externalCommandAcc;
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public double getGap() {
+		return gap;
+	}
+
+	public void setGap(double gap) {
+		this.gap = gap;
+	}
+
+	public double getFrontVehicleSpeed() {
+		return frontVehicleSpeed;
+	}
+
+	public void setFrontVehicleSpeed(double frontVehicleSpeed) {
+		this.frontVehicleSpeed = frontVehicleSpeed;
+	}
 
 	/**
 	 * Methods for external Updates
 	 */
 
 	public void findEpisodeFinished(double timeNow){
+		Vehicle frontVehicle =  this.lane.getClosestFrontVehicleInLane(this, 0);
+
+		if (isEpisodeDone) return;
+
+		if (frontVehicle != null){
+			if (frontVehicle.headPosition < this.headPosition + 2){ //2 meters
+				crashed =  true;
+				isEpisodeDone = true;
+			}
+			setGap(frontVehicle.headPosition - headPosition);
+			setFrontVehicleSpeed(frontVehicle.speed);
+		}
+		else {
+			if (lane.getVehicleCount() > 1){
+				crashed =  true;
+				isEpisodeDone = true;
+				setGap(0);
+				setFrontVehicleSpeed(lane.getVehicles().get(0).speed);
+			}
+			else {
+				setGap(lane.edge.length + 100 - headPosition);
+				setFrontVehicleSpeed(lane.edge.freeFlowSpeed);
+			}
+		}
+
+
 		if ( timeNow >= timeToReach || Math.abs(lane.edge.length - headPosition) < 4.5) {
 			isEpisodeDone = true;
 			if ( timeNow >= (timeToReach-2) && Math.abs(lane.edge.length - headPosition) < 4.5){
@@ -1015,6 +1096,14 @@ public class Vehicle {
 		}
 
 		timeRemain = timeToReach - timeNow;
+	}
+
+	public void assignIntersectionConstrains(double timeNow){
+		targetEdge = this.lane.edge;
+		isEpisodeDone = false;
+		int time = (int)(Math.random()*(45-30+1)+30);
+		this.setTimeToReach(timeNow+time);
+		this.setTimeRemain(time);
 	}
 
 	public boolean isEpisodeDone() {
@@ -1041,6 +1130,13 @@ public class Vehicle {
 		this.timeRemain = timeRemain;
 	}
 
+	public boolean isIntersectionConstraints() {
+		return isIntersectionConstraints;
+	}
+
+	public void setIntersectionConstraints(boolean intersectionConstraints) {
+		isIntersectionConstraints = intersectionConstraints;
+	}
 
 	public boolean isIs_success() {
 		return is_success;
@@ -1049,4 +1145,6 @@ public class Vehicle {
 	public void setIs_success(boolean is_success) {
 		this.is_success = is_success;
 	}
+
+
 }

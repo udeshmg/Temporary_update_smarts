@@ -16,6 +16,9 @@ public class VehicleExternal {
     private boolean done = false;
     private double timeRemain = 0;
     private boolean is_success = false;
+    private double gap = 0;
+    private double frontVehicleSpeed = 0;
+    private boolean crashed = false;
 
 
     public VehicleExternal(final Vehicle vehicle){
@@ -27,6 +30,24 @@ public class VehicleExternal {
         this.done = vehicle.isEpisodeDone();
         this.timeRemain = vehicle.getTimeRemain();
         this.is_success = vehicle.isIs_success();
+        this.crashed = vehicle.crashed;
+        this.gap = vehicle.getGap();
+        this.frontVehicleSpeed = vehicle.getFrontVehicleSpeed();
+
+        //Vehicle frontVehicle = vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);
+        //if (frontVehicle != null) {
+        //    frontVehicleSpeed = frontVehicle.speed;
+        //    gap = frontVehicle.headPosition - vehicle.headPosition;
+        //}
+        //else {
+        //    frontVehicleSpeed = vehicle.lane.edge.freeFlowSpeed;
+        //    gap = vehicle.lane.edge.length + 100 - vehicle.headPosition;
+        //    if (vehicle.crashed){
+        //        gap = 0;
+        //    }
+        //
+        //}
+
     }
 
     public int getVid() {
@@ -67,5 +88,21 @@ public class VehicleExternal {
 
     public void setEdgeId(int edgeId) {
         this.edgeId = edgeId;
+    }
+
+    public double getGap() {
+        return gap;
+    }
+
+    public void setGap(double gap) {
+        this.gap = gap;
+    }
+
+    public double getFrontVehicleSpeed() {
+        return frontVehicleSpeed;
+    }
+
+    public void setFrontVehicleSpeed(double frontVehicleSpeed) {
+        this.frontVehicleSpeed = frontVehicleSpeed;
     }
 }
