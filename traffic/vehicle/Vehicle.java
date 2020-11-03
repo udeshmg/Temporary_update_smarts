@@ -25,8 +25,6 @@ import traffic.vehicle.lanedecide.LaneDecider;
 import traffic.vehicle.vehicleController.ControllerFactory;
 import traffic.vehicle.vehicleController.VehicleController;
 
-import javax.xml.stream.FactoryConfigurationError;
-
 
 public class Vehicle {
 	public String id = "";
@@ -114,6 +112,7 @@ public class Vehicle {
 
 	private double gap = 0;
 	private double frontVehicleSpeed = 0.0;
+	private boolean inExternalControl = false;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -247,6 +246,7 @@ public class Vehicle {
 		final Lane lane = laneDecider.getNextEdgeLane(this);// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0();
 		if (pos >= 0) {
+			if (vid == 2) setInExternalControl(true);
 			this.lane = lane;
 			headPosition = pos;
 			startHeadPosition = headPosition;
@@ -386,16 +386,24 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
+			if (intersectionVisibleLength < (lane.edge.length - headPosition) && !isIntersectionConstraints) {
+				assignIntersectionConstrains(timeNow, settings.randomTimingGenerator);
+				isIntersectionConstraints = true;
+			}
+
 			findEpisodeFinished(timeNow);
 
-			if (settings.isExternalListenerUsed) {
-				if (this.vid == 1){
+			if (settings.isExternalListenerUsed && isIntersectionConstraints){// && isInExternalControl()) {
+				if (vid == 1) {
 					externalCommandAcc = controller.computePaddleCommand(this);
+					//System.out.println(timeNow + " " + externalCommandAcc);
 				}
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
+			//if (vid == 1) System.out.println("Data:" + timeRemain + " " + headPosition + " " + lane.edge.index);
 			} else {
 				acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			}
+
 			// Update vehicle speed, which must be between 0 and free-flow speed
 			speed += acceleration / settings.numStepsPerSecond;
 			if (speed > lane.edge.freeFlowSpeed) {
@@ -754,6 +762,7 @@ public class Vehicle {
 		if (active) {
 			double overshootDist = headPosition - lane.edge.length;
 
+
 			if (overshootDist >= 0){
 				//setIntersectionConstraints(false);
 				// Cancel priority lanes
@@ -764,6 +773,9 @@ public class Vehicle {
 					headPosition -= lane.edge.length;
 					// Update route leg
 					indexLegOnRoute++;
+
+					//reset intersection controls
+					isIntersectionConstraints = false;
 
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
@@ -1054,6 +1066,14 @@ public class Vehicle {
 		this.frontVehicleSpeed = frontVehicleSpeed;
 	}
 
+	public boolean isInExternalControl() {
+		return inExternalControl;
+	}
+
+	public void setInExternalControl(boolean inExternalControl) {
+		this.inExternalControl = inExternalControl;
+	}
+
 	/**
 	 * Methods for external Updates
 	 */
@@ -1098,10 +1118,8 @@ public class Vehicle {
 		timeRemain = timeToReach - timeNow;
 	}
 
-	public void assignIntersectionConstrains(double timeNow){
-		targetEdge = this.lane.edge;
-		isEpisodeDone = false;
-		int time = (int)(Math.random()*(45-30+1)+30);
+	public void assignIntersectionConstrains(double timeNow, Random randomTimingGenerator){
+		int time = randomTimingGenerator.nextInt(15)+30;
 		this.setTimeToReach(timeNow+time);
 		this.setTimeRemain(time);
 	}

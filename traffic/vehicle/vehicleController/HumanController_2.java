@@ -38,7 +38,7 @@ public class HumanController_2 extends VehicleController {
         if (counter%stepsPerSecond == 0)
             num_steps++;
 
-        if (num_steps < 10){
+        if (num_steps < 8){
             return 1;
         }
         else if (num_steps < 15){

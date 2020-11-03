@@ -19,6 +19,7 @@ public class VehicleExternal {
     private double gap = 0;
     private double frontVehicleSpeed = 0;
     private boolean crashed = false;
+    private boolean externalControl = false;
 
 
     public VehicleExternal(final Vehicle vehicle){
@@ -33,6 +34,9 @@ public class VehicleExternal {
         this.crashed = vehicle.crashed;
         this.gap = vehicle.getGap();
         this.frontVehicleSpeed = vehicle.getFrontVehicleSpeed();
+        this.externalControl = vehicle.isInExternalControl();
+
+        if (done) vehicle.setInExternalControl(false);
 
         //Vehicle frontVehicle = vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);
         //if (frontVehicle != null) {

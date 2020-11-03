@@ -746,11 +746,6 @@ public class TrafficNetwork extends RoadNetwork {
 		Vehicle next = getNextTripMakingVehicle(timeNow);
 
 		while (next != null){
-			//TODO: Change the location
-			int time = randomTimingGenerator.nextInt(15)+30;
-			next.setTimeToReach(timeNow+time);
-			next.setTimeRemain(time);
-
 			next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
 			if(listener != null){
 				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/settings.numStepsPerSecond), this);
@@ -902,6 +897,15 @@ public class TrafficNetwork extends RoadNetwork {
 
 			paths.add(new VehiclePathExternal(pathInInt, 1));
 		}
+	}
+
+	public Vehicle findVehicleWithID(int id){
+		for (Vehicle v : vehicles){
+			if (v.vid == id){
+				return v;
+			}
+		}
+		return null;
 	}
 
 

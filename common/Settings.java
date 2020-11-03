@@ -190,6 +190,8 @@ public class Settings {
 	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
 
+	long seed = 25;
+	public Random randomTimingGenerator = new Random(seed);
 
 
 	public String getOutputPrefix (){

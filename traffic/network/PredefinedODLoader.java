@@ -38,10 +38,12 @@ public class PredefinedODLoader extends ODDistributor {
     public Node[] getStartAndEndEdge(TrafficNetwork trafficNetwork, List<Edge> possibleStartEdges, List<Edge> possibleEndEdges, int timeNow) {
         Node[] odpair = {trafficNetwork.nodes.get(odMatrix[trafficType][counter][0]), trafficNetwork.nodes.get(odMatrix[trafficType][counter][1])};
         iterate();
-        if (timeNow > 2000) {
+        if(timeNow > 2000) {
             trafficType = 0;
         }
-        else { trafficType = 0;}
+        else {
+            trafficType = 0;
+        }
         return odpair;
     }
 
@@ -53,7 +55,8 @@ public class PredefinedODLoader extends ODDistributor {
     private void iterate(){
         counter ++;
         iterator ++;
-        if (counter == maxCounter){ counter = 0;}
-
+        if (counter == maxCounter){
+            counter = 0;
+        }
     }
 }

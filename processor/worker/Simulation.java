@@ -247,8 +247,8 @@ public class Simulation {
 
 
 		if (targetVehicle.lane != null) {
-			waitForActionsFromExternalClient();
-			sendTrafficData();
+		waitForActionsFromExternalClient();
+		sendTrafficData();
 		}
 
 
@@ -346,7 +346,10 @@ public class Simulation {
 		if (vehicleControls != null){
 			for ( VehicleControl vehicleControl : vehicleControls){
 				if ( trafficNetwork.vehicles.size() > 0 ) {
-					trafficNetwork.vehicles.get(vehicleControl.getIndex()-1).setExternalControls(vehicleControl);
+					Vehicle v = trafficNetwork.findVehicleWithID(vehicleControl.getIndex());
+					if (v != null) {
+						v.setExternalControls(vehicleControl);
+					}
 				}
 			}
 		}
