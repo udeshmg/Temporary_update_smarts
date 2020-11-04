@@ -30,13 +30,15 @@ public class VehicleExternal {
         this.vid = vehicle.vid;
         this.done = vehicle.isEpisodeDone();
         this.timeRemain = vehicle.getTimeRemain();
-        this.is_success = vehicle.isIs_success();
+        this.is_success = vehicle.isSuccess();
         this.crashed = vehicle.crashed;
         this.gap = vehicle.getGap();
         this.frontVehicleSpeed = vehicle.getFrontVehicleSpeed();
         this.externalControl = vehicle.isInExternalControl();
 
-        if (done) vehicle.setInExternalControl(false);
+        if (done) {
+            vehicle.setInExternalControl(false);
+        }
 
         //Vehicle frontVehicle = vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);
         //if (frontVehicle != null) {

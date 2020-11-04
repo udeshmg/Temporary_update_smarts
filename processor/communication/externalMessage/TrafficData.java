@@ -41,7 +41,9 @@ public class TrafficData {
                 numVehicles += lane.getVehicles().size();
                 for (Vehicle v : lane.getVehicles()){
 
+
                     vehicles.add(new VehicleExternal(v));
+
 
                     numVehicles++;
                     if (v.edgeBeforeTurnRight == edge){

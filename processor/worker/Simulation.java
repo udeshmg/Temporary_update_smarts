@@ -223,6 +223,8 @@ public class Simulation {
 		trafficNetwork.releaseVehicleFromParking(timeNow, simulationListener);
 		trafficNetwork.blockTramAtTramStop();
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
+		trafficNetwork.updateIntersectionControllers(timeNow);
+
 		if (step == 0) {
 			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
 					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
@@ -246,14 +248,14 @@ public class Simulation {
 		}
 
 
-		if (targetVehicle.lane != null) {
+		if (targetVehicle.lane != null && targetVehicle.isIntersectionConstraints()) {
 		waitForActionsFromExternalClient();
 		sendTrafficData();
 		}
 
 
 		if (targetVehicle != null) {
-			if (targetVehicle.isEpisodeDone() &&
+			if (targetVehicle.isEpisodeDone() && !targetVehicle.isInExternalControl() &&
 					((step - 1) % settings.extListenerUpdateInterval == 0 & (step - 1) > 0)) {
 				resetTraffic();
 				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);

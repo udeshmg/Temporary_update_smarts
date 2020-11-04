@@ -908,6 +908,14 @@ public class TrafficNetwork extends RoadNetwork {
 		return null;
 	}
 
+	public void updateIntersectionControllers(double timeNow){
+		for(Node node : nodes){
+			if (node.intersectionControllerInUse){
+				node.intersectionController.computeSchedule(timeNow);
+			}
+		}
+	}
+
 
 	public void updateStatistics(int step){
 

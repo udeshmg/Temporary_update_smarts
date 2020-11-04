@@ -1,6 +1,8 @@
 package traffic.road;
 
 import common.Settings;
+import traffic.IntersectionControl.IntersectionController;
+import traffic.IntersectionControl.PollBasedController;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.carfollow.SimpleCurve;
 
@@ -33,6 +35,12 @@ public class Node {
 	 * The grid cell that contains this node.
 	 */
 	public GridCell gridCell;
+	/**
+	 * Intersection controller in use
+	 */
+	public boolean intersectionControllerInUse;
+	public IntersectionController intersectionController;
+
 	/**
 	 * Whether there is traffic light at this node.
 	 */
@@ -93,6 +101,9 @@ public class Node {
 		this.light = light;
 		tramStop = tram_stop;
 		busStop = bus_stop;
+
+		intersectionController = new PollBasedController(this, 380, settings);
+		intersectionControllerInUse = true;
 	}
 
 	public void findIntersectionPolygon(){

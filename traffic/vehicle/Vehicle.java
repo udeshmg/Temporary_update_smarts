@@ -386,12 +386,9 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
-			if (intersectionVisibleLength < (lane.edge.length - headPosition) && !isIntersectionConstraints) {
-				assignIntersectionConstrains(timeNow, settings.randomTimingGenerator);
-				isIntersectionConstraints = true;
+			if (isIntersectionConstraints()){
+				findEpisodeFinished(timeNow);
 			}
-
-			findEpisodeFinished(timeNow);
 
 			if (settings.isExternalListenerUsed && isIntersectionConstraints){// && isInExternalControl()) {
 				if (vid == 1) {
@@ -1118,10 +1115,10 @@ public class Vehicle {
 		timeRemain = timeToReach - timeNow;
 	}
 
-	public void assignIntersectionConstrains(double timeNow, Random randomTimingGenerator){
-		int time = randomTimingGenerator.nextInt(15)+30;
-		this.setTimeToReach(timeNow+time);
-		this.setTimeRemain(time);
+	public void assignIntersectionConstrains(double timeNow, int timeToReach){
+		isIntersectionConstraints = true;
+		this.setTimeToReach(timeNow+timeToReach);
+		this.setTimeRemain(timeToReach);
 	}
 
 	public boolean isEpisodeDone() {
@@ -1156,11 +1153,11 @@ public class Vehicle {
 		isIntersectionConstraints = intersectionConstraints;
 	}
 
-	public boolean isIs_success() {
+	public boolean isSuccess() {
 		return is_success;
 	}
 
-	public void setIs_success(boolean is_success) {
+	public void setSuccess(boolean is_success) {
 		this.is_success = is_success;
 	}
 
