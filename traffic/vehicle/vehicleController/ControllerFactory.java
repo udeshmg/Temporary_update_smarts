@@ -16,7 +16,7 @@ public class ControllerFactory {
         if (number == 0)
             return new HumanController_2(v, settings);
         else if (number == 1)
-            return new HumanController_2(v, settings);
+            return new HumanController_3(v, settings);
         else
             return new HumanController_2(v, settings);
     }

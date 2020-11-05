@@ -28,16 +28,16 @@ public class VehicleExternal {
         this.speed = vehicle.speed;
         this.edgeId = vehicle.lane.edge.index;
         this.vid = vehicle.vid;
-        this.done = vehicle.isEpisodeDone();
-        this.timeRemain = vehicle.getTimeRemain();
-        this.is_success = vehicle.isSuccess();
-        this.crashed = vehicle.crashed;
-        this.gap = vehicle.getGap();
-        this.frontVehicleSpeed = vehicle.getFrontVehicleSpeed();
-        this.externalControl = vehicle.isInExternalControl();
+        this.done = vehicle.episodeStat.isEpisodeDone();
+        this.timeRemain = vehicle.episodeStat.getTimeRemain();
+        this.is_success = vehicle.episodeStat.isSuccess();
+        this.crashed = vehicle.episodeStat.isCrashed();
+        this.gap = vehicle.episodeStat.getGap();
+        this.frontVehicleSpeed = vehicle.episodeStat.getFrontVehicleSpeed();
+        this.externalControl = vehicle.episodeStat.isInExternalControl();
 
         if (done) {
-            vehicle.setInExternalControl(false);
+            vehicle.episodeStat.setInExternalControl(false);
         }
 
         //Vehicle frontVehicle = vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);

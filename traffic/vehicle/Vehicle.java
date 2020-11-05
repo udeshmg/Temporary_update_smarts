@@ -82,6 +82,7 @@ public class Vehicle {
 
 	VehicleController controller = null;
 	ControllerFactory controllerFactory = new ControllerFactory();
+	public IntersectionStatManager episodeStat = new IntersectionStatManager();
 
 	/**
 	 * External interface to control acceleration of the vehicle
@@ -101,18 +102,7 @@ public class Vehicle {
 	 * Following variables are used to track external statistics
 	 */
 
-	private boolean isEpisodeDone = false;
-	private boolean is_success = false;
-	private double timeToReach = 30; // in seconds
-	private double timeRemain = 0;
-	private boolean isIntersectionConstraints = false;
-	private double intersectionVisibleLength = 380; //In meters
-	private Edge targetEdge = null;
-	public boolean crashed = false;
 
-	private double gap = 0;
-	private double frontVehicleSpeed = 0.0;
-	private boolean inExternalControl = false;
 
 	/**
 	 * This method tries to find a start position for a vehicle such that the
@@ -246,7 +236,7 @@ public class Vehicle {
 		final Lane lane = laneDecider.getNextEdgeLane(this);// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0();
 		if (pos >= 0) {
-			if (vid == 2) setInExternalControl(true);
+			if (vid == 2) episodeStat.setInExternalControl(true);
 			this.lane = lane;
 			headPosition = pos;
 			startHeadPosition = headPosition;
@@ -386,11 +376,11 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
-			if (isIntersectionConstraints()){
-				findEpisodeFinished(timeNow);
+			if (episodeStat.isIntersectionConstraints()){
+				episodeStat.findEpisodeFinished(timeNow, this);
 			}
 
-			if (settings.isExternalListenerUsed && isIntersectionConstraints){// && isInExternalControl()) {
+			if (settings.isExternalListenerUsed && episodeStat.isIntersectionConstraints()){// && isInExternalControl()) {
 				if (vid == 1) {
 					externalCommandAcc = controller.computePaddleCommand(this);
 					//System.out.println(timeNow + " " + externalCommandAcc);
@@ -772,7 +762,7 @@ public class Vehicle {
 					indexLegOnRoute++;
 
 					//reset intersection controls
-					isIntersectionConstraints = false;
+					episodeStat.setIntersectionConstraints(false);
 
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
@@ -1047,119 +1037,6 @@ public class Vehicle {
 		this.id = id;
 	}
 
-	public double getGap() {
-		return gap;
-	}
-
-	public void setGap(double gap) {
-		this.gap = gap;
-	}
-
-	public double getFrontVehicleSpeed() {
-		return frontVehicleSpeed;
-	}
-
-	public void setFrontVehicleSpeed(double frontVehicleSpeed) {
-		this.frontVehicleSpeed = frontVehicleSpeed;
-	}
-
-	public boolean isInExternalControl() {
-		return inExternalControl;
-	}
-
-	public void setInExternalControl(boolean inExternalControl) {
-		this.inExternalControl = inExternalControl;
-	}
-
-	/**
-	 * Methods for external Updates
-	 */
-
-	public void findEpisodeFinished(double timeNow){
-		Vehicle frontVehicle =  this.lane.getClosestFrontVehicleInLane(this, 0);
-
-		if (isEpisodeDone) return;
-
-		if (frontVehicle != null){
-			if (frontVehicle.headPosition < this.headPosition + 2){ //2 meters
-				crashed =  true;
-				isEpisodeDone = true;
-			}
-			setGap(frontVehicle.headPosition - headPosition);
-			setFrontVehicleSpeed(frontVehicle.speed);
-		}
-		else {
-			if (lane.getVehicleCount() > 1){
-				crashed =  true;
-				isEpisodeDone = true;
-				setGap(0);
-				setFrontVehicleSpeed(lane.getVehicles().get(0).speed);
-			}
-			else {
-				setGap(lane.edge.length + 100 - headPosition);
-				setFrontVehicleSpeed(lane.edge.freeFlowSpeed);
-			}
-		}
-
-
-		if ( timeNow >= timeToReach || Math.abs(lane.edge.length - headPosition) < 4.5) {
-			isEpisodeDone = true;
-			if ( timeNow >= (timeToReach-2) && Math.abs(lane.edge.length - headPosition) < 4.5){
-				is_success = true;
-			}
-			else {
-				is_success = false;
-			}
-		}
-
-		timeRemain = timeToReach - timeNow;
-	}
-
-	public void assignIntersectionConstrains(double timeNow, int timeToReach){
-		isIntersectionConstraints = true;
-		this.setTimeToReach(timeNow+timeToReach);
-		this.setTimeRemain(timeToReach);
-	}
-
-	public boolean isEpisodeDone() {
-		return isEpisodeDone;
-	}
-
-	public void setEpisodeDone(boolean episodeDone) {
-		isEpisodeDone = episodeDone;
-	}
-
-	public double getTimeToReach() {
-		return timeToReach;
-	}
-
-	public void setTimeToReach(double timeToReach) {
-		this.timeToReach = timeToReach;
-	}
-
-	public double getTimeRemain() {
-		return timeRemain;
-	}
-
-	public void setTimeRemain(double timeRemain) {
-		this.timeRemain = timeRemain;
-	}
-
-	public boolean isIntersectionConstraints() {
-		return isIntersectionConstraints;
-	}
-
-	public void setIntersectionConstraints(boolean intersectionConstraints) {
-		isIntersectionConstraints = intersectionConstraints;
-	}
-
-	public boolean isSuccess() {
-		return is_success;
-	}
-
-	public void setSuccess(boolean is_success) {
-		this.is_success = is_success;
-	}
 
 
 }

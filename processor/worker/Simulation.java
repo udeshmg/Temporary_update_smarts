@@ -248,14 +248,14 @@ public class Simulation {
 		}
 
 
-		if (targetVehicle.lane != null && targetVehicle.isIntersectionConstraints()) {
+		if (targetVehicle.lane != null && targetVehicle.episodeStat.isIntersectionConstraints()) {
 		waitForActionsFromExternalClient();
 		sendTrafficData();
 		}
 
 
 		if (targetVehicle != null) {
-			if (targetVehicle.isEpisodeDone() && !targetVehicle.isInExternalControl() &&
+			if (targetVehicle.episodeStat.isEpisodeDone() && !targetVehicle.episodeStat.isInExternalControl() &&
 					((step - 1) % settings.extListenerUpdateInterval == 0 & (step - 1) > 0)) {
 				resetTraffic();
 				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);

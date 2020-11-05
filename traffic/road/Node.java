@@ -3,6 +3,7 @@ package traffic.road;
 import common.Settings;
 import traffic.IntersectionControl.IntersectionController;
 import traffic.IntersectionControl.PollBasedController;
+import traffic.IntersectionControl.RandomController;
 import traffic.vehicle.Vehicle;
 import traffic.vehicle.carfollow.SimpleCurve;
 
@@ -102,7 +103,7 @@ public class Node {
 		tramStop = tram_stop;
 		busStop = bus_stop;
 
-		intersectionController = new PollBasedController(this, 380, settings);
+		intersectionController = new RandomController(this, 380, settings);
 		intersectionControllerInUse = true;
 	}
 
