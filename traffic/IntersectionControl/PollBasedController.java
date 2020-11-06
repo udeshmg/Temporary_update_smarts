@@ -35,12 +35,13 @@ public class PollBasedController extends IntersectionController {
     @Override
     public void computeSchedule(double timeNow) {
 
+        if (!isTriggered) return;
         // Get arriving vehicles within control region and not yet finished servicing
         for (Edge edge : node.inwardEdges){
             ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
-            for (Vehicle v : edge.getFirstLane().getVehicles()){
-                if (!v.episodeStat.isFinalizedSchedule(timeNow) || !v.episodeStat.isIntersectionConstraints())
-                    laneQueue.add(v.episodeStat);
+            for (Vehicle vehicle : edge.getFirstLane().getVehicles()){
+                if (!vehicle.episodeStat.isFinalizedSchedule(timeNow) || !vehicle.episodeStat.isIntersectionConstraints())
+                    laneQueue.add(vehicle.episodeStat);
             }
             allQueues.add(laneQueue);
         }

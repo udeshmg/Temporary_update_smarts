@@ -380,6 +380,8 @@ public class Vehicle {
 				episodeStat.findEpisodeFinished(timeNow, this);
 			}
 
+			episodeStat.notifyController(this);
+
 			if (settings.isExternalListenerUsed && episodeStat.isIntersectionConstraints()){// && isInExternalControl()) {
 				if (vid == 1) {
 					externalCommandAcc = controller.computePaddleCommand(this);
@@ -754,6 +756,7 @@ public class Vehicle {
 				//setIntersectionConstraints(false);
 				// Cancel priority lanes
 				setPriorityLanes(false);
+				episodeStat.resetNotifyController();
 
 				while ((indexLegOnRoute < getRouteLegCount()) && (overshootDist >= 0)) {
 					// Update head position

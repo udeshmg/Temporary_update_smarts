@@ -20,6 +20,7 @@ public class IntersectionStatManager {
 
     private double timeArrived = 0.0;
     private double assignedTime = 0.0;
+    private boolean controllerNotified = false;
 
     public IntersectionStatManager(double timeArrived){
         this.timeArrived = timeArrived;
@@ -73,6 +74,20 @@ public class IntersectionStatManager {
         this.setTimeToReach(timeNow+timeToReach);
         this.setTimeRemain(timeToReach);
     }
+
+    public void notifyController(Vehicle vehicle){
+        if (vehicle.lane.edge.endNode.intersectionControllerInUse && !controllerNotified ){
+            if ( vehicle.lane.edge.endNode.intersectionController.getControlRegion() > (vehicle.lane.edge.length - vehicle.headPosition) )
+                vehicle.lane.edge.endNode.intersectionController.notifyController();
+                controllerNotified = true;
+        }
+    }
+
+    public void resetNotifyController(){
+        controllerNotified = false;
+    }
+
+
 
     public boolean isEpisodeDone() {
         return isEpisodeDone;
