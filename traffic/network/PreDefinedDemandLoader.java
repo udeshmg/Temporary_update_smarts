@@ -14,6 +14,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
     public int trafficType = 0;
     private boolean isUnidirectional = false;
     private int trafficGenarateDuration = 12000;
+    private boolean training = false;
 
     private Random rand;
 
@@ -64,6 +65,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         this.demand = settings.demandPerOneInterval;
         this.isUnidirectional = settings.isUnidirectional;
         this.trafficGenarateDuration = settings.trafficGenerateDuration;
+        this.training = settings.training;
         setDemandMatrix();
     }
 
@@ -80,17 +82,22 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
 
         selectTrafficType(currentStep);
         int numVehicles = 0;
-        //if (currentStep < trafficGenarateDuration) {
-            //if (currentStep % freq != 0 ) {
-               // numVehicles = 0;
-            //}
-             //else {
-              numVehicles = 1; //demandMatrix[trafficType][counter];
-            //}
-        //}
-        //else
-        //    numVehicles = 0;
-
+        if (training){
+            numVehicles = 1;
+        }
+        else {
+            if (currentStep < trafficGenarateDuration) {
+                //if (currentStep % freq != 0 ) {
+                // numVehicles = 0;
+                //}
+                //else {
+                numVehicles = 1; //rand.nextInt(3);
+                //}
+                //}
+                //else
+                //    numVehicles = 0;
+            }
+        }
         iterate();
         return numVehicles;
 

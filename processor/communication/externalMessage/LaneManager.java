@@ -124,7 +124,7 @@ public class LaneManager implements ExternalSimulationListener {
     @Override
     public void waitForAction() {
         byte[] reply = socket.recv();
-        System.out.println("Action received");
+        //System.out.println("Action received");
         String data = new String(reply, ZMQ.CHARSET);
         Gson gson = new Gson();
         SimulatorExternalControlObjects rdIndex = gson.fromJson(data, SimulatorExternalControlObjects.class);

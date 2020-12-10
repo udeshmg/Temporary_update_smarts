@@ -40,8 +40,6 @@ public class Settings {
 	@Expose() public double numStepsPerSecond = 5;//This determines the step length.
 	@Expose() public int pauseTimeBetweenStepsInMilliseconds = 0;//Can be used to adjust pace so a user can slow down simulation on GUI
 	@Expose() public int trafficReportStepGapInServerlessMode = 1;
-
-
 	/*
 	 * Display
 	 */
@@ -152,14 +150,12 @@ public class Settings {
 
 	@Expose() public int demandPerOneInterval = 1; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 1; // Frequency of traffic generation in steps
-	@Expose() public int numODPairs = 1;
+
 	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
-	@Expose() public int trafficGenerateDuration = 1; // in steps
+	@Expose() public int trafficGenerateDuration = 6000; // in steps
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
-
-	@Expose() public int extListenerUpdateInterval = 5; // lane update time interval in steps
 
 	/**
 	 * OD Distribution
@@ -187,9 +183,12 @@ public class Settings {
 	public String tlManager = "FIXED";
 	public String laneDecide = "UNBALANCED";
 
+	public boolean training = true;
+	@Expose() public int numODPairs = 1;
+
 	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
-
+	@Expose() public int extListenerUpdateInterval = 1; // lane update time interval in steps
 	long seed = 25;
 	public Random randomTimingGenerator = new Random(seed);
 

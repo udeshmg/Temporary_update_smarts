@@ -225,14 +225,27 @@ public class Simulation {
 		trafficNetwork.removeActiveVehicles(oneStepData_vehiclesReachedFellowWorker);
 		trafficNetwork.updateIntersectionControllers(timeNow);
 
-		if (step == 0) {
-			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
-					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
-					timeNow);
-			trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
-					numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
-					timeNow);
+		if (settings.training) {
+			if (step == 0) {
+				trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+						numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+						timeNow);
+				trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+						numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+						timeNow);
+			}
 		}
+		else{
+			if (step%600 == 0) {
+				trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+						numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+						timeNow);
+				//trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
+				//		numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
+				//		timeNow);
+			}
+		}
+
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
 		trafficNetwork.finishRemoveCheck(timeNow);
 
@@ -240,44 +253,45 @@ public class Simulation {
 		//sendTrafficDataToExternal();
 
 		// Wait for External agent for send instructions after number of time steps
-		Vehicle targetVehicle = null;
-		for (Vehicle v : trafficNetwork.vehicles){
-			if (v.vid == 2){
-				targetVehicle = v;
+
+		if (settings.training) {
+
+			Vehicle targetVehicle = null;
+			for (Vehicle v : trafficNetwork.vehicles) {
+				if (v.vid == 2) {
+					targetVehicle = v;
+				}
 			}
-		}
 
 
-		if (targetVehicle.lane != null && targetVehicle.episodeStat.isIntersectionConstraints()) {
-		waitForActionsFromExternalClient();
-		sendTrafficData();
-		}
+			if (targetVehicle.lane != null && targetVehicle.episodeStat.isIntersectionConstraints()) {
+				waitForActionsFromExternalClient();
+				sendTrafficData();
+			}
 
 
-		if (targetVehicle != null) {
-			if (targetVehicle.episodeStat.isEpisodeDone() && !targetVehicle.episodeStat.isInExternalControl() &&
-					((step - 1) % settings.extListenerUpdateInterval == 0 & (step - 1) > 0)) {
+			if (targetVehicle != null) {
+				if (targetVehicle.episodeStat.isEpisodeDone() && !targetVehicle.episodeStat.isInExternalControl() &&
+						((step - 1) % settings.extListenerUpdateInterval == 0 & (step - 1) > 0)) {
+					resetTraffic();
+					System.out.println("Traffic reset");
+					trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+					trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+				}
+			} else {
 				resetTraffic();
 				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
 				trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
 			}
 		}
 		else {
-			resetTraffic();
-			trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
-			trafficNetwork.createInternalNonPublicVehicles(1, step / settings.numStepsPerSecond, true);
+			waitForActionsFromExternalClient();
+			sendTrafficData();
 		}
-
-
 
 
 		// Clear one-step data
 		clearOneStepData();
-
-
-
-
-
 
 	}
 	public void waitForInit(){

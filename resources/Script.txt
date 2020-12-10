@@ -1,4 +1,4 @@
-maxNumSteps 10000000
+maxNumSteps 100000000
 numRandomBackgroundPrivateVehicles 10
 numRandomBackgroundTrams 10
 numRandomBackgroundBuses 10
@@ -13,7 +13,7 @@ numRuns 1
 lookAheadDistance 50
 numStepsPerSecond 5
 serverBased false
-trafficLightTiming NONE
+trafficLightTiming DYNAMIC
 trafficReportStepGapInServerlessMode 1
 driveOnLeft true
 ###

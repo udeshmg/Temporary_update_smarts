@@ -18,9 +18,9 @@ public class PollBasedController extends IntersectionController {
 
     ArrayList<ArrayList<IntersectionStatManager>> allQueues = new ArrayList<>();
     double serviceTime = 1.0;
-    double switchTime = 1.0;
+    double switchTime = 3.0;
     double latestArrivedTime = 1000000.0;
-    double timeToReachAtMaxSpeed = 380/22;
+    double timeToReachAtMaxSpeed = 22;
 
     public PollBasedController(Node node, double controlRegion){
         this.node = node;
@@ -40,11 +40,16 @@ public class PollBasedController extends IntersectionController {
         for (Edge edge : node.inwardEdges){
             ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
             for (Vehicle vehicle : edge.getFirstLane().getVehicles()){
-                if (!vehicle.episodeStat.isFinalizedSchedule(timeNow) || !vehicle.episodeStat.isIntersectionConstraints())
+                if (!vehicle.episodeStat.isFinalizedSchedule(timeNow) || !vehicle.episodeStat.isIntersectionConstraints()){
+                    if (controlRegion > (vehicle.lane.edge.length - vehicle.headPosition)){
                     laneQueue.add(vehicle.episodeStat);
+                }
+            }
             }
             allQueues.add(laneQueue);
         }
+        pollBasedSchedule(timeNow);
+        isTriggered = false;
     }
 
     public void getVehiclesInServiceFromQueue(ArrayList<ArrayList<IntersectionStatManager>> data, double timeNow){
@@ -71,7 +76,7 @@ public class PollBasedController extends IntersectionController {
                 IntersectionStatManager stat = allQueues.get(indexOfQueue).get(0);
                 currentTimeAssigned += serviceTime;
                 stat.setAssignedTime(currentTimeAssigned);
-                stat.assignIntersectionConstrains(timeNow, currentTimeAssigned + timeToReachAtMaxSpeed);
+                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned - latestArrivedTime) + timeToReachAtMaxSpeed);
                 allQueues.get(indexOfQueue).remove(0);
             }
             currentTimeAssigned += switchTime;

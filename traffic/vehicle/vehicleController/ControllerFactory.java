@@ -12,11 +12,11 @@ public class ControllerFactory {
     }
 
     public VehicleController getController(Vehicle v, Settings settings){
-        int number = rand.nextInt(2);
+        int number = 0; //rand.nextInt(2);
         if (number == 0)
-            return new HumanController_2(v, settings);
+            return new HumanController_4(v, settings);
         else if (number == 1)
-            return new HumanController_3(v, settings);
+            return new HumanController_2(v, settings);
         else
             return new HumanController_2(v, settings);
     }

@@ -103,7 +103,13 @@ public class Node {
 		tramStop = tram_stop;
 		busStop = bus_stop;
 
-		intersectionController = new RandomController(this, 380, settings);
+		if (settings.training) {
+			intersectionController = new RandomController(this, 380, settings);
+		}
+		else {
+			intersectionController = new PollBasedController(this, 380);
+			//intersectionController = new RandomController(this, 380, settings);
+		}
 		intersectionControllerInUse = true;
 	}
 

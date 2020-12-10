@@ -22,11 +22,16 @@ public class IntersectionStatManager {
     private double assignedTime = 0.0;
     private boolean controllerNotified = false;
 
+    private boolean isVirtual = false;
+
+    private int stepCounter = 0;
+
     public IntersectionStatManager(double timeArrived){
         this.timeArrived = timeArrived;
     }
 
     public IntersectionStatManager(){
+        stepCounter = 0;
     }
 
     public void findEpisodeFinished(double timeNow, Vehicle vehicle){
@@ -34,25 +39,25 @@ public class IntersectionStatManager {
 
         if (isEpisodeDone) return;
 
+
         if (frontVehicle != null){
-            if (frontVehicle.headPosition < vehicle.headPosition + 2){ //2 meters
+            isVirtual = false;
+            double headway = (frontVehicle.headPosition - vehicle.headPosition)/Math.max(vehicle.speed, 0.1);
+            //if (headway < 0.5){ //2 meters
+            if (frontVehicle.headPosition < vehicle.headPosition + 4.5){ //2 meters
                 crashed =  true;
                 isEpisodeDone = true;
+            }
+            else {
+                crashed = false;
             }
             setGap(frontVehicle.headPosition - vehicle.headPosition);
             setFrontVehicleSpeed(frontVehicle.speed);
         }
         else {
-            if (vehicle.lane.getVehicleCount() > 1){
-                crashed =  true;
-                isEpisodeDone = true;
-                setGap(0);
-                setFrontVehicleSpeed(vehicle.lane.getVehicles().get(0).speed);
-            }
-            else {
-                setGap(vehicle.lane.edge.length + 100 - vehicle.headPosition);
-                setFrontVehicleSpeed(vehicle.lane.edge.freeFlowSpeed);
-            }
+            isVirtual = true;
+            setGap(vehicle.lane.edge.length + 100 - vehicle.headPosition);
+            setFrontVehicleSpeed(vehicle.lane.edge.freeFlowSpeed);
         }
 
 
@@ -67,6 +72,43 @@ public class IntersectionStatManager {
         }
 
         timeRemain = timeToReach - timeNow;
+
+
+    }
+
+    public void findCruiseEpisodeFinished(double timeNow, Vehicle vehicle){
+        Vehicle frontVehicle =  vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);
+        stepCounter++;
+        if (isEpisodeDone) return;
+
+        if (frontVehicle != null){
+            double headway = (frontVehicle.headPosition - vehicle.headPosition)/Math.max(vehicle.speed, 0.1);
+
+            //if (headway < 0.5){ //2 meters
+            if (frontVehicle.headPosition < vehicle.headPosition + 4.5){ //2 meters
+                crashed =  true;
+                isEpisodeDone = true;
+            }
+            setGap(frontVehicle.headPosition - vehicle.headPosition);
+            setFrontVehicleSpeed(frontVehicle.speed);
+        }
+        else {
+            setGap(vehicle.lane.edge.length + 100 - vehicle.headPosition);
+            setFrontVehicleSpeed(vehicle.lane.edge.freeFlowSpeed);
+        }
+
+
+        if (Math.abs(vehicle.lane.edge.length - vehicle.headPosition) < 4.5) {
+            isEpisodeDone = true;
+            isSuccess = true;
+        }
+
+        if (stepCounter > 1000 ){
+            isEpisodeDone = true;
+            isSuccess = false;
+        }
+
+        timeRemain = timeToReach - timeNow;
     }
 
     public void assignIntersectionConstrains(double timeNow, double timeToReach){
@@ -75,12 +117,22 @@ public class IntersectionStatManager {
         this.setTimeRemain(timeToReach);
     }
 
-    public void notifyController(Vehicle vehicle){
+    public void notifyController(Vehicle vehicle, double timeNow){
         if (vehicle.lane.edge.endNode.intersectionControllerInUse && !controllerNotified ){
-            if ( vehicle.lane.edge.endNode.intersectionController.getControlRegion() > (vehicle.lane.edge.length - vehicle.headPosition) )
+            if (vehicle.lane.edge.endNode.intersectionController.getControlRegion() > (vehicle.lane.edge.length - vehicle.headPosition)) {
                 vehicle.lane.edge.endNode.intersectionController.notifyController();
                 controllerNotified = true;
+                vehicle.episodeStat.setTimeArrived(timeNow);
+            }
         }
+    }
+
+    public boolean isVirtual() {
+        return isVirtual;
+    }
+
+    public void setVirtual(boolean virtual) {
+        isVirtual = virtual;
     }
 
     public void resetNotifyController(){

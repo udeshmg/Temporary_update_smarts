@@ -29,7 +29,7 @@ public class PredefinedODLoader extends ODDistributor {
     //                                 {41,35}, {35,41}, {34,28}, {28,34}, {27,21}, {21,27}, {20,14}, {14,20}, {13,7}, {7,13}}};
 
     //private int [][][] odMatrix = {{{20,14}, {14,20}}};
-    private int [][][] odMatrix ={{{7,2}}};
+    private int [][][] odMatrix ={{{7,2},{6,4}}};
     //private int [][][] odMatrix ={{{5,0}}};
 
     //private int [][][] odMatrix ={{{4,1}, {5,1}}};

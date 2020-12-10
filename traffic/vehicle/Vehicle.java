@@ -236,7 +236,12 @@ public class Vehicle {
 		final Lane lane = laneDecider.getNextEdgeLane(this);// Start from the lane closest to roadside
 		final double pos = getStartPositionInLane0();
 		if (pos >= 0) {
-			if (vid == 2) episodeStat.setInExternalControl(true);
+			if (settings.training) {
+				if (vid % 2 == 0)
+					episodeStat.setInExternalControl(true);
+			}
+			else episodeStat.setInExternalControl(true);
+
 			this.lane = lane;
 			headPosition = pos;
 			startHeadPosition = headPosition;
@@ -376,19 +381,21 @@ public class Vehicle {
 			updateHeadway();
 			// Find impeding objects and compute acceleration based on the objects
 
-			if (episodeStat.isIntersectionConstraints()){
+			if (episodeStat.isIntersectionConstraints() && episodeStat.isInExternalControl()){
 				episodeStat.findEpisodeFinished(timeNow, this);
 			}
 
-			episodeStat.notifyController(this);
+			episodeStat.notifyController(this, timeNow);
 
 			if (settings.isExternalListenerUsed && episodeStat.isIntersectionConstraints()){// && isInExternalControl()) {
-				if (vid == 1) {
-					externalCommandAcc = controller.computePaddleCommand(this);
-					//System.out.println(timeNow + " " + externalCommandAcc);
+				if (settings.training) {
+					if (vid % 2 == 1) {
+						externalCommandAcc = controller.computePaddleCommand(this);
+						//System.out.println(timeNow + " " + externalCommandAcc);
+					}
 				}
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
-			//if (vid == 1) System.out.println("Data:" + timeRemain + " " + headPosition + " " + lane.edge.index);
+ 			//if (vid == 1) System.out.println("Data:" + timeRemain + " " + headPosition + " " + lane.edge.index);
 			} else {
 				acceleration = carFollow.computeAccelerationBasedOnImpedingObjects(this);
 			}
@@ -765,7 +772,6 @@ public class Vehicle {
 					indexLegOnRoute++;
 
 					//reset intersection controls
-					episodeStat.setIntersectionConstraints(false);
 
 					// Locate the new lane of vehicle. If the specified lane does not exist (e.g., moving from primary road to secondary road), change to the one with the highest lane number
 					final RouteLeg nextLeg = getRouteLeg(indexLegOnRoute);
