@@ -78,6 +78,8 @@ public class Vehicle {
 	private Node end;
 	private Settings settings;
 
+	private boolean isCAV;
+
 	public Vehicle(Settings settings) {
 		this.settings = settings;
 		this.carFollow = new CarFollow(settings);
@@ -245,7 +247,7 @@ public class Vehicle {
 			MOBILInput mobilInput = new MOBILInput(settings, lane, getRouteInLookAheadDistance(), type);
 			laneChangeDecision = laneChange.decideLaneChange(mobilInput, this);
 
-			if (laneChangeDecision == LaneChangeDirection.SAME) {
+			if (laneChangeDecision == LaneChangeDirection.SAME && isCAV()) {
 				laneChangeDecision = laneChange.dynamicLaneChange(this);
 			}
 
@@ -547,6 +549,14 @@ public class Vehicle {
 		return null;
 	}
 
+
+	public RouteLeg getNextLeg() {
+		if (indexLegOnRoute > 0 && indexLegOnRoute+1 < routeLegs.size()) {
+			return routeLegs.get(indexLegOnRoute+1);
+		}
+		return null;
+	}
+
 	public RouteLeg getRouteLeg(int indexOfRouteLeg) {
 		if (indexOfRouteLeg > -1 && indexOfRouteLeg < routeLegs.size()) {
 			return routeLegs.get(indexOfRouteLeg);
@@ -631,7 +641,7 @@ public class Vehicle {
 		/*
 		 * Re-route vehicle in certain situations
 		 */
-		if ((type != VehicleType.TRAM) && (settings.isDynamicRerouteAllowed)) {
+		if ((type != VehicleType.TRAM) && (settings.isDynamicRerouteAllowed) && isCAV) {
 			boolean reRoute = false;
 			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
 			if (indexLegOnRoute < (getRouteLegs().size() - 1) && (headPosition < lane.edge.getEndIntersectionLaneChangeProhibitedPos())) {
@@ -913,6 +923,14 @@ public class Vehicle {
 
 	public void setEnd(Node end) {
 		this.end = end;
+	}
+
+	public boolean isCAV() {
+		return isCAV;
+	}
+
+	public void setCAV(boolean CAV) {
+		isCAV = CAV;
 	}
 
 	public double getDisplacement(){

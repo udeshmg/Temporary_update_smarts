@@ -4,6 +4,8 @@ import traffic.TrafficNetwork;
 import traffic.light.*;
 import traffic.light.phasehandler.TLPhaseHandler;
 import traffic.light.schedule.TrafficLightSchedule;
+import traffic.road.Lane;
+import traffic.vehicle.Vehicle;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -39,7 +41,7 @@ public class DynamicSchedule extends TLScheduleHandler{
         fixedPeriods.put(LightColor.GYR_G, 10.0);
         fixedPeriods.put(LightColor.GYR_Y, 10.0);
         fixedPeriods.put(LightColor.GYR_R, 5.0);
-        maxGreenTime = 180.0;
+        maxGreenTime = 60.0;
     }
 
     @Override
@@ -64,7 +66,7 @@ public class DynamicSchedule extends TLScheduleHandler{
         LightPeriod current = schedule.getCurrentPeriod();
         if(current != null){
             if(current.getColor() == LightColor.GYR_G && timeNow >= current.getEnd()){
-                if(hasActivePhaseTraffic(current.getPhase()) && current.getDur() < maxGreenTime){
+                if(hasActivePhaseTraffic(current.getPhase()) && current.getDur() < maxGreenTime && hasSpaceInNextEdge(current.getPhase())){
                     schedule.extendDuration(current, 1);
                 }
             }
@@ -114,6 +116,44 @@ public class DynamicSchedule extends TLScheduleHandler{
             }
         }
         return false;
+    }
+
+    public boolean hasSpaceInNextEdge(Phase phase) {
+
+        Movement movement = findMajorMovement(phase);
+
+        if (movement != null){
+            return movement.getEndEdge().hasSpaceInEndOfAllLane();
+        }
+        else{
+            return true;
+        }
+    }
+
+    public Movement findMajorMovement(Phase phase) {
+        Movement movement = null;
+        int vehicleCount = 0;
+        int maxVehicleCount = 0;
+
+        for (Movement m : phase.getMovements()) {
+            for( Lane lane : m.getControlEdge().getLanes()) {
+                for (Vehicle v : lane.getVehicles()) {
+                    if (v.hasNextEdge()) {
+                        if (m.getEndEdge().index == v.getNextEdge().index) {
+                            vehicleCount++;
+                        }
+                    }
+                }
+            }
+
+            if (vehicleCount > maxVehicleCount){
+                movement = m;
+                maxVehicleCount = vehicleCount;
+            }
+        }
+
+        if (maxVehicleCount == 0) return null;
+        else return movement;
     }
 
     boolean hasInactivePhaseTraffic(Phase active, List<Phase> phases) {

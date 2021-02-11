@@ -47,7 +47,12 @@ public class UnbalancedLaneDecider extends LaneDecider {
                 } else if (nextEdge.getLane(vehicle.lane.laneNumber).isDirectionChanging){
                     newLane = nextEdge.getLane(nextEdge.getLaneCount() - 2);
                 } else {
-                    newLane = nextEdge.getLane(vehicle.lane.laneNumber);
+                     if (nextEdge.getLane(vehicle.lane.laneNumber).isBlocked){
+                         newLane = nextEdge.getFirstNonBlockedLane();
+                     }
+                     else {
+                         newLane = nextEdge.getLane(vehicle.lane.laneNumber);
+                     }
                 }
                 return newLane;
             }

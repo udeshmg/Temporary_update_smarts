@@ -96,6 +96,7 @@ public class Edge {
 	 * Vehicle speed extracted from external traffic data
 	 */
 	public double currentSpeed;
+	public double mvgCurrentSpeed;
 	/**
 	 * Whether there is one or more vehicle within the detection range of
 	 * traffic light
@@ -121,6 +122,7 @@ public class Edge {
 	 * this is used when lane numbers are different in two roads
 	 */
 	public int maxVehiclesAtTheEnd = 5;
+	private double slowDownFactor = 0.2;
 
 
 	/**
@@ -262,6 +264,22 @@ public class Edge {
 
 	public int getLaneCount(){
 		return lanes.size();
+	}
+
+	public int getNonBlockedLaneCount(){
+		int numLanes = 0;
+		for (Lane lane : lanes){
+			if (lane.isBlocked == false) numLanes++;
+		}
+
+		return numLanes;
+	}
+
+	public Lane getFirstNonBlockedLane(){
+		for (Lane lane : lanes){
+			if (lane.isBlocked == false) return lane;
+		}
+		return null;
 	}
 
 	public void addLane(Lane lane){
@@ -585,7 +603,7 @@ public class Edge {
 		return false;
 	}
 
-	public boolean hasSpaceInEndOfAllLane(Lane lane){
+	public boolean hasSpaceInEndOfAllLane(Lane lane, Vehicle vehicle){
 		int vehicleCount = 0;
 		for (Vehicle v : lane.getVehicles()) {
 			if (v.headPosition < lane.edge.getStartIntersectionSize()) {
@@ -593,7 +611,32 @@ public class Edge {
 			}
 		}
 
-		if ( vehicleCount < maxVehiclesAtTheEnd*getLaneCount()){
+		double maxVehiclecount = maxVehiclesAtTheEnd*getLaneCount();
+
+		if (!vehicle.isCAV()){
+			maxVehiclecount *= slowDownFactor; //Human-driven vehicles cannot merge as fast as autonomous vehicles
+		}
+
+		if ( vehicleCount < maxVehiclecount){
+			return true;
+		}
+		else {
+			//System.out.println("Blocked by Queue spill-back");
+			return false;
+		}
+	}
+
+	public boolean hasSpaceInEndOfAllLane(){
+		int vehicleCount = 0;
+		for (Lane lane : lanes) {
+			for (Vehicle v : lane.getVehicles()) {
+				if (v.headPosition < lane.edge.getStartIntersectionSize() && v.speed < 1) {
+					vehicleCount++;
+				}
+			}
+		}
+
+		if ( vehicleCount < getLaneCount()){
 			return true;
 		}
 		else {
@@ -616,7 +659,7 @@ public class Edge {
 
 		//When merging from higher lane to lower lane in a different road segment
 		if ((vehicle.lane.edge.getLaneCount() > lane.edge.getLaneCount()) && (vehicle.lane.laneNumber >= lane.edge.getLaneCount()-1)){
-			return hasSpaceInEndOfAllLane(lane);
+			return hasSpaceInEndOfAllLane(lane, vehicle);
 		}
 
 		return freeSpace >= (vehicle.length + vehicle.driverProfile.IDM_s0);

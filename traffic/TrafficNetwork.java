@@ -166,6 +166,12 @@ public class TrafficNetwork extends RoadNetwork {
 		// Set as active
 		vehicle.active = true;
 		// Add vehicle to system
+
+		if (Math.random() <= settings.cavPercentage)
+			vehicle.setCAV(true);
+		else
+			vehicle.setCAV(false);
+
 		vehicle.setHeadWayMultiplier(settings.safetyHeadwayMultiplier);
 		if (!vehicle.isExternal) {
 			// Update vehicle counters				
@@ -322,7 +328,7 @@ public class TrafficNetwork extends RoadNetwork {
 
 			for (ODDemand odpair : traffic){
 				final int numVehiclesNeeded = odpair.getNumVehicles();
-				for (int i = 0; i < numVehiclesNeeded; i++) {
+				for (int i = 0; i < numVehiclesNeeded; i++) { ;
 
 					addNewVehicle(odpair.getVehicleType(), false, false, odpair.getOrigin(), odpair.getDestination(), null, internalVehiclePrefix, timeNow, "", -1,
 							DriverProfile.NORMAL);
@@ -744,7 +750,13 @@ public class TrafficNetwork extends RoadNetwork {
 	public void releaseTripMakingVehicles(final double timeNow, SimulationListener listener) {
 		Vehicle next = getNextTripMakingVehicle(timeNow);
 		while (next != null){
-			next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
+
+			if (!next.isCAV()){
+				next.setRouteLegs(routingAlgoFactory.getRoutingAlgo(Routing.Algorithm.DIJKSTRA, this).createCompleteRoute(next.getStart(), next.getEnd(), next.type));
+			}
+			else {
+				next.setRouteLegs(routingAlgorithm.createCompleteRoute(next.getStart(), next.getEnd(), next.type));
+			}
 			if(listener != null){
 				listener.onVehicleAdd(Arrays.asList(next),(int)(timeNow/settings.numStepsPerSecond), this);
 			}
@@ -881,7 +893,7 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	public void addVehiclePaths(Vehicle v){
-		if (v.getNextRouteLegs().size() > 1) {
+		if (v.getNextRouteLegs().size() > 1 && v.isCAV()) {
 			ArrayList<Integer> pathInInt = new ArrayList<>();
 			for (RouteLeg routeLeg : v.getNextRouteLegs()) {
 				pathInInt.add(routeLeg.edge.startNode.index);
@@ -929,18 +941,20 @@ public class TrafficNetwork extends RoadNetwork {
 				int numVehiclesStraight = 0;
 				int numVehiclesLeft = 0;
 				for (Lane lane : edge.getLanes()) {
-					numVehicles += lane.getVehicles().size();
+					//numVehicles += lane.getVehicles().size();
 					for (Vehicle v : lane.getVehicles()) {
-						numVehicles++;
-						if (v.edgeBeforeTurnRight == edge) {
-							numVehiclesRight++;
-						} else if (v.edgeBeforeTurnLeft == edge) {
-							numVehiclesLeft++;
-						} else {
-							numVehiclesStraight++;
-						}
+						if(v.isCAV()) {
+							numVehicles += 2;
+							if (v.edgeBeforeTurnRight == edge) {
+								numVehiclesRight++;
+							} else if (v.edgeBeforeTurnLeft == edge) {
+								numVehiclesLeft++;
+							} else {
+								numVehiclesStraight++;
+							}
 
-						addVehiclePaths(v);
+							addVehiclePaths(v);
+						}
 
 					}
 

@@ -419,7 +419,7 @@ public class IDM {
 			}
 
 			// Flags the event that vehicle is within certain distance to light
-			if (targetEdge.endNode.light && (((examinedDist + targetEdge.length)
+			if ((((examinedDist + targetEdge.length)
 					- vehicle.headPosition) < settings.trafficLightDetectionDistance)) {
 				targetEdge.isDetectedVehicleForLight = true;
 			}

@@ -116,9 +116,13 @@ public class Simulation {
 
 					// Update accumulated vehicle speed
 					accumulatedVehicleSpeed += vehicle.speed;
-					vehicle.reRoute(timeNow, trafficNetwork.routingAlgorithm);
 
-					vehicle.dynamicReRoute(timeNow, trafficNetwork.routingAlgorithm);
+					//
+
+					if (vehicle.isCAV()) {
+						vehicle.reRoute(timeNow, trafficNetwork.routingAlgorithm);
+						vehicle.dynamicReRoute(timeNow, trafficNetwork.routingAlgorithm);
+					}
 
 					if(vehicle.isFinished()){
 						oneStepData_allVehiclesReachedDestination.add(vehicle);
@@ -134,6 +138,7 @@ public class Simulation {
 			} else {
 				edge.currentSpeed = edge.freeFlowSpeed;
 			}
+			edge.mvgCurrentSpeed = 0.1*edge.mvgCurrentSpeed + 0.9*edge.currentSpeed;
 		}
 		return vehicles;
 	}

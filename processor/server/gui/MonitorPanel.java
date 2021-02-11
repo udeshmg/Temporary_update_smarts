@@ -865,24 +865,53 @@ public class MonitorPanel extends JPanel {
 	 */
 	void drawRoadEdgeOnImage(final Graphics2D g2d, final Rectangle actualDrawingArea, final EdgeObject roadEdge,
 			final EdgeEndMarkerType endMarkerType) {
+		int iter = 0;
+		for (DrawingObject.LaneObject lane : roadEdge.lanes) {
+				/*
+				 * Calculate final positions
+				 */
+				final int startX = (convertLonToX(lane.lonStart));
+				final int startY = (convertLatToY(lane.latStart));
+				final int endX = (convertLonToX(lane.lonEnd));
+				final int endY = (convertLatToY(lane.latEnd));
+
+				/*
+				 * Draw a line representing the edge if it intersects the area shown in
+				 * the actual panel
+				 */
+				if (actualDrawingArea.intersectsLine(startX, startY, endX, endY)) {
+					g2d.drawLine(startX, startY, endX, endY);
+				}
+		}
+	}
+
+	void drawRoadLaneOnImage(final Graphics2D g2d, final Rectangle actualDrawingArea, final EdgeObject roadEdge,
+							 final EdgeEndMarkerType endMarkerType) {
+
+		int iter = 0;
+
 		for (DrawingObject.LaneObject lane : roadEdge.lanes) {
 
-			/*
-			 * Calculate final positions
-			 */
-			final int startX = (convertLonToX(lane.lonStart));
-			final int startY = (convertLatToY(lane.latStart));
-			final int endX = (convertLonToX(lane.lonEnd));
-			final int endY = (convertLatToY(lane.latEnd));
+			if (roadEdge.laneBlocks[iter]) {
+				/*
+				 * Calculate final positions
+				 */
+				final int startX = (convertLonToX(lane.lonStart));
+				final int startY = (convertLatToY(lane.latStart));
+				final int endX = (convertLonToX(lane.lonEnd));
+				final int endY = (convertLatToY(lane.latEnd));
 
-			/*
-			 * Draw a line representing the edge if it intersects the area shown in
-			 * the actual panel
-			 */
-			if (actualDrawingArea.intersectsLine(startX, startY, endX, endY)) {
-				g2d.drawLine(startX, startY, endX, endY);
+				/*
+				 * Draw a line representing the edge if it intersects the area shown in
+				 * the actual panel
+				 */
+				if (actualDrawingArea.intersectsLine(startX, startY, endX, endY)) {
+					g2d.drawLine(startX, startY, endX, endY);
+				}
 			}
+			iter++;
 		}
+
 	}
 
 	/**
@@ -1441,7 +1470,7 @@ public class MonitorPanel extends JPanel {
 				0.0f));
 		final ArrayList<EdgeObject> roadEdgesToDraw = new ArrayList<>(roadEdgesWithBlockingSign.values());
 		for (final EdgeObject re : roadEdgesToDraw) {
-			drawRoadEdgeOnImage(g2d, actualDrawingArea, re, EdgeEndMarkerType.start);
+			drawRoadLaneOnImage(g2d, actualDrawingArea, re, EdgeEndMarkerType.start);
 		}
 		g2d.setColor(Color.black);
 

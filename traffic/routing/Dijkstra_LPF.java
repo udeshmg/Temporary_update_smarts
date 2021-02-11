@@ -13,6 +13,9 @@ import traffic.road.RoadNetwork;
 import traffic.vehicle.VehicleType;
 import traffic.vehicle.VehicleUtil;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class Dijkstra_LPF extends Routing {
 
     class DijkstraEdge {
@@ -31,6 +34,8 @@ public class Dijkstra_LPF extends Routing {
             double ratio = 0;
             if (edge.getOutflow() != 0)
                 ratio = edge.getInflow()/edge.getOutflow();
+
+            //return edge.length/max(10, edge.mvgCurrentSpeed);
 
             //compute LPF
             return freeFlowTravelTime * (1 + 0.15*Math.pow(ratio, 4)); //LPF equation

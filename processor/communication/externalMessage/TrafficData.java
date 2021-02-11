@@ -26,7 +26,7 @@ public class TrafficData {
         for (Edge edge : trafficNetwork.edges) {
             RoadExternal roadExt = new RoadExternal();
             roadExt.setIndex(edge.index);
-            roadExt.setNumLanes(edge.getLaneCount());
+            roadExt.setNumLanes(edge.getNonBlockedLaneCount());
             roadExt.setStartNode(edge.startNode.index);
             roadExt.setEndNode(edge.endNode.index);
 
@@ -39,24 +39,23 @@ public class TrafficData {
             int numVehiclesOnMove = 0;
 
             for (Lane lane : edge.getLanes()){
-                numVehicles += lane.getVehicles().size();
+                //numVehicles += lane.getVehicles().size();
                 for (Vehicle v : lane.getVehicles()){
-                    numVehicles++;
-                    if (v.edgeBeforeTurnRight == edge){
-                        numVehiclesRight++;
-                    }
-                    else if (v.edgeBeforeTurnLeft == edge){
-                        numVehiclesLeft++;
-                    }
-                    else {
-                        numVehiclesStraight++;
-                    }
+                    if (v.isCAV()) {
+                        numVehicles ++;
+                        if (v.edgeBeforeTurnRight == edge) {
+                            numVehiclesRight++;
+                        } else if (v.edgeBeforeTurnLeft == edge) {
+                            numVehiclesLeft++;
+                        } else {
+                            numVehiclesStraight++;
+                        }
 
-                    if (v.speed < 5){
-                        numVehiclesStopped++;
-                    }
-                    else{
-                        numVehiclesOnMove++;
+                        if (v.speed < 5) {
+                            numVehiclesStopped++;
+                        } else {
+                            numVehiclesOnMove++;
+                        }
                     }
                 }
 
