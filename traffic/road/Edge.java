@@ -712,4 +712,33 @@ public class Edge {
 		int fullSignalCycle = endNode.outwardEdges.size() * 45;
 		outflow = ( numVehicleOutPerLane * getLaneCount() * settings.mvgFlow) / (fullSignalCycle*settings.numStepsPerSecond);
 	}
+
+	public Vehicle getLastVehicleInEdge(){
+		Vehicle lastVehicle = null;
+		for (Lane lane : lanes){
+			Vehicle v = lane.getLastVehicleInLane();
+
+			if (v != null){
+				if (lastVehicle == null){
+					lastVehicle = v;
+				}
+
+				if (lastVehicle.headPosition > v.headPosition){
+					lastVehicle = v;
+				}
+			}
+		}
+		return lastVehicle;
+	}
+
+	public Boolean isEdgeFull(){
+		Vehicle v = getLastVehicleInEdge();
+
+		if (v != null){
+			if (v.headPosition < 2 && v.speed < 0.1){
+				return true;
+			}
+		}
+		return false;
+	}
 }

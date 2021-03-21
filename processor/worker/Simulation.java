@@ -119,7 +119,7 @@ public class Simulation {
 
 					//
 
-					if (vehicle.isCAV()) {
+					if (vehicle.isCAV() || vehicle.isConnectedV()) {
 						vehicle.reRoute(timeNow, trafficNetwork.routingAlgorithm);
 						vehicle.dynamicReRoute(timeNow, trafficNetwork.routingAlgorithm);
 					}
@@ -138,7 +138,7 @@ public class Simulation {
 			} else {
 				edge.currentSpeed = edge.freeFlowSpeed;
 			}
-			edge.mvgCurrentSpeed = 0.1*edge.mvgCurrentSpeed + 0.9*edge.currentSpeed;
+			edge.mvgCurrentSpeed = 0.01*edge.mvgCurrentSpeed + 0.99*edge.currentSpeed;
 		}
 		return vehicles;
 	}
@@ -289,8 +289,8 @@ public class Simulation {
 					for (RoadControl edge : roadIndex.edges) {
 						if (edge.laneChange) {
 							int oppositeEdgeIndex = trafficNetwork.edges.get(edge.index).getOppositeEdge().index;
-							changeLaneDirection(oppositeEdgeIndex);
-							laneChangedEdgeIndex.add(oppositeEdgeIndex);
+								changeLaneDirection(oppositeEdgeIndex);
+								laneChangedEdgeIndex.add(oppositeEdgeIndex);
 						}
 
 						if (edge.speed > 0){
@@ -406,11 +406,20 @@ public class Simulation {
 	}
 
 	public void changeLaneDirection(int edgeIndex){
-		if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 2) {
-			trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChangeDir();
+
+		if (trafficNetwork.edges.get(edgeIndex).getLaneCount() + trafficNetwork.edges.get(edgeIndex).getOppositeEdge().getLaneCount() <= 4){
+			if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 1) {
+				trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChangeDir();
+			} else {
+				System.out.println("Warning : Cannot change the direction because this is the only lane in Road: " + edgeIndex);
+			}
 		}
 		else {
-			System.out.println("Warning : Cannot change the direction because this is the only lane in Road: " + edgeIndex);
+			if (trafficNetwork.edges.get(edgeIndex).getLaneCount() > 2) {
+				trafficNetwork.edges.get(edgeIndex).getLastLane().markLaneToChangeDir();
+			} else {
+				System.out.println("Warning : Cannot change the direction because this is the only lane in Road: " + edgeIndex);
+			}
 		}
 	}
 

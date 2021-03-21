@@ -78,7 +78,8 @@ public class Vehicle {
 	private Node end;
 	private Settings settings;
 
-	private boolean isCAV;
+	private boolean isCAV; //full automatic
+	private boolean isConnectedV; //connected only
 
 	public Vehicle(Settings settings) {
 		this.settings = settings;
@@ -716,7 +717,7 @@ public class Vehicle {
 			newRoute.add(oldRoute.get(i));
 		}
 
-		ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute + 1).edge.startNode,
+		ArrayList<RouteLeg> partialRoute = routingAlgorithm.createCompleteRoute(oldRoute.get(currentIndexOnOldRoute+1).edge.startNode,
 					oldRoute.get(oldRoute.size() - 1).edge.endNode, type);
 		if (partialRoute != null) {
 			newRoute.addAll(partialRoute);
@@ -932,6 +933,15 @@ public class Vehicle {
 	public void setCAV(boolean CAV) {
 		isCAV = CAV;
 	}
+
+	public boolean isConnectedV() {
+		return isConnectedV;
+	}
+
+	public void setConnectedV(boolean connectedV) {
+		isConnectedV = connectedV;
+	}
+
 
 	public double getDisplacement(){
 		double displacement = headPosition;

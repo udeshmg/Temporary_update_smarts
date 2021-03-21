@@ -169,8 +169,10 @@ public class TrafficNetwork extends RoadNetwork {
 
 		if (Math.random() <= settings.cavPercentage)
 			vehicle.setCAV(true);
-		else
+		else {
+			vehicle.setConnectedV(true);
 			vehicle.setCAV(false);
+		}
 
 		vehicle.setHeadWayMultiplier(settings.safetyHeadwayMultiplier);
 		if (!vehicle.isExternal) {
@@ -751,7 +753,7 @@ public class TrafficNetwork extends RoadNetwork {
 		Vehicle next = getNextTripMakingVehicle(timeNow);
 		while (next != null){
 
-			if (!next.isCAV()){
+			if (!(next.isCAV() || next.isConnectedV())){
 				next.setRouteLegs(routingAlgoFactory.getRoutingAlgo(Routing.Algorithm.DIJKSTRA, this).createCompleteRoute(next.getStart(), next.getEnd(), next.type));
 			}
 			else {
@@ -893,7 +895,7 @@ public class TrafficNetwork extends RoadNetwork {
 	}
 
 	public void addVehiclePaths(Vehicle v){
-		if (v.getNextRouteLegs().size() > 1 && v.isCAV()) {
+		if (v.getNextRouteLegs().size() > 1 && (v.isCAV() || v.isConnectedV())) {
 			ArrayList<Integer> pathInInt = new ArrayList<>();
 			for (RouteLeg routeLeg : v.getNextRouteLegs()) {
 				pathInInt.add(routeLeg.edge.startNode.index);
@@ -943,7 +945,7 @@ public class TrafficNetwork extends RoadNetwork {
 				for (Lane lane : edge.getLanes()) {
 					//numVehicles += lane.getVehicles().size();
 					for (Vehicle v : lane.getVehicles()) {
-						if(v.isCAV()) {
+						if(v.isCAV() || v.isConnectedV()) {
 							numVehicles += 2;
 							if (v.edgeBeforeTurnRight == edge) {
 								numVehiclesRight++;

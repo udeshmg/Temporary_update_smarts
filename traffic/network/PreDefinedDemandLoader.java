@@ -47,9 +47,9 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
         for (int i = 0; i < maxCounter; i++){
             if (i%2 == 0) {
                 demandMatrix[0][i] = demand;
-                demandMatrix[1][i] = 2;
+                demandMatrix[1][i] = 1;
             } else {
-                demandMatrix[0][i] = 2;
+                demandMatrix[0][i] = 1;
                 demandMatrix[1][i] = demand;
             }
         }

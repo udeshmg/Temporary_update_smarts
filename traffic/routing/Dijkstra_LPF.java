@@ -35,7 +35,10 @@ public class Dijkstra_LPF extends Routing {
             if (edge.getOutflow() != 0)
                 ratio = edge.getInflow()/edge.getOutflow();
 
-            //return edge.length/max(10, edge.mvgCurrentSpeed);
+            if (edge.isEdgeFull())
+                ratio = 2;
+
+            //return edge.length/min(5, edge.mvgCurrentSpeed+0.01);
 
             //compute LPF
             return freeFlowTravelTime * (1 + 0.15*Math.pow(ratio, 4)); //LPF equation
