@@ -1,12 +1,10 @@
 package common;
 
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
-import org.apache.commons.math4.analysis.solvers.RegulaFalsiSolver;
 import processor.SimulationListener;
 import processor.communication.externalMessage.ExternalSimulationListener;
 import traffic.light.manager.TLManager;
@@ -66,8 +64,10 @@ public class Settings {
 	 */
 	@Expose() public String inputSimulationScript = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Script.txt";//Simulation setup file when GUI is not used
 	//@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7_mixed.osm";//OSM file where road network information can be extracted
-	//@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/Grid_7x7.osm";
-	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/map_preprocessed_3.osm";//OSM file where road network information can be extracted
+	public String osmSuffix = "map_preprocessed_4.osm";
+	@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/"+ osmSuffix;
+
+	//@Expose() public String inputOpenStreetMapFile = "C:/Users/pgunarathna/IdeaProjects/Temporary_update_smarts/resources/map_preprocessed_4.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -116,7 +116,7 @@ public class Settings {
 	 */
 	@Expose() public Routing.Algorithm routingAlgorithm = Routing.Algorithm.DIJKSTRA_LPF;//Routing algorithm
 	@Expose() public boolean isDynamicRerouteAllowed = true; // uses to change the vehicle path
-	@Expose() public double routeUpdateInterval  = 300;
+	@Expose() public double routeUpdateInterval  = 60;
 	public double minLengthOfRouteStartEndEdge = 20;//In meters. This may affect whether there is enough space to insert vehicle.
 	public List<double[]> listRouteSourceWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes start
 	public List<double[]> listRouteDestinationWindowForInternalVehicle = new ArrayList<>();//List of windows where random routes end
@@ -155,12 +155,12 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 28; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 60; // Frequency of traffic generation in steps
-	@Expose() public int numODPairs = 20;
-	@Expose() public int demandChangedFreq = 6000; // in steps
+	@Expose() public int demandPerOneInterval = 10; // Amount of vehicles to generate at single time step
+	@Expose() public int demandGenerationTimeInterval = 10; // Frequency of traffic generation in steps
+	@Expose() public int numODPairs = 2;
+	@Expose() public int demandChangedFreq = 3000; // in steps
 	@Expose() public boolean isUnidirectional = false;
-	@Expose() public int trafficGenerateDuration = 12000; // in steps
+	@Expose() public int trafficGenerateDuration = 6000; // in steps
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
@@ -176,7 +176,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/Journal/revised/NYC/OriginalMap/test/7am/";
+	public String defaultDownloadDirectory = "download/Journal/revised/NYC/OriginalMap/test/7am";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;
@@ -198,8 +198,8 @@ public class Settings {
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
-		else return externalListener +"__9_"+String.valueOf(cavPercentage)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		if (!isExternalListenerUsed) return osmSuffix + "_noLA_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		else return  osmSuffix + "_" + externalListener +"__9_"+String.valueOf(cavPercentage)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {

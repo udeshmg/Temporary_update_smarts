@@ -645,7 +645,7 @@ public class Vehicle {
 		if ((type != VehicleType.TRAM) && (settings.isDynamicRerouteAllowed) && isCAV) {
 			boolean reRoute = false;
 			// Reroute happens if vehicle has moved too slowly for too long or the road is blocked ahead
-			if (indexLegOnRoute < (getRouteLegs().size() - 1) && (headPosition < lane.edge.getEndIntersectionLaneChangeProhibitedPos())) {
+			if (indexLegOnRoute < (getRouteLegs().size() - 1)) {
 				if ((timeNow - lastReRouted) > settings.routeUpdateInterval){
 					reRoute = true;
 				}

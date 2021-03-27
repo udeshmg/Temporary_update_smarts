@@ -297,6 +297,7 @@ public class Edge {
 		return null;
 	}
 
+
 	public Lane getLastLane(){
 		if(!lanes.isEmpty()){
 			return lanes.get(lanes.size()-1);
@@ -735,7 +736,7 @@ public class Edge {
 		Vehicle v = getLastVehicleInEdge();
 
 		if (v != null){
-			if (v.headPosition < 2 && v.speed < 0.1){
+			if (v.headPosition < 1 && v.speed < 0.1){
 				return true;
 			}
 		}

@@ -289,8 +289,10 @@ public class Simulation {
 					for (RoadControl edge : roadIndex.edges) {
 						if (edge.laneChange) {
 							int oppositeEdgeIndex = trafficNetwork.edges.get(edge.index).getOppositeEdge().index;
+							//if  (oppositeEdgeIndex== 145 || oppositeEdgeIndex == 118) {
 								changeLaneDirection(oppositeEdgeIndex);
 								laneChangedEdgeIndex.add(oppositeEdgeIndex);
+							//}
 						}
 
 						if (edge.speed > 0){

@@ -44,7 +44,9 @@ public class NewYorkTaxiGenerator extends TrafficGenerator{
                 ODDemand odDemand = new ODDemand();
                 odDemand.setOrigin(ODpair.get(0));
                 odDemand.setDestination(ODpair.get(1));
-                odDemand.setNumVehicles(14); // Value 20
+                odDemand.setNumVehicles(12); // Value 20 for upscale
+                                             // 12 for 7 am
+                                             // 14 for 12 pm
                 odDemand.setVehicleType(getVehicleTypeDistributor().getVehicleType());
 
                 odDemands.add(odDemand);

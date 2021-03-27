@@ -58,7 +58,7 @@ public class UnbalancedLaneDecider extends LaneDecider {
             }
         }else{
             RouteLeg firstLeg = vehicle.getRouteLeg(vehicle.indexLegOnRoute);
-            return firstLeg.edge.getFirstLane();
+            return firstLeg.edge.getFirstNonBlockedLane();
         }
     }
 }
