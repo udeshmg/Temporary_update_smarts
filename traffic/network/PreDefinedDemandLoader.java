@@ -91,7 +91,7 @@ public class PreDefinedDemandLoader extends TemporalDistributor {
                 // numVehicles = 0;
                 //}
                 //else {
-                numVehicles = 1; //rand.nextInt(3);
+                numVehicles = rand.nextInt(demand);
                 //}
                 //}
                 //else

@@ -14,6 +14,7 @@ public class RandomController extends IntersectionController {
 
     private Random randomTimingGenerator = null;
     private int time = 22;
+    private int increment = 0;
 
     public RandomController(Node node, double controlRegion, Settings settings){
         this.node = node;
@@ -45,6 +46,8 @@ public class RandomController extends IntersectionController {
             //}
 
             int timeToReach = randomTimingGenerator.nextInt(25) + lowerBound;
+            //int timeToReach = 1 + lowerBound;
+            increment++;
             vehicle.episodeStat.assignIntersectionConstrains(timeNow,timeToReach);
             //System.out.println("Assigned time: " + vehicle.vid + " " + time);
             time++;

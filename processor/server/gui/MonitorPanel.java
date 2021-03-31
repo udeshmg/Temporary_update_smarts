@@ -1971,7 +1971,7 @@ public class MonitorPanel extends JPanel {
 			if (realTimeFactor > 0) {
 				speedUp = String.valueOf(Math.round(realTimeFactor * 100.0) / 100.0);
 			}
-			statusLabel.setText("Time: " + d + " day " + h + " hours " + m + " minutes " + String.format("%02d", s)
+			statusLabel.setText("Time: " + d + " day " + h + " hours " + m + " minutes " + String.format("%02d", totalSeconds) //TODO: change to Seconds
 					+ " seconds. Speed-up: " + speedUp + ".");
 		}
 	}

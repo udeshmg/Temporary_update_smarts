@@ -5,10 +5,14 @@ import traffic.road.Lane;
 import traffic.routing.RouteLeg;
 import traffic.vehicle.Vehicle;
 
+import java.util.Random;
+
 public class UnbalancedLaneDecider extends LaneDecider {
+
+    private Random rand = new Random(5);
+
     @Override
     public void computeLanes(Vehicle vehicle) {
-
     }
 
     @Override
@@ -53,7 +57,8 @@ public class UnbalancedLaneDecider extends LaneDecider {
             }
         }else{
             RouteLeg firstLeg = vehicle.getRouteLeg(vehicle.indexLegOnRoute);
-            return firstLeg.edge.getFirstLane();
+            int laneNumber = rand.nextInt(firstLeg.edge.getLaneCount());
+            return firstLeg.edge.getLane(laneNumber);
         }
     }
 }

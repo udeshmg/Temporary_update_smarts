@@ -236,14 +236,14 @@ public class Simulation {
 			}
 		}
 		else{
-			if (step%600 == 0) {
+			//if (step%300 == 0) {
 				trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
 						numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
 						timeNow);
 				//trafficNetwork.createInternalVehicles(numLocalRandomPrivateVehicles, numLocalRandomTrams,
 				//		numLocalRandomBuses, isNewNonPubVehiclesAllowed, isNewTramsAllowed, isNewBusesAllowed,
 				//		timeNow);
-			}
+			//}
 		}
 
 		trafficNetwork.repeatExternalVehicles(step, timeNow);
@@ -264,7 +264,7 @@ public class Simulation {
 			}
 
 
-			if (targetVehicle.lane != null && targetVehicle.episodeStat.isIntersectionConstraints()) {
+			if (targetVehicle != null && targetVehicle.lane != null && targetVehicle.episodeStat.isIntersectionConstraints()) {
 				waitForActionsFromExternalClient();
 				sendTrafficData();
 			}

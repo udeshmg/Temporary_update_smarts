@@ -17,19 +17,41 @@ public class PollBasedController extends IntersectionController {
 
 
     ArrayList<ArrayList<IntersectionStatManager>> allQueues = new ArrayList<>();
+    ArrayList<Double> currentTimes = new ArrayList<>();
+    ArrayList<Boolean> isQueueVisited= new ArrayList<>();
+
     double serviceTime = 1.0;
-    double switchTime = 3.0;
+    double switchTime = 1.0;
     double latestArrivedTime = 1000000.0;
-    double timeToReachAtMaxSpeed = 22;
+    double timeToReachAtMaxSpeed = 21;
 
     public PollBasedController(Node node, double controlRegion){
         this.node = node;
         this.controlRegion = controlRegion;
+
+        initTimes();
+        initVisited();
     }
 
     public PollBasedController(){
         this.node = null;
         this.controlRegion = 380;
+
+        initTimes();
+        initVisited();
+    }
+
+    public void initTimes(){
+        for (int i = 0; i < 4; i++){
+            currentTimes.add(-(serviceTime+switchTime));
+        }
+    }
+
+    public void initVisited(){
+        isQueueVisited.clear();
+        for (int i = 0; i < 4; i++){
+            isQueueVisited.add(false);
+        }
     }
 
     @Override
@@ -37,16 +59,24 @@ public class PollBasedController extends IntersectionController {
 
         if (!isTriggered) return;
         // Get arriving vehicles within control region and not yet finished servicing
+        int queueIndex = 0;
         for (Edge edge : node.inwardEdges){
-            ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
-            for (Vehicle vehicle : edge.getFirstLane().getVehicles()){
-                if (!vehicle.episodeStat.isFinalizedSchedule(timeNow) || !vehicle.episodeStat.isIntersectionConstraints()){
-                    if (controlRegion > (vehicle.lane.edge.length - vehicle.headPosition)){
-                    laneQueue.add(vehicle.episodeStat);
+                ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
+                for (Vehicle vehicle : edge.getFirstLane().getVehicles()){
+                    double lastExitedVehicleTimeSch = 0.0;
+                    if (!vehicle.episodeStat.isFinalizedSchedule(timeNow)){
+                        if (controlRegion > (vehicle.lane.edge.length - vehicle.headPosition)){
+                        laneQueue.add(vehicle.episodeStat);
+                        }
+                    }
+                    else{
+                        if (vehicle.episodeStat.getTimeRemain() > lastExitedVehicleTimeSch){
+                            currentTimes.set(queueIndex, vehicle.episodeStat.getTimeRemain()-timeToReachAtMaxSpeed);
+                        }
+                    }
                 }
-            }
-            }
-            allQueues.add(laneQueue);
+                allQueues.add(laneQueue);
+                queueIndex++;
         }
         pollBasedSchedule(timeNow);
         isTriggered = false;
@@ -68,16 +98,19 @@ public class PollBasedController extends IntersectionController {
         int indexOfQueue = findFirstArrivedVehicleInQueues();
         int numQueues = allQueues.size();
 
-        double currentTimeAssigned = latestArrivedTime;
+        initVisited();
+
+        double currentTimeAssigned = 0.0;
         while (!allVehiclesServiced()){
             while( !allQueues.get(indexOfQueue).isEmpty() &&
-                    allQueues.get(indexOfQueue).get(0).getTimeArrived() <= currentTimeAssigned ){
+                    allQueues.get(indexOfQueue).get(0).getTimeArrived() <= timeNow + currentTimeAssigned ){
 
                 IntersectionStatManager stat = allQueues.get(indexOfQueue).get(0);
-                currentTimeAssigned += serviceTime;
-                stat.setAssignedTime(currentTimeAssigned);
-                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned - latestArrivedTime) + timeToReachAtMaxSpeed);
+                currentTimeAssigned = serviceTime + Math.max(currentTimeAssigned, getSafestAllowedTime(indexOfQueue));
+                stat.setAssignedTime(currentTimeAssigned+timeNow);
+                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned) + timeToReachAtMaxSpeed);
                 allQueues.get(indexOfQueue).remove(0);
+
             }
             currentTimeAssigned += switchTime;
 
@@ -91,6 +124,26 @@ public class PollBasedController extends IntersectionController {
                 */
         }
         allQueues.clear();
+    }
+
+    private double getSafestAllowedTime(int index){
+        int i = 0;
+        double safestTime = 0;
+        for (Double assignedTime : currentTimes){
+            if (index != i){
+                if (safestTime < assignedTime+switchTime) {
+                    safestTime = assignedTime+switchTime;
+                }
+            else{
+                if (safestTime < assignedTime+serviceTime) {
+                        safestTime = assignedTime+serviceTime;
+                }
+                }
+            }
+            i++;
+        }
+        return safestTime;
+
     }
 
     private int findFirstArrivedVehicleInQueues(){
@@ -128,21 +181,21 @@ public class PollBasedController extends IntersectionController {
 
         List<IntersectionStatManager> l1 = Arrays.asList(
                 new IntersectionStatManager(0),
-                new IntersectionStatManager(1),
-                new IntersectionStatManager(3.5),
-                new IntersectionStatManager(7),
-                new IntersectionStatManager(9)
+                new IntersectionStatManager(10)
+                //new IntersectionStatManager(3.5),
+                //new IntersectionStatManager(7),
+                //new IntersectionStatManager(9)
         );
 
 
         ArrayList<IntersectionStatManager> q1 = new ArrayList<>(l1);
 
         List<IntersectionStatManager> l2 = Arrays.asList(
-                new IntersectionStatManager(1),
-                new IntersectionStatManager(2.5),
-                new IntersectionStatManager(4),
-                new IntersectionStatManager(6),
-                new IntersectionStatManager(11)
+                new IntersectionStatManager(22),
+                new IntersectionStatManager(23.5)
+                //new IntersectionStatManager(4),
+                //new IntersectionStatManager(6),
+                //new IntersectionStatManager(11)
         );
 
         ArrayList<IntersectionStatManager> q2 = new ArrayList<>(l2);
@@ -153,15 +206,15 @@ public class PollBasedController extends IntersectionController {
         //pollBasedController.allQueues = allQueues;
 
         pollBasedController.getVehiclesInServiceFromQueue(allQueues, 0);
-        pollBasedController.pollBasedSchedule(0);
+        pollBasedController.pollBasedSchedule(10);
 
         for (IntersectionStatManager stat : l1) {
-            System.out.println("Assigned time: " + stat.getAssignedTime());
+            System.out.println("Assigned time: " + stat.getAssignedTime() + " , " + stat.getTimeToReach());
         }
 
 
         for (IntersectionStatManager stat : l2) {
-            System.out.println("Assigned time: " + stat.getAssignedTime());
+            System.out.println("Assigned time: " + stat.getAssignedTime()  + " , " + stat.getTimeToReach());
         }
 
         System.out.println("############");

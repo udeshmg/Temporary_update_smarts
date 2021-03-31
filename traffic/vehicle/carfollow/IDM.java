@@ -90,7 +90,7 @@ public class IDM {
 		double v = vehicle.speed;
 		double v0 = vehicle.type.maxSpeed;
 
-		return command*vehicle.driverProfile.IDM_a * (1 - Math.pow(v / v0, delta));
+		return command*vehicle.driverProfile.IDM_a; // * (1 - Math.pow(v / v0, delta));
 
 	}
 	/**
@@ -134,7 +134,7 @@ public class IDM {
 		double lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, 10000, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.FRONT));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TRAM));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LIGHT));
-		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.CONFLICT));
+		//lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.CONFLICT));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.TURN));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.LANEBLOCK));
 		lowestAcceleration = getLowerAccelerationAndUpdateSlowdownFactor(vehicle, impedingObject, lowestAcceleration, computeAccelerationWithImpedingObject(vehicle, impedingObject, vehicle.lane, SlowdownFactor.PRIORITY_VEHICLE));

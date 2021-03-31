@@ -14,15 +14,18 @@ public class IntersectionStatManager {
 
     private double gap = 0;
     private double frontVehicleSpeed = 0.0;
+    private double frontVehicleTimeRemain = 0.0;
+    private double frontVehicleDistance = 0.0;
     private boolean inExternalControl = false;
 
     private boolean finalizedSchedule = false;
 
     private double timeArrived = 0.0;
-    private double assignedTime = 0.0;
+    private double assignedTime = -1;
     private boolean controllerNotified = false;
 
     private boolean isVirtual = false;
+    private int id = -1;
 
     private int stepCounter = 0;
 
@@ -34,6 +37,14 @@ public class IntersectionStatManager {
         stepCounter = 0;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void findEpisodeFinished(double timeNow, Vehicle vehicle){
         Vehicle frontVehicle =  vehicle.lane.getClosestFrontVehicleInLane(vehicle, 0);
 
@@ -42,11 +53,15 @@ public class IntersectionStatManager {
 
         if (frontVehicle != null){
             isVirtual = false;
+
+            frontVehicleTimeRemain = frontVehicle.episodeStat.getTimeRemain();
+            frontVehicleDistance = frontVehicle.lane.edge.length - frontVehicle.headPosition;
+
             double headway = (frontVehicle.headPosition - vehicle.headPosition)/Math.max(vehicle.speed, 0.1);
             //if (headway < 0.5){ //2 meters
             if (frontVehicle.headPosition < vehicle.headPosition + 4.5){ //2 meters
-                crashed =  true;
-                isEpisodeDone = true;
+                //crashed =  true;
+                //isEpisodeDone = true;
             }
             else {
                 crashed = false;
@@ -56,6 +71,8 @@ public class IntersectionStatManager {
         }
         else {
             isVirtual = true;
+            frontVehicleTimeRemain = 0;
+            frontVehicleDistance = 0;
             setGap(vehicle.lane.edge.length + 100 - vehicle.headPosition);
             setFrontVehicleSpeed(vehicle.lane.edge.freeFlowSpeed);
         }
@@ -223,6 +240,9 @@ public class IntersectionStatManager {
 
 
     public boolean isFinalizedSchedule(double timeNow) {
+        if (assignedTime < 0)
+            return false;
+
         if (assignedTime <= timeNow)
             return true;
         return false;
@@ -247,5 +267,21 @@ public class IntersectionStatManager {
 
     public void setAssignedTime(double assignedTime) {
         this.assignedTime = assignedTime;
+    }
+
+    public double getFrontVehicleTimeRemain() {
+        return frontVehicleTimeRemain;
+    }
+
+    public void setFrontVehicleTimeRemain(double frontVehicleTimeRemain) {
+        this.frontVehicleTimeRemain = frontVehicleTimeRemain;
+    }
+
+    public double getFrontVehicleDistance() {
+        return frontVehicleDistance;
+    }
+
+    public void setFrontVehicleDistance(double frontVehicleDistance) {
+        this.frontVehicleDistance = frontVehicleDistance;
     }
 }

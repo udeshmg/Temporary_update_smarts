@@ -16,6 +16,7 @@ import traffic.road.RoadUtil;
 import traffic.routing.RouteLeg;
 import traffic.routing.Routing;
 import traffic.vehicle.carfollow.CarFollow;
+import traffic.vehicle.carfollow.ImpedingObject;
 import traffic.vehicle.carfollow.SimpleCurve;
 import traffic.vehicle.carfollow.SlowdownFactor;
 import traffic.vehicle.lanechange.LaneChange;
@@ -394,6 +395,8 @@ public class Vehicle {
 						//System.out.println(timeNow + " " + externalCommandAcc);
 					}
 				}
+				//acceleration = Math.min(carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc),
+				//		carFollow.getIdm().computeAccelerationWithImpedingObject(this, new ImpedingObject(), this.lane, SlowdownFactor.CONFLICT));
 				acceleration = carFollow.getIdm().computeAccelerationBasedOnCommand(this, externalCommandAcc);
  			//if (vid == 1) System.out.println("Data:" + timeRemain + " " + headPosition + " " + lane.edge.index);
 			} else {
@@ -944,6 +947,18 @@ public class Vehicle {
 
 	public void setEnd(Node end) {
 		this.end = end;
+	}
+
+	public int getVid() {
+		return vid;
+	}
+
+	public void setVid(int vid) {
+		this.vid = vid;
+
+		if (episodeStat != null){
+			episodeStat.setId(vid);
+		}
 	}
 
 	public double getDisplacement(){

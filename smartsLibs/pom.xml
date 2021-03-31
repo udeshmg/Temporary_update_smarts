@@ -39,6 +39,15 @@
             <version>4.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.sample</groupId>
+            <artifactId>sample</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>/home/student.unimelb.edu.au/pgunarathna/gurobi/gurobi910/linux64/lib/gurobi.jar
+            </systemPath>
+        </dependency>
+
 
     </dependencies>
 
@@ -49,6 +58,8 @@
             <url>http://repository.apache.org/snapshots</url>
         </repository>
     </repositories>
+
+
 
 
 </project>

@@ -2,6 +2,7 @@ package traffic.road;
 
 import common.Settings;
 import traffic.IntersectionControl.IntersectionController;
+import traffic.IntersectionControl.MultiPollBasedController;
 import traffic.IntersectionControl.PollBasedController;
 import traffic.IntersectionControl.RandomController;
 import traffic.vehicle.Vehicle;
@@ -107,7 +108,7 @@ public class Node {
 			intersectionController = new RandomController(this, 380, settings);
 		}
 		else {
-			intersectionController = new PollBasedController(this, 380);
+			intersectionController = new MultiPollBasedController(this, 380);
 			//intersectionController = new RandomController(this, 380, settings);
 		}
 		intersectionControllerInUse = true;

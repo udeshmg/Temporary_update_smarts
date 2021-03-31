@@ -63,7 +63,7 @@ public class Settings {
 	 * Input
 	 */
 	@Expose() public String inputSimulationScript = "./resources/Script.txt";//Simulation setup file when GUI is not used
-	@Expose() public String inputOpenStreetMapFile = "./resources/singleLane.osm";//OSM file where road network information can be extracted
+	@Expose() public String inputOpenStreetMapFile = "./resources/twoLane.osm";//OSM file where road network information can be extracted
 	@Expose() public String inputBuiltinResource = "/resources/";//Directory where built-in resources are located
 	@Expose() public String inputBuiltinRoadGraph = inputBuiltinResource + "roads.txt";//Built-in road network data
 	@Expose() public String inputBuiltinAdministrativeRegionCentroid = inputBuiltinResource + "country_centroids_all.csv";//Coordinates of administrative regions
@@ -128,7 +128,7 @@ public class Settings {
 	 */
 	public double lookAheadDistance = 50;//In meters. Vehicle looks for impeding objects within a certain distance.
 	public double intersectionSpeedThresholdOfFront = 0;//In m/s. If the speed of front vehicle is lower than this value, its back vehicle may not cross intersections between them.
-	public double minTimeSafeToCrossIntersection = 1;//In seconds. This affects how vehicle reacts to conflict traffic at intersection.
+	public double minTimeSafeToCrossIntersection = 0.5;//In seconds. This affects how vehicle reacts to conflict traffic at intersection.
 	public double periodOfTrafficWaitForTramAtStop = 20;//In seconds. How long a tram needs to wait at tram stop.
 	public double minGapBetweenTramStopTimerCountDowns = 3;//In seconds. When tram stop timer reaches 0, it cannot be triggered again immediately when this value is positive.
 	public boolean isAllowReroute = false;//Whether imported vehicles can change routes automatically in congested traffic
@@ -148,12 +148,12 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 1; // Amount of vehicles to generate at single time step
-	@Expose() public int demandGenerationTimeInterval = 1; // Frequency of traffic generation in steps
+	@Expose() public int demandPerOneInterval = 10; // Amount of vehicles to generate at single time step
+	@Expose() public int demandGenerationTimeInterval = 10; // Frequency of traffic generation in steps
 
 	@Expose() public int demandChangedFreq = 6000; // in steps
 	@Expose() public boolean isUnidirectional = false;
-	@Expose() public int trafficGenerateDuration = 6000; // in steps
+	@Expose() public int trafficGenerateDuration = 3000; // in steps
 	@Expose() public int mvgVehicleCount = 30; // time-step in which vehicle details are sampled
 	@Expose() public int mvgFlow = 300; // time-step in which vehicle details are sampled
 
@@ -180,11 +180,11 @@ public class Settings {
 	public double startPosOffset = 0.0;
 	public boolean stopsAtMaxSteps = true;
 	public int gridlockDetectionTime = 600;
-	public String tlManager = "FIXED";
+	public String tlManager = "DYNAMIC";
 	public String laneDecide = "UNBALANCED";
 
-	public boolean training = true;
-	@Expose() public int numODPairs = 1;
+	public boolean training = false;
+	@Expose() public int numODPairs = 2;
 
 	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
@@ -194,8 +194,8 @@ public class Settings {
 
 
 	public String getOutputPrefix (){
-		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
-		else return externalListener +"__9_"+String.valueOf(routingAlgorithm)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		else return externalListener +"_LP_"+String.valueOf(demandPerOneInterval)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {

@@ -180,7 +180,7 @@ public class TrafficNetwork extends RoadNetwork {
 			}
 			// Assign vehicle ID
 			vehicle.id = idPrefix + Long.toString(numInternalVehicleAllTime);
-			vehicle.vid = numInternalVehicleAllTime;
+			vehicle.setVid(numInternalVehicleAllTime);
 			// Add vehicle to system
 			vehicles.add(vehicle);
 			tripMakingVehicles.add(vehicle);
@@ -188,7 +188,7 @@ public class TrafficNetwork extends RoadNetwork {
 		} else {
 			// Add external vehicle to system
 			vehicle.id = externalId;
-			vehicle.vid = vid;
+			vehicle.setVid(vid);
 			vehicles.add(vehicle);
 			tripMakingVehicles.add(vehicle);
 			//vehicle.park(true, timeRouteStart);
@@ -717,7 +717,7 @@ public class TrafficNetwork extends RoadNetwork {
 	public void changeLaneOfVehicles(final double timeNow) {
 		for (int i = 0; i < vehicles.size(); i++) {
 			final Vehicle vehicle = vehicles.get(i);
-			vehicle.changeLane(timeNow);
+			//vehicle.changeLane(timeNow);
 		}
 	}
 

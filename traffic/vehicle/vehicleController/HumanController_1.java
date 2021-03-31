@@ -56,7 +56,7 @@ public class HumanController_1 extends VehicleController {
 
         if (num_steps < 12){
             if (vehicle.speed < 4) return 1;
-            else return 0;
+            else return 1;
         }
         else return 1;
     }

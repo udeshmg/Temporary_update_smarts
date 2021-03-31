@@ -18,6 +18,8 @@ public class VehicleExternal {
     private boolean is_success = false;
     private double gap = 0;
     private double frontVehicleSpeed = 0;
+    private double frontVehicleTimeRemain = 0;
+    private double frontVehicleDistance = 0;
     private boolean crashed = false;
     private boolean externalControl = false;
     private boolean isVirtual = false;
@@ -37,6 +39,9 @@ public class VehicleExternal {
         this.frontVehicleSpeed = vehicle.episodeStat.getFrontVehicleSpeed();
         this.externalControl = vehicle.episodeStat.isInExternalControl() && vehicle.episodeStat.isIntersectionConstraints();
         this.isVirtual = vehicle.episodeStat.isVirtual();
+
+        this.frontVehicleTimeRemain = vehicle.episodeStat.getFrontVehicleTimeRemain();
+        this.frontVehicleDistance = vehicle.episodeStat.getFrontVehicleDistance();
 
         if (done) {
             vehicle.episodeStat.setInExternalControl(false);

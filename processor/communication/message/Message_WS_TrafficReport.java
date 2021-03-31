@@ -111,7 +111,7 @@ public class Message_WS_TrafficReport {
 				sVehicle.worker = workerName;
 				sVehicle.driverProfile = v.driverProfile.name();
 				sVehicle.slowDownFactor = v.getRecentSlowDownFactor();
-				sVehicle.headwayMultiplier = v.getHeadWayMultiplier();
+				sVehicle.headwayMultiplier =  Math.round(v.episodeStat.getTimeRemain() * 100.0) / 100.0; //TODO: Change to correct var
 				sVehicle.edgeIndex = v.lane.edge.index;
 				sVehicle.laneIndex = v.lane.index;
 				sVehicle.originalEdgeMaxSpeed = v.lane.edge.freeFlowSpeed;
