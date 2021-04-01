@@ -15,6 +15,8 @@ public class MultiPollBasedController extends IntersectionController {
 
     ArrayList<ArrayList<IntersectionStatManager>> allQueues = new ArrayList<>();
     ArrayList<Double> currentTimes = new ArrayList<>();
+    ArrayList<Double> previousScheduledTimes = new ArrayList<>();
+
     double latestArrivedTime = 1000000.0;
     double timeToReachAtMaxSpeed = 22;
 
@@ -28,30 +30,46 @@ public class MultiPollBasedController extends IntersectionController {
         this.node = node;
         this.controlRegion = controlRegion;
         setQueueMapping();
+        initTimes();
     }
 
     public MultiPollBasedController(){
         this.node = null;
         this.controlRegion = 380;
+        initTimes();
+    }
+
+    public void initTimes(){
+        for (int i = 0; i < 4; i++){
+            previousScheduledTimes.add(-(serviceTime+switchOverTime));
+        }
     }
 
     @Override
     public void computeSchedule(double timeNow) {
 
         if (!isTriggered) return;
+        int queueIndex = 0;
         // Get arriving vehicles within control region and not yet finished servicing
         for (Edge edge : node.inwardEdges){
             if (edge.index == 12 || edge.index == 13) {
                 for (Lane lane : edge.getLanes()) {
                     ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
+                    double lastExitedVehicleTimeSch = 0.0;
                     for (Vehicle vehicle : lane.getVehicles()) {
                         if (!vehicle.episodeStat.isFinalizedSchedule(timeNow)) {
                             if (controlRegion > (vehicle.lane.edge.length - vehicle.headPosition)) {
                                 laneQueue.add(vehicle.episodeStat);
                             }
                         }
+                        else{
+                            if (vehicle.episodeStat.getTimeRemain() > lastExitedVehicleTimeSch){
+                                previousScheduledTimes.set(queueIndex, vehicle.episodeStat.getTimeRemain()-timeToReachAtMaxSpeed);
+                            }
+                        }
                     }
                     allQueues.add(laneQueue);
+                    queueIndex++;
                 }
             }
         }
@@ -63,10 +81,10 @@ public class MultiPollBasedController extends IntersectionController {
     public void setQueueMapping(){
         ArrayList<List<Double>> map = new ArrayList<>();
 
-        map.add(Arrays.asList(1.0,-1.0,3.0,1.0));
-        map.add(Arrays.asList(-1.0,1.0,4.0,3.0));
-        map.add(Arrays.asList(3.0,1.0,1.0,-1.0));
-        map.add(Arrays.asList(4.0,3.0,-1.0,1.0));
+        map.add(Arrays.asList(0.5,-1.0,1.0,0.5));
+        map.add(Arrays.asList(-1.0,0.5,1.0,0.5));
+        map.add(Arrays.asList(1.0,1.0,0.5,-1.0));
+        map.add(Arrays.asList(1.0,0.5,-1.0,0.5));
         this.map = map;
 
         resetCurrentTimes();
@@ -102,16 +120,16 @@ public class MultiPollBasedController extends IntersectionController {
         int numQueues = allQueues.size();
         resetCurrentTimes();
 
-        double currentTimeAssigned = latestArrivedTime;
+        double currentTimeAssigned = 0;
         while (!allVehiclesServiced()){
             while( !allQueues.get(indexOfQueue).isEmpty() &&
-                    allQueues.get(indexOfQueue).get(0).getTimeArrived() <= currentTimeAssigned + serviceTime){
+                    allQueues.get(indexOfQueue).get(0).getTimeArrived() <= currentTimeAssigned + timeNow){
 
 
                 IntersectionStatManager stat = allQueues.get(indexOfQueue).get(0);
-                currentTimeAssigned = Math.max(stat.getTimeArrived()+serviceTime, getSafestAllowedTime(indexOfQueue));
-                stat.setAssignedTime(currentTimeAssigned);
-                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned - latestArrivedTime) + timeToReachAtMaxSpeed);
+                currentTimeAssigned = Math.max(getPreviousAllowedTime(indexOfQueue), getSafestAllowedTime(indexOfQueue));
+                stat.setAssignedTime(currentTimeAssigned+timeNow);
+                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned) + timeToReachAtMaxSpeed);
                 allQueues.get(indexOfQueue).remove(0);
 
                 // Store last vehicle's time
@@ -134,6 +152,20 @@ public class MultiPollBasedController extends IntersectionController {
             if (currentTimes.get(i) >= 0 && assignedTime > 0 && safestTime < currentTimes.get(i) + assignedTime){ //assigned time -1 indicates no vehicles
                 safestTime = currentTimes.get(i) + assignedTime;
             }
+            i++;
+        }
+        return safestTime;
+
+    }
+
+    private double getPreviousAllowedTime(int index){
+        int i = 0;
+        double safestTime = 0;
+        for (Double assignedTime : previousScheduledTimes){
+
+                if (safestTime < assignedTime+map.get(index).get(i)) {
+                    safestTime = assignedTime+map.get(index).get(i);
+                }
             i++;
         }
         return safestTime;

@@ -148,7 +148,7 @@ public class Settings {
 	 *  Traffic Generation settings
 	 */
 
-	@Expose() public int demandPerOneInterval = 10; // Amount of vehicles to generate at single time step
+	@Expose() public int demandPerOneInterval = 30; // Amount of vehicles to generate at single time step
 	@Expose() public int demandGenerationTimeInterval = 10; // Frequency of traffic generation in steps
 
 	@Expose() public int demandChangedFreq = 6000; // in steps
@@ -186,7 +186,7 @@ public class Settings {
 	public boolean training = false;
 	@Expose() public int numODPairs = 2;
 
-	@Expose() public boolean isExternalListenerUsed = true;
+	@Expose() public boolean isExternalListenerUsed = false;
 	@Expose() public String externalListener = "CLLA";
 	@Expose() public int extListenerUpdateInterval = 1; // lane update time interval in steps
 	long seed = 25;

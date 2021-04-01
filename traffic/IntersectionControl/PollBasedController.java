@@ -1,23 +1,19 @@
 package traffic.IntersectionControl;
 
-import common.Settings;
-import org.apache.commons.numbers.gamma.RegularizedGamma;
 import traffic.road.Edge;
 import traffic.road.Node;
 import traffic.vehicle.IntersectionStatManager;
 import traffic.vehicle.Vehicle;
 
-import java.security.interfaces.EdECKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class PollBasedController extends IntersectionController {
 
 
     ArrayList<ArrayList<IntersectionStatManager>> allQueues = new ArrayList<>();
-    ArrayList<Double> currentTimes = new ArrayList<>();
+    ArrayList<Double> previousScheduledTimes = new ArrayList<>();
     ArrayList<Boolean> isQueueVisited= new ArrayList<>();
 
     double serviceTime = 1.0;
@@ -43,7 +39,7 @@ public class PollBasedController extends IntersectionController {
 
     public void initTimes(){
         for (int i = 0; i < 4; i++){
-            currentTimes.add(-(serviceTime+switchTime));
+            previousScheduledTimes.add(-(serviceTime+switchTime));
         }
     }
 
@@ -62,8 +58,8 @@ public class PollBasedController extends IntersectionController {
         int queueIndex = 0;
         for (Edge edge : node.inwardEdges){
                 ArrayList<IntersectionStatManager> laneQueue = new ArrayList<>();
+                double lastExitedVehicleTimeSch = 0.0;
                 for (Vehicle vehicle : edge.getFirstLane().getVehicles()){
-                    double lastExitedVehicleTimeSch = 0.0;
                     if (!vehicle.episodeStat.isFinalizedSchedule(timeNow)){
                         if (controlRegion > (vehicle.lane.edge.length - vehicle.headPosition)){
                         laneQueue.add(vehicle.episodeStat);
@@ -71,7 +67,7 @@ public class PollBasedController extends IntersectionController {
                     }
                     else{
                         if (vehicle.episodeStat.getTimeRemain() > lastExitedVehicleTimeSch){
-                            currentTimes.set(queueIndex, vehicle.episodeStat.getTimeRemain()-timeToReachAtMaxSpeed);
+                            previousScheduledTimes.set(queueIndex, vehicle.episodeStat.getTimeRemain()-timeToReachAtMaxSpeed);
                         }
                     }
                 }
@@ -129,7 +125,7 @@ public class PollBasedController extends IntersectionController {
     private double getSafestAllowedTime(int index){
         int i = 0;
         double safestTime = 0;
-        for (Double assignedTime : currentTimes){
+        for (Double assignedTime : previousScheduledTimes){
             if (index != i){
                 if (safestTime < assignedTime+switchTime) {
                     safestTime = assignedTime+switchTime;
