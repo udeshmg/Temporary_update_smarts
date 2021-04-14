@@ -78,9 +78,9 @@ public class IntersectionStatManager {
         }
 
 
-        if ( timeNow >= timeToReach || Math.abs(vehicle.lane.edge.length - vehicle.headPosition) < 4.5) {
+        if ( timeNow >= timeToReach || Math.abs(vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition) < 4.5) {
             isEpisodeDone = true;
-            if ( timeNow >= (timeToReach-2) && Math.abs(vehicle.lane.edge.length - vehicle.headPosition) < 4.5){
+            if ( timeNow >= (timeToReach-2) && Math.abs(vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition) < 4.5){
                 isSuccess = true;
             }
             else {

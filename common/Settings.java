@@ -89,7 +89,7 @@ public class Settings {
 	public int numLanesPerEdge = 0;//A positive value means all edges have the same number of lanes. '0' means the number is read from OSM data or set based on edge type.
 	public String roadGraph = "";//Road graph data in a string.
 	public double laneWidthInMeters = 3.25;
-	public double pavementLineRatio = 1.0;
+	public double pavementLineRatio = 0.5;
 
 	/*
 	 * Map data
@@ -186,7 +186,7 @@ public class Settings {
 	public boolean training = false;
 	@Expose() public int numODPairs = 2;
 
-	@Expose() public boolean isExternalListenerUsed = false;
+	@Expose() public boolean isExternalListenerUsed = true;
 	@Expose() public String externalListener = "CLLA";
 	@Expose() public int extListenerUpdateInterval = 1; // lane update time interval in steps
 	long seed = 25;
@@ -195,7 +195,7 @@ public class Settings {
 
 	public String getOutputPrefix (){
 		if (!isExternalListenerUsed) return "noLA_"+String.valueOf(demandPerOneInterval)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
-		else return externalListener +"_LP_"+String.valueOf(demandPerOneInterval)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
+		else return externalListener +"_RL_"+String.valueOf(demandPerOneInterval)+"_"+extListenerUpdateInterval+"_"+demandPerOneInterval+"_"+demandChangedFreq+"_";
 	}
 
 	public TrafficGenerator getTrafficGenerator() {

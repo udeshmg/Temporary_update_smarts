@@ -45,7 +45,7 @@ public class Simulator {
 
 	static void startSystem() {
 
-		new Server(false).run();
+		new Server(true).run();
 		createWorkers();
 
 	}

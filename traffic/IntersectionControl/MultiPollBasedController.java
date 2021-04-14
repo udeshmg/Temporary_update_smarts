@@ -81,10 +81,17 @@ public class MultiPollBasedController extends IntersectionController {
     public void setQueueMapping(){
         ArrayList<List<Double>> map = new ArrayList<>();
 
-        map.add(Arrays.asList(0.5,-1.0,1.0,0.5));
+        /*map.add(Arrays.asList(0.5,-1.0,1.0,0.5));
         map.add(Arrays.asList(-1.0,0.5,1.0,0.5));
         map.add(Arrays.asList(1.0,1.0,0.5,-1.0));
-        map.add(Arrays.asList(1.0,0.5,-1.0,0.5));
+        map.add(Arrays.asList(1.0,0.5,-1.0,0.5));*/
+
+        map.add(Arrays.asList(0.5,-1.0,2.0,1.5));
+        map.add(Arrays.asList(-1.0,0.5,1.5,1.0));
+        map.add(Arrays.asList(0.5,0.5,0.5,-1.0));
+        map.add(Arrays.asList(0.5,0.8,-1.0,0.5));
+
+
         this.map = map;
 
         resetCurrentTimes();

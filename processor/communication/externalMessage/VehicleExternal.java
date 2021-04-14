@@ -27,7 +27,7 @@ public class VehicleExternal {
 
     public VehicleExternal(final Vehicle vehicle){
         this.headPosition = vehicle.headPosition;
-        this.headPositionFromEnd = vehicle.lane.edge.length - vehicle.headPosition;
+        this.headPositionFromEnd = vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition;
         this.speed = vehicle.speed;
         this.edgeId = vehicle.lane.edge.index;
         this.vid = vehicle.vid;
