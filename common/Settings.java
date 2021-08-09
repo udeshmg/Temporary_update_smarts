@@ -167,7 +167,7 @@ public class Settings {
 	@Expose() public String temporalDistributor = "Uniform";
 	public String vehicleTypeDistributor = "Default";
 	public double safetyHeadwayMultiplier = 0.1;
-	public String defaultDownloadDirectory = "download/RQ2/Vehicles/";
+	public String defaultDownloadDirectory = "download/";
 	public String defaultTestName = null;
 	public int defaultRunIndex = 1;
 	public String downloadDirectory = defaultDownloadDirectory;

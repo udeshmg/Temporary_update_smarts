@@ -5,9 +5,9 @@ import traffic.vehicle.DriverProfile;
 import traffic.vehicle.Vehicle;
 
 import java.util.Random;
-import gurobi.*;
+//import gurobi.*;
 import traffic.vehicle.VehicleType;
-
+/*
 public class GurobiController extends VehicleController{
 
 
@@ -98,4 +98,4 @@ public class GurobiController extends VehicleController{
         }
         return 1;
     }
-}
+}*/
