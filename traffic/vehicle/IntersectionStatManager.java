@@ -6,10 +6,13 @@ public class IntersectionStatManager {
 
     private boolean isEpisodeDone = false;
     private boolean isSuccess = false;
+    private boolean isCrashRisk = false;
     private double timeToReach = 30; // in seconds
     private double timeRemain = 0;
     private boolean isIntersectionConstraints = false;
     private Edge targetEdge = null;
+
+
     private boolean crashed = false;
 
     private double gap = 0;
@@ -28,12 +31,19 @@ public class IntersectionStatManager {
     private int id = -1;
 
     private int stepCounter = 0;
+    private boolean useFrontVehicle = false;
 
     public IntersectionStatManager(double timeArrived){
         this.timeArrived = timeArrived;
     }
 
+    public IntersectionStatManager(boolean useFrontVehicle){
+        this.useFrontVehicle = useFrontVehicle;
+        stepCounter = 0;
+    }
+
     public IntersectionStatManager(){
+        this.useFrontVehicle = false;
         stepCounter = 0;
     }
 
@@ -59,9 +69,9 @@ public class IntersectionStatManager {
 
             double headway = (frontVehicle.headPosition - vehicle.headPosition)/Math.max(vehicle.speed, 0.1);
             //if (headway < 0.5){ //2 meters
-            if (frontVehicle.headPosition < vehicle.headPosition + 4.5){ //2 meters
-                //crashed =  true;
-                //isEpisodeDone = true;
+            if (useFrontVehicle && (frontVehicle.headPosition < vehicle.headPosition + 4.5)){ //2 meters
+                crashed =  true;
+                isEpisodeDone = true;
             }
             else {
                 crashed = false;
@@ -80,17 +90,18 @@ public class IntersectionStatManager {
 
         if ( timeNow >= timeToReach || Math.abs(vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition) < 4.5) {
             isEpisodeDone = true;
-            if ( timeNow >= (timeToReach-2) && Math.abs(vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition) < 4.5){
+            if ( timeNow >= (timeToReach-0.6) && Math.abs(vehicle.lane.edge.length - vehicle.lane.edge.getEndIntersectionSize() - vehicle.headPosition) < 4.5){
                 isSuccess = true;
             }
             else {
                 isSuccess = false;
             }
+            if (Math.abs(timeToReach-timeNow) > 1.2){
+                isCrashRisk = true;
+            }
         }
 
         timeRemain = timeToReach - timeNow;
-
-
     }
 
     public void findCruiseEpisodeFinished(double timeNow, Vehicle vehicle){
@@ -124,7 +135,6 @@ public class IntersectionStatManager {
             isEpisodeDone = true;
             isSuccess = false;
         }
-
         timeRemain = timeToReach - timeNow;
     }
 
@@ -283,5 +293,14 @@ public class IntersectionStatManager {
 
     public void setFrontVehicleDistance(double frontVehicleDistance) {
         this.frontVehicleDistance = frontVehicleDistance;
+    }
+
+
+    public boolean isCrashRisk() {
+        return isCrashRisk;
+    }
+
+    public void setCrashRisk(boolean crashRisk) {
+        isCrashRisk = crashRisk;
     }
 }

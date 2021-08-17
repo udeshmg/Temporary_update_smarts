@@ -121,6 +121,29 @@ public class MultiPollBasedController extends IntersectionController {
         }
     }
 
+    public void fcfsSchedule(double timeNow){
+        int indexOfQueue = findFirstArrivedVehicleInQueues();
+        int numQueues = allQueues.size();
+        resetCurrentTimes();
+
+        double currentTimeAssigned = 0;
+        while (!allVehiclesServiced()){
+                IntersectionStatManager stat = allQueues.get(indexOfQueue).get(0);
+                currentTimeAssigned = Math.max(getPreviousAllowedTime(indexOfQueue), getSafestAllowedTime(indexOfQueue));
+                stat.setAssignedTime(currentTimeAssigned+timeNow);
+                stat.assignIntersectionConstrains(timeNow, (currentTimeAssigned) + timeToReachAtMaxSpeed);
+                allQueues.get(indexOfQueue).remove(0);
+
+                // Store last vehicle's time
+                currentTimes.set(indexOfQueue, currentTimeAssigned);
+                //currentTimeAssigned += serviceTime;
+
+                indexOfQueue = findFirstArrivedVehicleInQueues();
+                currentTimeAssigned = latestArrivedTime;
+        }
+        allQueues.clear();
+    }
+
     public void pollBasedSchedule(double timeNow){
 
         int indexOfQueue = findFirstArrivedVehicleInQueues();

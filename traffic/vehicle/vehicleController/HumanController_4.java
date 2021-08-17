@@ -9,14 +9,13 @@ public class HumanController_4 extends VehicleController {
     protected int num_steps = 0;
     protected int counter = 0;
     protected double stepsPerSecond = 0;
-    private Random rand = new Random();
+    private Random rand = null;
     private int acc = 0;
 
     public HumanController_4(Vehicle vehicle, Settings settings){
         // Vehicle is not used in current implementation
         this.stepsPerSecond = settings.numStepsPerSecond;
         long seed = settings.randomTimingGenerator.nextInt(20000);
-        System.out.println(seed);
         this.rand = new Random(seed);
     }
 

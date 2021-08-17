@@ -184,6 +184,7 @@ public class Settings {
 	public String laneDecide = "UNBALANCED";
 
 	public boolean training = false;
+	public boolean useFrontVehicle = false;
 	@Expose() public int numODPairs = 2;
 
 	@Expose() public boolean isExternalListenerUsed = true;

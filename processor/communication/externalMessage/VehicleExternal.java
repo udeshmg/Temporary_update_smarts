@@ -23,6 +23,7 @@ public class VehicleExternal {
     private boolean crashed = false;
     private boolean externalControl = false;
     private boolean isVirtual = false;
+    private boolean isCrashRisk = false;
 
 
     public VehicleExternal(final Vehicle vehicle){
@@ -42,6 +43,7 @@ public class VehicleExternal {
 
         this.frontVehicleTimeRemain = vehicle.episodeStat.getFrontVehicleTimeRemain();
         this.frontVehicleDistance = vehicle.episodeStat.getFrontVehicleDistance();
+        this.isCrashRisk = vehicle.episodeStat.isCrashRisk();
 
         if (done) {
             vehicle.episodeStat.setInExternalControl(false);

@@ -83,7 +83,7 @@ public class Vehicle {
 
 	VehicleController controller = null;
 	ControllerFactory controllerFactory = new ControllerFactory();
-	public IntersectionStatManager episodeStat = new IntersectionStatManager();
+	public IntersectionStatManager episodeStat = null;
 
 	/**
 	 * External interface to control acceleration of the vehicle
@@ -96,6 +96,7 @@ public class Vehicle {
 		this.laneChange = new LaneChange(settings);
 		this.laneDecider = settings.getLaneDecider();
 		this.controller = controllerFactory.getController(this, settings);
+		this.episodeStat = new IntersectionStatManager(settings.useFrontVehicle);
 	}
 
 

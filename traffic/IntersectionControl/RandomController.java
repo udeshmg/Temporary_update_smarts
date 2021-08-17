@@ -46,9 +46,10 @@ public class RandomController extends IntersectionController {
             //}
 
             int timeToReach = randomTimingGenerator.nextInt(25) + lowerBound;
-            //int timeToReach = 1 + lowerBound;
-            increment++;
-            vehicle.episodeStat.assignIntersectionConstrains(timeNow,timeToReach);
+            //int timeToReach = increment + lowerBound;
+            if (vehicle.vid == 2)
+                increment++;
+            vehicle.episodeStat.assignIntersectionConstrains(timeNow, timeToReach);
             //System.out.println("Assigned time: " + vehicle.vid + " " + time);
             time++;
         }
